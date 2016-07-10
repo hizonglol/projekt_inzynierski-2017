@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Project</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_info">Infomation</string>
+    <string name="button_text">Compute</string>
+    <string name="group_number_bin">Group (bin):</string>
+    <string name="group_number_dec">Group (dec):</string>
+    <string name="index">Index number:</string>
+    <string name="index_hint">type decimal number</string>
+    <string name="mask">Mask number:</string>
+    <string name="mask_hint">type binary mask</string>
+    <string name="version_number">0.1</string>
+    <string name="version_text">Version</string>
+</resources>

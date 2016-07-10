@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Projekt</string>
+    <string name="index_hint">wprowadź numer decymalnie</string>
+    <string name="mask_hint">wprowadź maskę binarnie</string>
+    <string name="group_number_bin">Grupa (bin):</string>
+    <string name="group_number_dec">Grupa (dec):</string>
+    <string name="button_text">Wylicz</string>
+    <string name="index">Nr indeksu:</string>
+    <string name="mask">Nr maski:</string>
+
+    <string name="action_settings">Ustawienia</string>
+    <string name="action_info">Informacje</string>
+
+    <string name="version_text">Wersja</string>
+    <string name="version_number">0.1</string>
+</resources>

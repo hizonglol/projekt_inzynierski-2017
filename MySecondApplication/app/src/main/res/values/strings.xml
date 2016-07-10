@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">My Second Application</string>
+
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="section_title">Pytanie nr %1$d</string>
+
+    <string name="action_settings">Ustawienia</string>
+    <string name="action_info">Informacje</string>
+
+    <string name="version_text">Wersja</string>
+    <string name="version_number">0.1</string>
+</resources>
