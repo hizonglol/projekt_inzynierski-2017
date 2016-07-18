@@ -5,11 +5,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,19 +23,17 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final TextView wyswietlBin = (TextView) findViewById(R.id.view_number_bin);
         final TextView wyswietlDec = (TextView) findViewById(R.id.view_number_dec);
         final EditText poleIndeks = (EditText) findViewById(R.id.index_number);
         final EditText poleMaska = (EditText) findViewById(R.id.mask_number);
 
-        poleMaska.setImeActionLabel("label", poleMaska.getImeActionId());
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         final Button button = (Button) findViewById(R.id.button);
 
         //definicja handlera do button
         final View.OnClickListener buttonHandler = new View.OnClickListener() {
             public void onClick(View v) throws NumberFormatException {
-                String numer_bin = getString(R.string.group_number_bin);
                 String numer_dec = getString(R.string.group_number_dec);
                 int wynik = 0;
                 int indeks;
@@ -93,14 +90,12 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 //sprawdzamy czy wprowadzona maska byla poprawna
-                if (max_ilosc_bitow != 2) {
+                if (max_ilosc_bitow > 3) {
                     Toast.makeText(getBaseContext(), "Nieprawidłowa maska", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 //jesli wszystko bylo dobre to wyswietlamy wynik
-                wyswietlBin.setText(numer_bin);
-                wyswietlBin.append(" " + Integer.toBinaryString(wynik));
                 wyswietlDec.setText(numer_dec);
                 wyswietlDec.append(" " + wynik);
 
@@ -131,28 +126,12 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        EditText.OnEditorActionListener exampleListener = new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView tv, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    button.callOnClick();
-
-                    View current = getCurrentFocus();
-                    if (current != null) current.clearFocus();
-
-                    return true;
-                }
-                return false;
-            }
-        };
-
         if (button != null) {
             button.setOnClickListener(buttonHandler);
         }
 
         if (poleMaska != null) {
             poleMaska.setOnFocusChangeListener(maskListener);
-            poleMaska.setOnEditorActionListener(exampleListener);
         }
 
     }

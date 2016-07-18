@@ -31,7 +31,7 @@ public class TabsActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
-    int numberOfTabs = 3;
+    int numberOfTabs = 30;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +54,7 @@ public class TabsActivity extends AppCompatActivity {
             tabLayout.setupWithViewPager(mViewPager);
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-
+        /*
         if (fab != null)
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -63,13 +62,14 @@ public class TabsActivity extends AppCompatActivity {
                     /*
                     Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
-                            */
+                            *//*
 
                     Intent intentMain = new Intent(getApplicationContext(), MainActivity.class);
                     Log.i("Tabs", "Navigating to menu");
                     navigateUpTo(intentMain);
                 }
             });
+        */
     }
 
     @Override

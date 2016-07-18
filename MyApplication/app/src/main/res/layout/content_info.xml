@@ -11,13 +11,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/version_text"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:padding="5dp" />
 
     <TextView
         android:id="@+id/versionNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/version_number"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:paddingLeft="5dp"
+        android:paddingBottom="5dp" />
 
 </LinearLayout>

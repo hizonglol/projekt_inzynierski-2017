@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Second Application</string>
+    <string name="app_name">Haszówki</string>
 
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="section_title">Pytanie nr %1$d</string>
@@ -7,6 +7,15 @@
     <string name="action_settings">Ustawienia</string>
     <string name="action_info">Informacje</string>
 
+    <string name="index_title">Numer indeksu:</string>
+    <string name="weight_title">Wektor wag:</string>
+    <string name="result_title">Wynik:</string>
+    <string name="exit_button">Wyjdź</string>
+    <string name="start_test_button">Rozpocznij test</string>
+    <string name="qr_code_button">Skanuj kod QR</string>
+    <string name="compute_button">Wylicz</string>
+    <string name="modulo_result">Modulo 16:</string>
+
     <string name="version_text">Wersja</string>
-    <string name="version_number">0.1</string>
+    <string name="version_number">0.1.1</string>
 </resources>
