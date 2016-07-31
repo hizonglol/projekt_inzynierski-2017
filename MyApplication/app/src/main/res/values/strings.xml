@@ -1,16 +1,24 @@
 <resources>
-    <string name="app_name">Wnukówki</string>
-    <string name="index_hint">wprowadź numer decymalnie</string>
-    <string name="mask_hint">wprowadź maskę binarnie</string>
-    <string name="group_number_bin">Grupa (bin):</string>
-    <string name="group_number_dec">Grupa (dec):</string>
-    <string name="button_text">Wylicz</string>
-    <string name="index">Nr indeksu:</string>
-    <string name="mask">Nr maski:</string>
 
-    <string name="action_settings">Ustawienia</string>
-    <string name="action_info">Informacje</string>
+    <!--*** General strings ***-->
+    <string name="label_app">Wnukówki</string>
+    <string name="version_number">0.1.2</string>
 
-    <string name="version_text">Wersja</string>
-    <string name="version_number">0.1.1</string>
+    <!--*** LABEL strings of MAIN ***-->
+    <string name="label_index">Nr indeksu:</string>
+    <string name="hint_index">wprowadź numer decymalnie</string>
+    <string name="label_mask">Nr maski:</string>
+    <string name="hint_mask">wprowadź maskę binarnie</string>
+    <string name="label_group_value_dec">Grupa (dec):</string>
+
+    <!--*** BUTTON strings of MAIN ***-->
+    <string name="button_compute">Wylicz</string>
+
+    <!--*** LABEL strings of INFO ***-->
+    <string name="label_info_activity">Informacje</string>
+    <string name="label_version">Wersja</string>
+    <!--
+    @string/number_version
+    w general strings -->
+
 </resources>

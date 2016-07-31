@@ -1,6 +1,8 @@
 package com.twohe.mysecondapplication;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -15,6 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+
+import java.util.List;
 
 /**
  * Created by TwoHe on 10.07.2016.
@@ -30,6 +35,13 @@ public class TabsActivity extends AppCompatActivity {
     private ViewPager mViewPager;
 
     int numberOfTabs = 30;
+
+    private boolean isCallable(Intent intent) {
+        List<ResolveInfo> list = getPackageManager().queryIntentActivities(intent,
+                PackageManager.MATCH_DEFAULT_ONLY);
+        Log.v("Ilosc instancji: ", String.valueOf(list.size()));
+        return list.size() < 2;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +80,7 @@ public class TabsActivity extends AppCompatActivity {
                 }
             });
         */
+
     }
 
     @Override

@@ -8,7 +8,7 @@
     <string name="label_null">null</string>
 
 
-    <!--*** TITLE strings of MAIN ***-->
+    <!--*** LABEL strings of MAIN ***-->
     <string name="label_index">Numer indeksu:</string>
     <string name="label_hall_row">Rząd</string>
     <string name="label_hall_place">Miejsce</string>
@@ -26,7 +26,7 @@
     <string name="button_compute">Wylicz</string>
 
 
-    <!--*** TITLE strings of INFO ***-->
+    <!--*** LABEL strings of INFO ***-->
     <string name="label_info_activity">Informacje</string>
     <string name="label_version">Wersja</string>
     <!--
@@ -34,7 +34,7 @@
     w general strings -->
 
 
-    <!--*** TITLE strings of SETTINGS ***-->
+    <!--*** LABEL strings of SETTINGS ***-->
     <string name="label_settings_activity">Ustawienia</string>
     <string name="label_name">Imię:</string>
     <string name="label_surname">Nazwisko:</string>
@@ -48,7 +48,7 @@
     <string name="button_save">Zapisz</string>
 
 
-    <!--*** TITLE strings of TABS ***-->
+    <!--*** LABEL strings of TABS ***-->
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="label_section">Pytanie nr %1$d</string>
     <string name="label_group_number">Nr grupy:</string>
@@ -63,14 +63,14 @@
     <string name="button_next_question">Następne pytanie</string>
 
 
-    <!--*** TITLE strings of SUMMARY ***-->
+    <!--*** LABEL strings of SUMMARY ***-->
     <string name="label_summary_activity">Podsumowanie</string>
     <string name="label_yes_answers">Odpowiedzi TAK:</string>
     <string name="label_no_answers">Odpowiedzi NIE:</string>
     <string name="label_dunno_answers">Odpowiedzi NIE WIEM:</string>
     <string name="label_sum_of_answers">Suma pytań:</string>
 
-    
+
     <!--*** BUTTON strings of SUMMARY ***-->
     <string name="button_back_to_test">Wróć do testu</string>
 

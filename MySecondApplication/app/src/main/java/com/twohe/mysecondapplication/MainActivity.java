@@ -113,10 +113,11 @@ public class MainActivity extends AppCompatActivity {
                             .setAction("Action", null).show();
                             */
 
+                /*
                 if(!moduloflag){
                     Toast.makeText(getBaseContext(), "Wylicz grupę", Toast.LENGTH_SHORT).show();
                     return;
-                }
+                }*/
 
                 Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
                 if (isCallable(intentTabs)) {
@@ -182,6 +183,16 @@ public class MainActivity extends AppCompatActivity {
 
             Intent intentInfo = new Intent(getApplicationContext(), InfoActivity.class);
             startActivity(intentInfo);
+
+            Log.i("Menu", "Info");
+
+            return true;
+        }
+
+        if (id == R.id.action_summary) {
+
+            Intent intentSummary = new Intent(getApplicationContext(), SummaryActivity.class);
+            startActivity(intentSummary);
 
             Log.i("Menu", "Info");
 

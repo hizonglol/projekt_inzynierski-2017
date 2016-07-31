@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
 
         final TextView wyswietlDec = (TextView) findViewById(R.id.view_number_dec);
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         //definicja handlera do button
         final View.OnClickListener buttonHandler = new View.OnClickListener() {
             public void onClick(View v) throws NumberFormatException {
-                String numer_dec = getString(R.string.group_number_dec);
+                String numer_dec = getString(R.string.label_group_value_dec);
                 int wynik = 0;
                 int indeks;
                 int maska;
