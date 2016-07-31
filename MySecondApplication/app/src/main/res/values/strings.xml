@@ -1,21 +1,77 @@
 <resources>
-    <string name="app_name">Haszówki</string>
 
+    <!--*** General strings ***-->
+    <string name="label_app">Haszówki</string>
+    <string name="version_value">0.1.2</string>
+    <string name="zero_value">0</string>
+    <string name="six_zeros_value">000000</string>
+    <string name="label_null">null</string>
+
+
+    <!--*** TITLE strings of MAIN ***-->
+    <string name="label_index">Numer indeksu:</string>
+    <string name="label_hall_row">Rząd</string>
+    <string name="label_hall_place">Miejsce</string>
+    <string name="label_weight">Wektor wag:</string>
+    <string name="label_result">Wynik:</string>
+    <string name="label_result_modulo">Modulo 16:</string>
+    <string name="label_subject_value">Nazwa przedmiotu:</string>
+    <string name="label_exam_id_value">ID testu:</string>
+
+
+    <!--*** BUTTON strings of MAIN ***-->
+    <string name="button_qr_code">Skanuj kod QR</string>
+    <string name="button_exit">Wyjdź</string>
+    <string name="button_start_test">Rozpocznij test</string>
+    <string name="button_compute">Wylicz</string>
+
+
+    <!--*** TITLE strings of INFO ***-->
+    <string name="label_info_activity">Informacje</string>
+    <string name="label_version">Wersja</string>
+    <!--
+    @string/number_version
+    w general strings -->
+
+
+    <!--*** TITLE strings of SETTINGS ***-->
+    <string name="label_settings_activity">Ustawienia</string>
+    <string name="label_name">Imię:</string>
+    <string name="label_surname">Nazwisko:</string>
+    <!--
+    @string/title_index_number
+    @string/title_subject_name
+    w title strings of main -->
+
+
+    <!--*** BUTTON strings of SETTINGS ***-->
+    <string name="button_save">Zapisz</string>
+
+
+    <!--*** TITLE strings of TABS ***-->
     <string name="section_format">Hello World from section: %1$d</string>
-    <string name="section_title">Pytanie nr %1$d</string>
+    <string name="label_section">Pytanie nr %1$d</string>
+    <string name="label_group_number">Nr grupy:</string>
+    <string name="label_question_number">Pytanie nr:</string>
 
-    <string name="action_settings">Ustawienia</string>
-    <string name="action_info">Informacje</string>
 
-    <string name="index_title">Numer indeksu:</string>
-    <string name="weight_title">Wektor wag:</string>
-    <string name="result_title">Wynik:</string>
-    <string name="exit_button">Wyjdź</string>
-    <string name="start_test_button">Rozpocznij test</string>
-    <string name="qr_code_button">Skanuj kod QR</string>
-    <string name="compute_button">Wylicz</string>
-    <string name="modulo_result">Modulo 16:</string>
+    <!--*** BUTTON strings of TABS ***-->
+    <string name="button_yes">Tak</string>
+    <string name="button_no">Nie</string>
+    <string name="button_dunno">Nie wiem</string>
+    <string name="button_end_test">Zakończ test</string>
+    <string name="button_next_question">Następne pytanie</string>
 
-    <string name="version_text">Wersja</string>
-    <string name="version_number">0.1.1</string>
+
+    <!--*** TITLE strings of SUMMARY ***-->
+    <string name="label_summary_activity">Podsumowanie</string>
+    <string name="label_yes_answers">Odpowiedzi TAK:</string>
+    <string name="label_no_answers">Odpowiedzi NIE:</string>
+    <string name="label_dunno_answers">Odpowiedzi NIE WIEM:</string>
+    <string name="label_sum_of_answers">Suma pytań:</string>
+
+    
+    <!--*** BUTTON strings of SUMMARY ***-->
+    <string name="button_back_to_test">Wróć do testu</string>
+
 </resources>

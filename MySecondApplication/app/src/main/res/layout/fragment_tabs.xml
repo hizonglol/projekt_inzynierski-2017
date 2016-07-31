@@ -9,9 +9,118 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.twohe.mysecondapplication.TabsActivity$PlaceholderFragment">
 
-    <TextView
-        android:id="@+id/section_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <TableRow
+            android:id="@+id/row_tab_info_labels"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="true">
+
+            <TextView
+                android:id="@+id/label_group_number"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="@string/label_group_number"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/label_question_number"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="@string/label_question_number"
+                android:textSize="15sp" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/row_tab_info"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/row_tab_info_labels">
+
+            <TextView
+                android:id="@+id/group_number"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="4"
+                android:gravity="center"
+                android:minHeight="50sp"
+                android:singleLine="true"
+                android:text="@string/zero_value"
+                android:textColor="@color/abc_primary_text_material_light"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/question_number"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="4"
+                android:gravity="center"
+                android:minHeight="50dp"
+                android:singleLine="true"
+                android:text="@string/zero_value"
+                android:textColor="@color/abc_primary_text_material_light"
+                android:textSize="30sp" />
+
+        </TableRow>
+
+    <Button
+        android:id="@+id/button_yes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/row_tab_info"
+        android:text="@string/button_yes" />
+
+    <Button
+        android:id="@+id/button_no"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/button_yes"
+        android:text="@string/button_no" />
+
+    <Button
+        android:id="@+id/button_dunno"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/button_no"
+        android:text="@string/button_dunno" />
+
+        <TableRow
+            android:id="@+id/buttons"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/button_dunno">
+
+            <Button
+                android:id="@+id/button_end_test"
+                android:layout_width="0sp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="@string/button_end_test" />
+
+            <Button
+                android:id="@+id/button_next_question"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/button_next_question" />
+
+        </TableRow>
 
 </RelativeLayout>

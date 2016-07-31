@@ -2,7 +2,6 @@ package com.twohe.mysecondapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 /**
  * Created by TwoHe on 10.07.2016.
@@ -139,8 +137,6 @@ public class TabsActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_tabs, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
         }
     }
@@ -170,7 +166,7 @@ public class TabsActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
 
-            String titlePattern = getResources().getString(R.string.section_title);
+            String titlePattern = getResources().getString(R.string.label_section);
             String title = String.format(titlePattern, position);
 
             return title;
