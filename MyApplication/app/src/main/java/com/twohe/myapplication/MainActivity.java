@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -26,8 +25,6 @@ public class MainActivity extends AppCompatActivity {
         final TextView wyswietlDec = (TextView) findViewById(R.id.view_number_dec);
         final EditText poleIndeks = (EditText) findViewById(R.id.index_number);
         final EditText poleMaska = (EditText) findViewById(R.id.mask_number);
-
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         final Button button = (Button) findViewById(R.id.button);
 

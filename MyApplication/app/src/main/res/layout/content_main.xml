@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:id="@+id/my_scrollview"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:layout_marginTop="?android:attr/actionBarSize"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -10,110 +12,120 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:id="@+id/index_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:gravity="left|center"
-        android:minHeight="50dp"
-        android:singleLine="true"
-        android:text="@string/label_index"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="20sp" />
-
-    <EditText
-        android:id="@+id/index_number"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/index_text"
-        android:layout_alignTop="@+id/index_text"
-        android:layout_toEndOf="@+id/index_text"
-        android:gravity="center"
-        android:hint="@string/hint_index"
-        android:inputType="phone"
-        android:maxLength="6"
-        android:minHeight="50dp"
-        android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textIsSelectable="false"
-        android:textSize="15sp" />
-
-    <View
-        android:id="@+id/index_number_line"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/index_number"
-        android:layout_marginBottom="8sp"
-        android:layout_marginTop="8sp"
-        android:background="@android:color/darker_gray" />
-
-    <TextView
-        android:id="@+id/mask_text"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/index_text"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/index_number_line"
-        android:gravity="left|center"
-        android:minHeight="50dp"
-        android:singleLine="true"
-        android:text="@string/label_mask"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textIsSelectable="false"
-        android:textSize="20sp" />
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/mask_number"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/mask_text"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/index_number"
-        android:layout_toEndOf="@+id/mask_text"
-        android:digits="01"
-        android:gravity="center"
-        android:hint="@string/hint_mask"
-        android:inputType="phone"
-        android:maxLength="18"
-        android:minHeight="50dp"
-        android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textIsSelectable="false"
-        android:textSize="15sp" />
+        <TextView
+            android:id="@+id/index_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:gravity="left|center"
+            android:minHeight="50dp"
+            android:singleLine="true"
+            android:text="@string/label_index"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="20sp" />
 
-    <View
-        android:id="@+id/mask_number_line"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/mask_text"
-        android:layout_marginBottom="8sp"
-        android:layout_marginTop="8sp"
-        android:background="@android:color/darker_gray" />
+        <EditText
+            android:id="@+id/index_number"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/index_text"
+            android:layout_alignTop="@+id/index_text"
+            android:layout_toEndOf="@+id/index_text"
+            android:gravity="center"
+            android:hint="@string/hint_index"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="phone"
+            android:maxLength="6"
+            android:minHeight="50dp"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textIsSelectable="false"
+            android:textSize="15sp" />
 
-    <TextView
-        android:id="@+id/view_number_dec"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/mask_number_line"
-        android:gravity="left|center"
-        android:paddingBottom="5dp"
-        android:paddingTop="5dp"
-        android:singleLine="true"
-        android:text="@string/label_group_value_dec"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="25sp" />
+        <View
+            android:id="@+id/index_number_line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/index_number"
+            android:layout_marginBottom="8sp"
+            android:layout_marginTop="8sp"
+            android:background="@android:color/darker_gray" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/view_number_dec"
-        android:clickable="true"
-        android:singleLine="true"
-        android:text="@string/button_compute" />
+        <TextView
+            android:id="@+id/mask_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/index_text"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/index_number_line"
+            android:gravity="left|center"
+            android:minHeight="50dp"
+            android:singleLine="true"
+            android:text="@string/label_mask"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textIsSelectable="false"
+            android:textSize="20sp" />
 
-</RelativeLayout>
+        <EditText
+            android:id="@+id/mask_number"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/mask_text"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/index_number_line"
+            android:layout_toEndOf="@+id/mask_text"
+            android:digits="01"
+            android:gravity="center"
+            android:hint="@string/hint_mask"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="phone"
+            android:maxLength="18"
+            android:minHeight="50dp"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textIsSelectable="false"
+            android:textSize="15sp" />
+
+        <View
+            android:id="@+id/mask_number_line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/mask_text"
+            android:layout_marginBottom="8sp"
+            android:layout_marginTop="8sp"
+            android:background="@android:color/darker_gray" />
+
+        <TextView
+            android:id="@+id/view_number_dec"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/mask_number_line"
+            android:gravity="left|center"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:singleLine="true"
+            android:text="@string/label_group_value_dec"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/view_number_dec"
+            android:clickable="true"
+            android:singleLine="true"
+            android:text="@string/button_compute" />
+
+    </RelativeLayout>
+
+</ScrollView>
+
