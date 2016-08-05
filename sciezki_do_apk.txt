@@ -1,2 +1,0 @@
-\MySecondApplication\app\build\outputs\apk
-\MyApplication\app\build\outputs\apk
