@@ -1,0 +1,15 @@
+ver. 0.2.0
++ dodane wyœwietlanie informacji po naciœniêciu przycisku w zak³adkach w TabsActivity
+
+ver. 0.1.2
++ dodane Summary Activity
+~ przeprojektowany layout w Main, Tabs, Settings Activity
++ tekst na drugim pasku na górze aplikacji w Settings, Info, Summary Activity
++ ustawione domyœlne wartoœci pól w ka¿dym activity dla lepszego rozeznania rozmieszczenia elementów
++ w Main, Info, Summary Activity ustawione linie rozgraniczaj¹ce rzêdy
++ przesuwny layout po pokazaniu siê soft keyboard input w Main, Settings
++ przesuwny layout po przejœciu w tryb landscape w Main, Tabs, Settings, Summary Activity
+- usuniête wyliczanie grupy z racji przeprojektowania Main Activity
+
+Known bugs:
+* z³e granice przesuwania w trybie landscape w Tabs Activity

@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -150,6 +151,51 @@ public class TabsActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_tabs, container, false);
+            rootView.findViewById(R.id.button_end_test).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int liczba = getArguments().getInt(ARG_SECTION_NUMBER);
+                    CharSequence toast = "Wcisnieto Zakoncz Test. Zakladka nr: " + String.valueOf(liczba);
+                    Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
+                    wyswietl.show();
+                }
+            });
+            rootView.findViewById(R.id.button_yes).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int liczba = getArguments().getInt(ARG_SECTION_NUMBER);
+                    CharSequence toast = "Wcisnieto Tak. Zakladka nr: " + String.valueOf(liczba);
+                    Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
+                    wyswietl.show();
+                }
+            });
+            rootView.findViewById(R.id.button_no).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int liczba = getArguments().getInt(ARG_SECTION_NUMBER);
+                    CharSequence toast = "Wcisnieto Nie. Zakladka nr: " + String.valueOf(liczba);
+                    Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
+                    wyswietl.show();
+                }
+            });
+            rootView.findViewById(R.id.button_dunno).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int liczba = getArguments().getInt(ARG_SECTION_NUMBER);
+                    CharSequence toast = "Wcisnieto Nie Wiem. Zakladka nr: " + String.valueOf(liczba);
+                    Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
+                    wyswietl.show();
+                }
+            });
+            rootView.findViewById(R.id.button_next_question).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int liczba = getArguments().getInt(ARG_SECTION_NUMBER);
+                    CharSequence toast = "Wcisnieto Nastepne Pytanie. Zakladka nr: " + String.valueOf(liczba);
+                    Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
+                    wyswietl.show();
+                }
+            });
             return rootView;
         }
     }
@@ -180,7 +226,7 @@ public class TabsActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
 
             String titlePattern = getResources().getString(R.string.label_section);
-            String title = String.format(titlePattern, position);
+            String title = String.format(titlePattern, position + 1);
 
             return title;
         }

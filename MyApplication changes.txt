@@ -1,0 +1,5 @@
+ver. 0.1.2
+~ uporz¹dkowano plik strings.xml (sekcje)
+~ w Main Activity edycja pe³noekranowa w trybie landscape zamieniona na soft keyboard input
++ przesuwny layout po pokazaniu siê soft keyboard input
++ w Main Activity dodane paski rozgraniczaj¹ce rzêdy w layout
