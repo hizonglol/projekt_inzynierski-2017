@@ -12,9 +12,4 @@
         android:orderInCategory="100"
         android:title="@string/label_info_activity"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_summary"
-        android:orderInCategory="100"
-        android:title="@string/label_summary_activity"
-        app:showAsAction="never" />
 </menu>

@@ -6,6 +6,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +20,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    int moduloGroup = 0;
     boolean moduloflag = false;
 
     private boolean isEmpty(EditText etText) {
@@ -32,17 +32,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         /* check if the app is intended to close */
-        if( getIntent().getBooleanExtra("Exit me", false)){
+        if (getIntent().getBooleanExtra("Exit me", false)) {
             finish();
             return; // return to prevent from doing unnecessary stuffs
         }
 
         //*****************************************************************************************
 
-        SettingsDataSource db = new SettingsDataSource(this);
+        final SettingsDataSource db = new SettingsDataSource(this);
         db.open();
-
-        db.updateSetting("dupadupa55", "blebl55e");
 
         //*****************************************************************************************
 
@@ -56,63 +54,104 @@ public class MainActivity extends AppCompatActivity {
         final View.OnClickListener computeButtonHandler = new View.OnClickListener() {
             public void onClick(View v) throws NumberFormatException {
 
-                int cyfryIndeksu[] = new int[6];
-                int wartosciWag[] = new int[6];
-                int cyfryWyniku[] = new int[6];
+                moduloflag = false;
+
+                int digitsIndex[] = new int[6];
+                int digitsWeights[] = new int[6];
+                int digitsResult[] = new int[6];
 
                 //*******************************************************
                 //SPRAWDZAMY TERAZ INDEKS
                 //*******************************************************
-                /*
+
+                EditText editWeights = (EditText) findViewById(R.id.weight_value);
+                TextView viewResult = (TextView) findViewById(R.id.result_value);
+
+                String stringIndex = db.getSetting("setting_index");
+                String stringWeights = null;
+
+                if (editWeights != null)
+                    stringWeights = editWeights.getText().toString();
+
                 try {
-                    cyfryIndeksu[1] = Integer.parseInt(indexNumber5.getText().toString());
-                    Log.v("Wartość", String.valueOf(cyfryIndeksu[1]));
-                } catch (NumberFormatException e) {
-                    Toast.makeText(getBaseContext(), "Podaj 2 cyfrę indeksu", Toast.LENGTH_SHORT).show();
+                    for (int i = 0; i < 6; ++i) {
+                        digitsIndex[i] = Integer.parseInt(Character.toString(stringIndex.charAt(i)));
+                        Log.v("Index", String.valueOf(digitsIndex[i]));
+                    }
+                } catch (StringIndexOutOfBoundsException e) {
+                    Toast.makeText(getBaseContext(), "Podaj poprawny indeks", Toast.LENGTH_SHORT).show();
                     return;
-                }*/
+                }
 
                 //*******************************************************
                 //SPRAWDZAMY TERAZ WAGI
                 //*******************************************************
-                /*
-                try { //sprawdzamy czy podano numer indeksu
-                    wartosciWag[0] = Integer.parseInt(weightNumber6.getText().toString());
-                    Log.v("Wartość", String.valueOf(wartosciWag[0]));
-                } catch (NumberFormatException e) {
-                    Toast.makeText(getBaseContext(), "Podaj 1 cyfrę indeksu", Toast.LENGTH_SHORT).show();
-                    return;
-                }*/
 
-
-                int wynik = 0;
-                for (int i = 0; i < 6; ++i) {
-                    cyfryWyniku[i] = cyfryIndeksu[i] * wartosciWag[i];
-                    wynik += cyfryWyniku[i];
+                if (stringWeights != null) {
+                    try { //sprawdzamy czy podano numer indeksu
+                        for (int i = 0; i < 6; ++i) {
+                            digitsWeights[i] = Integer.parseInt(Character.toString(stringWeights.charAt(i)));
+                            Log.v("Waga", String.valueOf(digitsWeights[i]));
+                        }
+                    } catch (StringIndexOutOfBoundsException e) {
+                        Toast.makeText(getBaseContext(), "Podaj poprawną wagę", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                 }
 
-                /*
-                if (resultNumber6 != null) {
-                    resultNumber6.setText(String.valueOf(cyfryWyniku[0]));
-                }*/
+                int numberResult = 0;
+                for (int i = 0; i < 6; ++i) {
+                    digitsResult[i] = digitsIndex[i] * digitsWeights[i];
+                    numberResult += digitsResult[i];
+                    Log.v("Wynik", String.valueOf(digitsResult[i]));
+                }
 
 
-                wynik = wynik % 16;
-                moduloGroup = wynik;
+                if (viewResult != null) {
+                    String stringResult = "";
+
+                    for (int i = 0; i < 5; ++i) {
+                        stringResult += String.valueOf(digitsResult[i]) + " + ";
+                    }
+
+                    stringResult += digitsResult[5] + " = " + numberResult;
+
+                    viewResult.setText(stringResult);
+                    viewResult.setSelected(true);
+
+                }
+
+
+                int numberModuloResult = numberResult % 16;
                 moduloflag = true;
 
-                TextView moduloResult = (TextView) findViewById(R.id.result_modulo_value);
+                TextView viewModuloResult = (TextView) findViewById(R.id.result_modulo_value);
+                String stringModuloResult = null;
 
-                /*
-                if (moduloResult != null) {
-                    moduloResult.setText(Html.fromHtml("<small>" + getString(R.string.modulo_result) + "</small>" + "<br />" +
-                            "<bold>" + String.valueOf(wynik) + "</bold>"));
-                }*/
+                if (numberModuloResult < 10)
+                    stringModuloResult = String.valueOf(numberModuloResult);
+                else if (numberModuloResult == 10)
+                    stringModuloResult = "A";
+                else if (numberModuloResult == 11)
+                    stringModuloResult = "B";
+                else if (numberModuloResult == 12)
+                    stringModuloResult = "C";
+                else if (numberModuloResult == 13)
+                    stringModuloResult = "D";
+                else if (numberModuloResult == 14)
+                    stringModuloResult = "E";
+                else if (numberModuloResult == 15)
+                    stringModuloResult = "F";
 
+                if (viewModuloResult != null) {
+                    viewModuloResult.setText(stringModuloResult);
+                }
+
+                db.createSetting("setting_group", stringModuloResult);
             }
         };
         if (computeButton != null) {
-            //computeButton.setOnClickListener(computeButtonHandler);
+            computeButton.setOnClickListener(computeButtonHandler);
         }
 
         View.OnClickListener startTestButtonHandler = new View.OnClickListener() {
@@ -122,11 +161,11 @@ public class MainActivity extends AppCompatActivity {
                             .setAction("Action", null).show();
                             */
 
-                /*
-                if(!moduloflag){
-                    Toast.makeText(getBaseContext(), "Wylicz grupę", Toast.LENGTH_SHORT).show();
+
+                if (!moduloflag) {
+                    Toast.makeText(getBaseContext(), "Wylicz poprawną grupę", Toast.LENGTH_SHORT).show();
                     return;
-                }*/
+                }
 
                 Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
                 if (isCallable(intentTabs)) {
@@ -144,16 +183,51 @@ public class MainActivity extends AppCompatActivity {
         View.OnClickListener exitButtonHandler = new View.OnClickListener() {
             public void onClick(View v) throws NumberFormatException {
 
-                Intent intent = getIntent();
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("Exit me", true);
-                startActivity(intent);
+                Intent intentMain = getIntent();
+                intentMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intentMain.putExtra("Exit me", true);
+                startActivity(intentMain);
                 finish();
 
             }
         };
         if (exitButton != null)
             exitButton.setOnClickListener(exitButtonHandler);
+    }
+
+    void resumeState() {
+
+        SettingsDataSource db = new SettingsDataSource(this);
+        db.open();
+
+
+        TextView viewIndex = (TextView) findViewById(R.id.index_value);
+        TextView viewSubject = (TextView) findViewById(R.id.subject_value);
+
+        String stringIndex = db.getSetting("setting_index");
+        String stringSubject = db.getSetting("setting_subject");
+
+        if (viewIndex != null)
+            viewIndex.setText(stringIndex);
+
+        if (viewSubject != null)
+            viewSubject.setText(stringSubject);
+
+        db.close();
+    }
+
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Always call the superclass so it can restore the view hierarchy
+        super.onRestoreInstanceState(savedInstanceState);
+
+        resumeState();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+
+        resumeState();
     }
 
     private boolean isCallable(Intent intent) {
@@ -192,16 +266,6 @@ public class MainActivity extends AppCompatActivity {
 
             Intent intentInfo = new Intent(getApplicationContext(), InfoActivity.class);
             startActivity(intentInfo);
-
-            Log.i("Menu", "Info");
-
-            return true;
-        }
-
-        if (id == R.id.action_summary) {
-
-            Intent intentSummary = new Intent(getApplicationContext(), SummaryActivity.class);
-            startActivity(intentSummary);
 
             Log.i("Menu", "Info");
 

@@ -18,7 +18,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -49,6 +52,11 @@ public class TabsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabs);
 
+        final SettingsDataSource db = new SettingsDataSource(this);
+        db.open();
+
+        db.createSetting("setting_questions_amount", String.valueOf(numberOfTabs));
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -63,24 +71,6 @@ public class TabsActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         if (tabLayout != null)
             tabLayout.setupWithViewPager(mViewPager);
-
-
-        /*
-        if (fab != null)
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    /*
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                            *//*
-
-                    Intent intentMain = new Intent(getApplicationContext(), MainActivity.class);
-                    Log.i("Tabs", "Navigating to menu");
-                    navigateUpTo(intentMain);
-                }
-            });
-        */
 
     }
 
@@ -155,9 +145,9 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     int liczba = getArguments().getInt(ARG_SECTION_NUMBER);
-                    CharSequence toast = "Wcisnieto Zakoncz Test. Zakladka nr: " + String.valueOf(liczba);
-                    Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
-                    wyswietl.show();
+                    Log.d("Fragment activity", "Wcisnieto Zakoncz Test. Zakladka nr: " + String.valueOf(liczba));
+                    Intent intentSummary = new Intent(getActivity().getApplication(), SummaryActivity.class);
+                    startActivity(intentSummary);
                 }
             });
             rootView.findViewById(R.id.button_yes).setOnClickListener(new View.OnClickListener() {
@@ -196,8 +186,23 @@ public class TabsActivity extends AppCompatActivity {
                     wyswietl.show();
                 }
             });
+
+
+            final SettingsDataSource db = new SettingsDataSource(getActivity());
+            db.open();
+
+            TextView viewGroup = (TextView) rootView.findViewById(R.id.group_number);
+            TextView viewQuestionNumber = (TextView) rootView.findViewById(R.id.question_number);
+
+            if (viewGroup != null)
+                viewGroup.setText(db.getSetting("setting_group"));
+
+            if (viewQuestionNumber != null)
+                viewQuestionNumber.setText(String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER)));
+
             return rootView;
         }
+
     }
 
     /**

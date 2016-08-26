@@ -15,13 +15,6 @@ public class InfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        SettingsDataSource db = new SettingsDataSource(this);
-        db.open();
-
-        String klucz = db.getSetting("dupadupa55");
-
-        Log.d("Info", klucz);
-
         /* obsluga toolbar w Info */
         Toolbar infoToolbar = (Toolbar) findViewById(R.id.infoToolbar);
         if (infoToolbar != null)

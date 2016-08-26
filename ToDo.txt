@@ -14,3 +14,6 @@ aktualizuj¹ siê wynikowe pola.
 Serwer aplikacji
 
 Apache Tomcat
+
+Poprawne dzia³anie przycisku Nastêpne pytanie w Tabs Activity
+Poprawne dzia³anie przycisku "back" na telefonie.
