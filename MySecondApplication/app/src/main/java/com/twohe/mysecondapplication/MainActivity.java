@@ -37,6 +37,15 @@ public class MainActivity extends AppCompatActivity {
             return; // return to prevent from doing unnecessary stuffs
         }
 
+        //*****************************************************************************************
+
+        SettingsDataSource db = new SettingsDataSource(this);
+        db.open();
+
+        db.updateSetting("dupadupa55", "blebl55e");
+
+        //*****************************************************************************************
+
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(mainToolbar);
 

@@ -13,7 +13,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     public static final String TABLE_SETTINGS = "settings";
-    public static final String COLUMN_ID = "id";
     public static final String COLUMN_SETTING = "setting";
     public static final String COLUMN_SETTING_VALUE = "setting_value";
 
@@ -22,9 +21,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = "create table "
-            + TABLE_SETTINGS + "( " + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_SETTING
-            + " text not null, " + COLUMN_SETTING_VALUE
+            + TABLE_SETTINGS + "( " + COLUMN_SETTING
+            + " text not null unique, " + COLUMN_SETTING_VALUE
             + " text not null);";
 
     public DBHelper(Context context) {
@@ -34,6 +32,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase database) {
         database.execSQL(DATABASE_CREATE);
+        Log.d(this.getClass().getName(), "Utworzono baze danych");
     }
 
     @Override

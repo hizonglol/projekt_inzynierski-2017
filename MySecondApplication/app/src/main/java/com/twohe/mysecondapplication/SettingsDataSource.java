@@ -4,21 +4,19 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.util.Log;
 
 /**
  * Created by morri on 23.08.2016.
  */
 public class SettingsDataSource {
 
-
     // Database fields
     private SQLiteDatabase database;
     private DBHelper dbHelper;
-    private String[] allColumns = {DBHelper.COLUMN_ID,
+    private String[] allColumns = {
             DBHelper.COLUMN_SETTING,
             DBHelper.COLUMN_SETTING_VALUE};
 
@@ -34,52 +32,63 @@ public class SettingsDataSource {
         dbHelper.close();
     }
 
-    public Setting createSetting(String setting, String setting_value) {
+    /* updates existing setting */
+    public int updateSetting(String setting, String settingValue) {
+
+        ContentValues values = new ContentValues();
+        values.put(DBHelper.COLUMN_SETTING_VALUE, settingValue);
+
+        return database.update(DBHelper.TABLE_SETTINGS,
+                values, DBHelper.COLUMN_SETTING + " = ?",
+                new String[]{setting});
+    }
+
+    /* creates setting or updates it if it exists */
+    public Boolean createSetting(String setting, String setting_value) {
         ContentValues values = new ContentValues();
         values.put(DBHelper.COLUMN_SETTING, setting);
         values.put(DBHelper.COLUMN_SETTING_VALUE, setting_value);
 
-        long insertId = database.insert(DBHelper.TABLE_SETTINGS, null,
-                values);
-
-        Cursor cursor = database.query(DBHelper.TABLE_SETTINGS,
-                allColumns, DBHelper.COLUMN_ID + " = " + insertId, null,
-                null, null, null);
-        cursor.moveToFirst();
-        Setting newSetting = cursorToSetting(cursor);
-        cursor.close();
-        return newSetting;
-    }
-
-    public void deleteSetting(Setting setting) {
-        long id = setting.getId();
-        System.out.println("Deleted setting: " + id);
-        database.delete(DBHelper.TABLE_SETTINGS, DBHelper.COLUMN_ID
-                + " = " + id, null);
-    }
-
-    public List<Setting> getAllSettings() {
-        List<Setting> settings = new ArrayList<Setting>();
-
-        Cursor cursor = database.query(DBHelper.TABLE_SETTINGS,
-                allColumns, null, null, null, null, null);
-
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            Setting setting = cursorToSetting(cursor);
-            settings.add(setting);
-            cursor.moveToNext();
+        try {
+            database.insertOrThrow(DBHelper.TABLE_SETTINGS, null, values);
+        } catch (SQLiteConstraintException e) {
+            Log.d("DB", "Setting already exists. Updating...");
+            updateSetting(setting, setting_value);
         }
-        // make sure to close the cursor
-        cursor.close();
-        return settings;
+
+        return true;
     }
 
-    private Setting cursorToSetting(Cursor cursor) {
-        Setting setting = new Setting();
-        setting.setId(cursor.getLong(0));
-        setting.setSetting(cursor.getString(1));
-        setting.setSettingValue(cursor.getString(2));
-        return setting;
+    /* gets setting. If setting does not exist, creates setting and returns space */
+    public String getSetting(String setting) {
+        String setting_value = " ";
+
+        Cursor cursor = database.query(DBHelper.TABLE_SETTINGS,
+                allColumns, DBHelper.COLUMN_SETTING + "=?", new String[]{setting}, null, null, null, null);
+
+        if (cursor != null) {
+
+            if (cursor.getCount() < 1) {
+                createSetting(setting, " ");
+                cursor.close();
+                return setting_value;
+            }
+
+            cursor.moveToFirst();
+            setting_value = cursor.getString(1);
+
+
+            cursor.close();
+        }
+
+        // make sure to close the cursor
+        return setting_value;
+    }
+
+    /* deletes setting. I dunno why I made this method */
+    public void deleteSetting(String setting) {
+        System.out.println("Deleted setting: " + setting);
+        database.delete(DBHelper.TABLE_SETTINGS, DBHelper.COLUMN_SETTING
+                + " = ?", new String[]{setting});
     }
 }

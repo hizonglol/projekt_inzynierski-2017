@@ -3,6 +3,7 @@ package com.twohe.mysecondapplication;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 /**
  * Created by TwoHe on 10.07.2016.
@@ -13,6 +14,13 @@ public class InfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
+
+        SettingsDataSource db = new SettingsDataSource(this);
+        db.open();
+
+        String klucz = db.getSetting("dupadupa55");
+
+        Log.d("Info", klucz);
 
         /* obsluga toolbar w Info */
         Toolbar infoToolbar = (Toolbar) findViewById(R.id.infoToolbar);
