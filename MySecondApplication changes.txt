@@ -1,3 +1,8 @@
+ver. 0.3.1
+~ poprawiono dzia³anie przycisku "Wróæ do testu" w Summary Activity
++ zak³adki dodawane s¹ dynamicznie w Tabs Activity
++ kolor przycisku siê zmienia po wybraniu odpowiedzi w Tabs Activity
+
 ver. 0.3.0
 + dodane na nowo wyliczanie grupy
 ~ baza danych zapisuje informacje otrzymane z Settings Activity
@@ -28,3 +33,6 @@ ver. 0.1.2
 
 Known bugs:
 * z³e granice przesuwania w trybie landscape w Tabs Activity
+* stan zak³adek siê nie zapamiêtuje. Rozwi¹zanie: 
+  do zmiany FragmentPagerAdapter na FragmentStatePagerAdapter
+  i zapamiêtywanie stanu zak³adek w wektorze

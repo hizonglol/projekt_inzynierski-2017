@@ -17,12 +17,13 @@ import android.widget.TextView;
  */
 public class SettingsActivity extends AppCompatActivity {
 
+    SettingsDataSource db = new SettingsDataSource(this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        final SettingsDataSource db = new SettingsDataSource(this);
         db.open();
 
         /* obsluga toolbar w Settings */
@@ -60,20 +61,28 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        db.close();
+    }
+
+
     void resumeState(){
 
-        SettingsDataSource db = new SettingsDataSource(this);
-        db.open();
+        SettingsDataSource resume_db = new SettingsDataSource(this);
+        resume_db.open();
 
         EditText editName = (EditText) findViewById(R.id.name_value);
         EditText editSurname = (EditText) findViewById(R.id.surname_value);
         EditText editIndex = (EditText) findViewById(R.id.index_value);
         EditText editSubject = (EditText) findViewById(R.id.subject_value);
 
-        String stringName = db.getSetting("setting_name");
-        String stringSurname = db.getSetting("setting_surname");
-        String stringIndex = db.getSetting("setting_index");
-        String stringSubject = db.getSetting("setting_subject");
+        String stringName = resume_db.getSetting("setting_name");
+        String stringSurname = resume_db.getSetting("setting_surname");
+        String stringIndex = resume_db.getSetting("setting_index");
+        String stringSubject = resume_db.getSetting("setting_subject");
 
 
         if (editName != null)
@@ -88,7 +97,7 @@ public class SettingsActivity extends AppCompatActivity {
         if(editSubject != null)
             editSubject.setText(stringSubject);
 
-        db.close();
+        resume_db.close();
 
     }
 

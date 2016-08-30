@@ -45,9 +45,7 @@ public class SummaryActivity extends AppCompatActivity {
         View.OnClickListener backToTestButtonHandler = new View.OnClickListener() {
             public void onClick(View v) {
 
-                Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
-                startActivity(intentTabs);
-                intentTabs.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                finish();
 
                 Log.i("Summary", "Going back to tabs");
             }

@@ -2,7 +2,7 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Haszówki</string>
-    <string name="version_value">0.3.0</string>
+    <string name="version_value">0.3.1</string>
     <string name="zero_value">0</string>
     <string name="six_zeros_value">000000</string>
     <string name="label_null">null</string>
@@ -60,7 +60,7 @@
     <string name="button_no">Nie</string>
     <string name="button_dunno">Nie wiem</string>
     <string name="button_end_test">Zakończ test</string>
-    <string name="button_next_question">Następne pytanie</string>
+    <string name="button_add_question">Dodaj pytanie</string>
 
 
     <!--*** LABEL strings of SUMMARY ***-->

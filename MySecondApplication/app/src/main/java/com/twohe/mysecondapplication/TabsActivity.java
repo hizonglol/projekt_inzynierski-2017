@@ -3,6 +3,8 @@ package com.twohe.mysecondapplication;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -21,8 +23,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,6 +73,12 @@ public class TabsActivity extends AppCompatActivity {
         if (tabLayout != null)
             tabLayout.setupWithViewPager(mViewPager);
 
+        addTab();
+
+    }
+
+    public void addTab() {
+        mSectionsPagerAdapter.addFragment();
     }
 
     @Override
@@ -112,35 +119,61 @@ public class TabsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //*********************************************************************************************
+
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class QuestionFragment extends Fragment {
         /**
          * The fragment argument representing the section number for this
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        public PlaceholderFragment() {
+        public QuestionFragment() {
         }
 
         /**
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
+        public static QuestionFragment newInstance(int sectionNumber) {
+            QuestionFragment fragment = new QuestionFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
             return fragment;
         }
 
+        private void setTab(View rootView, int arg){
+
+            Button buttonYes = (Button) rootView.findViewById(R.id.button_yes);
+            Button buttonNo = (Button) rootView.findViewById(R.id.button_no);
+            Button buttonDunno = (Button) rootView.findViewById(R.id.button_dunno);
+
+            if (arg == 1) {
+                buttonYes.getBackground().setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
+                buttonNo.getBackground().clearColorFilter();
+                buttonDunno.getBackground().clearColorFilter();
+
+            }
+            else if(arg == 2){
+                buttonYes.getBackground().clearColorFilter();
+                buttonNo.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+                buttonDunno.getBackground().clearColorFilter();
+            }
+            else if(arg == 3){
+                buttonYes.getBackground().clearColorFilter();
+                buttonNo.getBackground().clearColorFilter();
+                buttonDunno.getBackground().setColorFilter(Color.YELLOW, PorterDuff.Mode.MULTIPLY);
+            }
+        }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_tabs, container, false);
+            final View rootView = inflater.inflate(R.layout.fragment_tabs, container, false);
             rootView.findViewById(R.id.button_end_test).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -157,6 +190,8 @@ public class TabsActivity extends AppCompatActivity {
                     CharSequence toast = "Wcisnieto Tak. Zakladka nr: " + String.valueOf(liczba);
                     Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
                     wyswietl.show();
+                    setTab(rootView, 1);
+
                 }
             });
             rootView.findViewById(R.id.button_no).setOnClickListener(new View.OnClickListener() {
@@ -166,6 +201,8 @@ public class TabsActivity extends AppCompatActivity {
                     CharSequence toast = "Wcisnieto Nie. Zakladka nr: " + String.valueOf(liczba);
                     Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
                     wyswietl.show();
+                    setTab(rootView, 2);
+
                 }
             });
             rootView.findViewById(R.id.button_dunno).setOnClickListener(new View.OnClickListener() {
@@ -175,15 +212,18 @@ public class TabsActivity extends AppCompatActivity {
                     CharSequence toast = "Wcisnieto Nie Wiem. Zakladka nr: " + String.valueOf(liczba);
                     Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
                     wyswietl.show();
+                    setTab(rootView, 3);
                 }
             });
-            rootView.findViewById(R.id.button_next_question).setOnClickListener(new View.OnClickListener() {
+            rootView.findViewById(R.id.button_add_question).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int liczba = getArguments().getInt(ARG_SECTION_NUMBER);
-                    CharSequence toast = "Wcisnieto Nastepne Pytanie. Zakladka nr: " + String.valueOf(liczba);
+                    CharSequence toast = "Wcisnieto Dodaj Pytanie. Zakladka nr: " + String.valueOf(liczba);
                     Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
                     wyswietl.show();
+
+                    ((TabsActivity)getActivity()).addTab();
                 }
             });
 
@@ -205,11 +245,15 @@ public class TabsActivity extends AppCompatActivity {
 
     }
 
+    //*********************************************************************************************
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        private List<Fragment> fragments = new ArrayList<>();
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -219,12 +263,12 @@ public class TabsActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            return fragments.get(position);
         }
 
         @Override
         public int getCount() {
-            return numberOfTabs;
+            return fragments.size();
         }
 
         @Override
@@ -235,6 +279,12 @@ public class TabsActivity extends AppCompatActivity {
 
             return title;
         }
+
+        public void addFragment() {
+            fragments.add(QuestionFragment.newInstance(fragments.size()+1));
+            notifyDataSetChanged();
+        }
+
     }
 
 }

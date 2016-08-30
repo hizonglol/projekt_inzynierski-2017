@@ -22,9 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     boolean moduloflag = false;
 
-    private boolean isEmpty(EditText etText) {
-        return etText.getText().toString().trim().length() == 0;
-    }
+    SettingsDataSource db = new SettingsDataSource(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
         //*****************************************************************************************
 
-        final SettingsDataSource db = new SettingsDataSource(this);
         db.open();
 
         //*****************************************************************************************
@@ -194,6 +191,15 @@ public class MainActivity extends AppCompatActivity {
         if (exitButton != null)
             exitButton.setOnClickListener(exitButtonHandler);
     }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        db.close();
+    }
+
 
     void resumeState() {
 
