@@ -1,13 +1,18 @@
 package com.twohe.mysecondapplication;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.util.StringBuilderPrinter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +20,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.util.List;
 
@@ -46,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button startTestButton = (Button) findViewById(R.id.button_start_test);
         Button exitButton = (Button) findViewById(R.id.button_exit);
+        Button scanQRButton = (Button) findViewById(R.id.button_qr_code);
 
         final Button computeButton = (Button) findViewById(R.id.button_compute);
         final View.OnClickListener computeButtonHandler = new View.OnClickListener() {
@@ -67,8 +76,18 @@ public class MainActivity extends AppCompatActivity {
                 String stringIndex = db.getSetting("setting_index");
                 String stringWeights = null;
 
-                if (editWeights != null)
+                if (editWeights != null) {
                     stringWeights = editWeights.getText().toString();
+
+                    if (stringWeights.length() != 6) {
+                        StringBuilder builderStringWeights = new StringBuilder(stringWeights);
+                        while (builderStringWeights.length() < 6) {
+                            builderStringWeights.insert(0, "0");
+                        }
+                        editWeights.setText(builderStringWeights);
+                        stringWeights = builderStringWeights.toString();
+                    }
+                }
 
                 try {
                     for (int i = 0; i < 6; ++i) {
@@ -171,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
                 EditText editRow = (EditText) findViewById(R.id.hall_row_value);
                 EditText editPlace = (EditText) findViewById(R.id.hall_place_value);
                 EditText editTestId = (EditText) findViewById(R.id.exam_id_value);
+                TextView viewSubjectValue = (TextView) findViewById(R.id.subject_value);
 
                 if (editRow != null) {
                     if (Integer.parseInt(editRow.getText().toString()) < 1) {
@@ -181,15 +201,27 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if (editPlace != null) {
-                    if (Integer.parseInt(editPlace.getText().toString()) < 1){
+                    if (Integer.parseInt(editPlace.getText().toString()) < 1) {
                         Toast.makeText(getBaseContext(), "Podaj poprawne miejsce", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     db.createSetting("setting_hall_place", editPlace.getText().toString());
                 }
 
-                if (editTestId != null)
+                if (editTestId != null) {
+                    if (editTestId.getText().length() == 0) {
+                        Toast.makeText(getBaseContext(), "Wprowadź ID testu", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     db.createSetting("setting_test_id", editTestId.getText().toString());
+                }
+
+                if (viewSubjectValue != null) {
+                    if (viewSubjectValue.getText().length() < 2) {
+                        Toast.makeText(getBaseContext(), "Wprowadź nazwę przedmiotu", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
 
                 Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
                 if (isCallable(intentTabs)) {
@@ -217,6 +249,43 @@ public class MainActivity extends AppCompatActivity {
         };
         if (exitButton != null)
             exitButton.setOnClickListener(exitButtonHandler);
+
+
+        View.OnClickListener scanQRButtonHandler = new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.v("MainActivity", "Scanning");
+                IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
+                integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+                integrator.setPrompt("Zeskanuj kod QR");
+                integrator.setCameraId(0);  // Use a specific camera of the device
+                integrator.setBeepEnabled(false);
+                integrator.initiateScan(IntentIntegrator.QR_CODE_TYPES);
+            }
+        };
+        if (scanQRButton != null)
+            scanQRButton.setOnClickListener(scanQRButtonHandler);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        EditText editTestId = (EditText) findViewById(R.id.exam_id_value);
+
+        if (requestCode == IntentIntegrator.REQUEST_CODE && data != null) {
+            IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            if (scanResult != null) {
+                String contents = scanResult.getContents();
+                if (editTestId != null)
+                    editTestId.setText(contents);
+                // handle scan result
+                Log.v("Scan result:", contents);
+            } else {
+                // else continue with any other code you need in the method
+                Log.v("MainActivity", "scanResult is null.");
+            }
+        }
     }
 
 

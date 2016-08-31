@@ -1,3 +1,8 @@
+ver. 0.4.0
++ przy wciskaniu przycisku Rozpocznij Test sprawdzane jest istnienie ID testu oraz nazwy przedmiotu
+~ wektor wag jest uzupe³niany o zera na pocz¹tku w razie wpisania wektora krótszego ni¿ 6 cyfr
++ dodane skanowanie kodów qr i wpisywanie odczytanej wartoœci jako ID testu
+
 ver. 0.3.2
 ~ poprawiono zapamiêtywanie stanu wciœniêtych przycisków w Tabs Activity
 + iloœæ wciœniêtych przycisków jest zliczana i wyœwietlana w podsumowaniu
@@ -40,3 +45,4 @@ ver. 0.1.2
 
 Known bugs:
 * z³e granice przesuwania w trybie landscape w Tabs Activity
+* aplikacja nie pyta siê o przyznanie uprawnieñ do korzystania z kamery

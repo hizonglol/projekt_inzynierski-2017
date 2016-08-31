@@ -146,7 +146,6 @@
                 android:inputType="phone"
                 android:maxLength="6"
                 android:singleLine="true"
-                android:text="@string/six_zeros_value"
                 android:textAlignment="gravity"
                 android:textSize="30sp" />
 
@@ -299,7 +298,6 @@
                 android:gravity="center"
                 android:minHeight="50sp"
                 android:singleLine="true"
-                android:text="@string/label_null"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
@@ -314,7 +312,6 @@
                 android:inputType="text"
                 android:minHeight="50sp"
                 android:singleLine="true"
-                android:text="@string/label_null"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
