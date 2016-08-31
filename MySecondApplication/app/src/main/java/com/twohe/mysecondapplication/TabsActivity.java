@@ -240,6 +240,8 @@ public class TabsActivity extends AppCompatActivity {
             if (viewQuestionNumber != null)
                 viewQuestionNumber.setText(String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER)));
 
+            db.close();
+
             return rootView;
         }
 

@@ -3,6 +3,7 @@ ver. 0.3.2
 + iloœæ wciœniêtych przycisków jest zliczana i wyœwietlana w podsumowaniu
 ~ poprawiono wyœwietlanie siê sumy pytañ: teraz wyœwietlana jest ich poprawna iloœæ
 ~ poprawiono b³¹d przy próbie wyliczenia grupy bez skonfigurowania numeru indeksu
+~ poprawiono wyciek bazy danych w Main Activity
 
 ver. 0.3.1
 ~ poprawiono dzia³anie przycisku "Wróæ do testu" w Summary Activity
