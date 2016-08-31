@@ -1,3 +1,9 @@
+ver. 0.3.2
+~ poprawiono zapamiêtywanie stanu wciœniêtych przycisków w Tabs Activity
++ iloœæ wciœniêtych przycisków jest zliczana i wyœwietlana w podsumowaniu
+~ poprawiono wyœwietlanie siê sumy pytañ: teraz wyœwietlana jest ich poprawna iloœæ
+~ poprawiono b³¹d przy próbie wyliczenia grupy bez skonfigurowania numeru indeksu
+
 ver. 0.3.1
 ~ poprawiono dzia³anie przycisku "Wróæ do testu" w Summary Activity
 + zak³adki dodawane s¹ dynamicznie w Tabs Activity
@@ -33,6 +39,3 @@ ver. 0.1.2
 
 Known bugs:
 * z³e granice przesuwania w trybie landscape w Tabs Activity
-* stan zak³adek siê nie zapamiêtuje. Rozwi¹zanie: 
-  do zmiany FragmentPagerAdapter na FragmentStatePagerAdapter
-  i zapamiêtywanie stanu zak³adek w wektorze

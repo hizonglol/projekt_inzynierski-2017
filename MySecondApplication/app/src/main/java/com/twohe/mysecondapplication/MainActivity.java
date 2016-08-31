@@ -72,8 +72,13 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     for (int i = 0; i < 6; ++i) {
-                        digitsIndex[i] = Integer.parseInt(Character.toString(stringIndex.charAt(i)));
-                        Log.v("Index", String.valueOf(digitsIndex[i]));
+                        try {
+                            digitsIndex[i] = Integer.parseInt(Character.toString(stringIndex.charAt(i)));
+                            Log.v("Index", String.valueOf(digitsIndex[i]));
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(getBaseContext(), "Podaj poprawny indeks", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
                 } catch (StringIndexOutOfBoundsException e) {
                     Toast.makeText(getBaseContext(), "Podaj poprawny indeks", Toast.LENGTH_SHORT).show();
@@ -158,11 +163,33 @@ public class MainActivity extends AppCompatActivity {
                             .setAction("Action", null).show();
                             */
 
-
                 if (!moduloflag) {
                     Toast.makeText(getBaseContext(), "Wylicz poprawną grupę", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                EditText editRow = (EditText) findViewById(R.id.hall_row_value);
+                EditText editPlace = (EditText) findViewById(R.id.hall_place_value);
+                EditText editTestId = (EditText) findViewById(R.id.exam_id_value);
+
+                if (editRow != null) {
+                    if (Integer.parseInt(editRow.getText().toString()) < 1) {
+                        Toast.makeText(getBaseContext(), "Podaj poprawny rząd", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    db.createSetting("setting_hall_row", editRow.getText().toString());
+                }
+
+                if (editPlace != null) {
+                    if (Integer.parseInt(editPlace.getText().toString()) < 1){
+                        Toast.makeText(getBaseContext(), "Podaj poprawne miejsce", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    db.createSetting("setting_hall_place", editPlace.getText().toString());
+                }
+
+                if (editTestId != null)
+                    db.createSetting("setting_test_id", editTestId.getText().toString());
 
                 Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
                 if (isCallable(intentTabs)) {

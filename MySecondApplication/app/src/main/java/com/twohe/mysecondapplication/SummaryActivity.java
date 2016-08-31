@@ -53,13 +53,33 @@ public class SummaryActivity extends AppCompatActivity {
         if (backToTestButton != null)
             backToTestButton.setOnClickListener(backToTestButtonHandler);
 
+        TextView viewYesAmount = (TextView) findViewById(R.id.yes_answer_number);
+        TextView viewNoAmount = (TextView) findViewById(R.id.no_answer_number);
+        TextView viewDunnoAmount = (TextView) findViewById(R.id.dunno_answer_number);
         TextView viewQuestionsAmount = (TextView) findViewById(R.id.sum_of_answers_number);
 
-        final SettingsDataSource db = new SettingsDataSource(this);
-        db.open();
+        Bundle b = getIntent().getExtras();
+        int amount_of_questions = -1; // or other values
+        int amount_of_yes_answers = -1;
+        int amount_of_no_answers = -1;
+        int amount_of_dunno_answers = -1;
+        if(b != null) {
+            amount_of_questions = b.getInt("amount_of_questions");
+            amount_of_yes_answers = b.getInt("amount_of_yes_answers");
+            amount_of_no_answers = b.getInt("amount_of_no_answers");
+            amount_of_dunno_answers = b.getInt("amount_of_dunno_answers");
+        }
 
         if (viewQuestionsAmount != null)
-            viewQuestionsAmount.setText(db.getSetting("setting_questions_amount"));
+            viewQuestionsAmount.setText(String.valueOf(amount_of_questions));
 
+        if (viewYesAmount != null)
+            viewYesAmount.setText(String.valueOf(amount_of_yes_answers));
+
+        if (viewNoAmount != null)
+            viewNoAmount.setText(String.valueOf(amount_of_no_answers));
+
+        if (viewDunnoAmount != null)
+            viewDunnoAmount.setText(String.valueOf(amount_of_dunno_answers));
     }
 }
