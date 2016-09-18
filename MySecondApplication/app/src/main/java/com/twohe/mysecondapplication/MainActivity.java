@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
                     viewModuloResult.setText(stringModuloResult);
                 }
 
+                db.createSetting("setting_weights", stringWeights);
                 db.createSetting("setting_group", stringModuloResult);
             }
         };
@@ -271,14 +272,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        EditText editTestWeight = (EditText) findViewById(R.id.weight_value);
         EditText editTestId = (EditText) findViewById(R.id.exam_id_value);
 
         if (requestCode == IntentIntegrator.REQUEST_CODE && data != null) {
             IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
             if (scanResult != null) {
                 String contents = scanResult.getContents();
+                String[] contentsTable = contents.split("\\s+");
+                if (editTestWeight != null)
+                    editTestWeight.setText(contentsTable[0]);
                 if (editTestId != null)
-                    editTestId.setText(contents);
+                    editTestId.setText(contentsTable[1]);
                 // handle scan result
                 Log.v("Scan result:", contents);
             } else {

@@ -1,3 +1,10 @@
+ver. 0.5.0
++ ³¹czenie siê z serwerem i wysy³anie zapytania z danymi testu
+~ poprawiony focus w MainActivity
+~ test jest zaznaczany w ca³oœci po klikniêciu w dane pole do edytowania
+~ dzia³a odczytywanie kodu QR w formacie "wektor_wag id_testu"
+~ po dodaniu nowego pytania automatycznie siê do niego przechodzi
+
 ver. 0.4.0
 + przy wciskaniu przycisku Rozpocznij Test sprawdzane jest istnienie ID testu oraz nazwy przedmiotu
 ~ wektor wag jest uzupe³niany o zera na pocz¹tku w razie wpisania wektora krótszego ni¿ 6 cyfr
@@ -46,3 +53,4 @@ ver. 0.1.2
 Known bugs:
 * z³e granice przesuwania w trybie landscape w Tabs Activity
 * aplikacja nie pyta siê o przyznanie uprawnieñ do korzystania z kamery
+* brak ustawianego koloru przycisku po jego wciœniêciu

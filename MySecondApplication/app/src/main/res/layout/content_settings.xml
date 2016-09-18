@@ -45,6 +45,7 @@
             <EditText
                 android:id="@+id/name_value"
                 android:layout_width="match_parent"
+                android:selectAllOnFocus="true"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:imeOptions="flagNoExtractUi"
@@ -60,6 +61,7 @@
                 android:id="@+id/surname_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:selectAllOnFocus="true"
                 android:ems="10"
                 android:imeOptions="flagNoExtractUi"
                 android:inputType="textPersonName" />
@@ -74,6 +76,7 @@
                 android:id="@+id/index_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:selectAllOnFocus="true"
                 android:digits="0123456789"
                 android:ems="10"
                 android:imeOptions="flagNoExtractUi"
@@ -89,6 +92,7 @@
             <EditText
                 android:id="@+id/subject_value"
                 android:layout_width="match_parent"
+                android:selectAllOnFocus="true"
                 android:layout_height="wrap_content"
                 android:imeOptions="flagNoExtractUi"
                 android:inputType="text" />
