@@ -5,8 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -231,6 +235,7 @@ public class TabsActivity extends AppCompatActivity {
 
         private void setTab(View rootView, int arg) {
 
+
             Button buttonYes = (Button) rootView.findViewById(R.id.button_yes);
             Button buttonNo = (Button) rootView.findViewById(R.id.button_no);
             Button buttonDunno = (Button) rootView.findViewById(R.id.button_dunno);
@@ -242,27 +247,39 @@ public class TabsActivity extends AppCompatActivity {
             else if (last_answer == 3) ((TabsActivity) getActivity()).amount_of_dunno_answers--;
 
             if (arg == 1) {
-                buttonYes.getBackground().setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
-                buttonNo.getBackground().clearColorFilter();
-                buttonDunno.getBackground().clearColorFilter();
+                //buttonYes.getBackground().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
+                //buttonNo.getBackground().clearColorFilter();
+                //buttonDunno.getBackground().clearColorFilter();
+                buttonYes.setBackgroundColor(Color.GREEN);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
                 getArguments().putInt("choosen_answer", 1);
                 ((TabsActivity) getActivity()).amount_of_yes_answers++;
             } else if (arg == 2) {
-                buttonYes.getBackground().clearColorFilter();
-                buttonNo.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
-                buttonDunno.getBackground().clearColorFilter();
+                //buttonYes.getBackground().clearColorFilter();
+                //buttonNo.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+                //buttonDunno.getBackground().clearColorFilter();
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundColor(Color.RED);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
                 getArguments().putInt("choosen_answer", 2);
                 ((TabsActivity) getActivity()).amount_of_no_answers++;
             } else if (arg == 3) {
-                buttonYes.getBackground().clearColorFilter();
-                buttonNo.getBackground().clearColorFilter();
-                buttonDunno.getBackground().setColorFilter(Color.YELLOW, PorterDuff.Mode.MULTIPLY);
+                //buttonYes.getBackground().clearColorFilter();
+                //buttonNo.getBackground().clearColorFilter();
+                //buttonDunno.getBackground().setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundColor(Color.YELLOW);
                 getArguments().putInt("choosen_answer", 3);
                 ((TabsActivity) getActivity()).amount_of_dunno_answers++;
             } else if (arg == 0) {
-                buttonYes.getBackground().clearColorFilter();
-                buttonNo.getBackground().clearColorFilter();
-                buttonDunno.getBackground().clearColorFilter();
+                //buttonYes.getBackground().clearColorFilter();
+                //buttonNo.getBackground().clearColorFilter();
+                //buttonDunno.getBackground().clearColorFilter();
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
                 getArguments().putInt("choosen_answer", 0);
             }
         }
@@ -330,7 +347,7 @@ public class TabsActivity extends AppCompatActivity {
                     } else {
                         Log.d("Warning", "No network connection available.");
                         Toast.makeText(getActivity().getBaseContext(), "Brak połączenia z internetem!", Toast.LENGTH_SHORT).show();
-                        setTab(rootView, 0);
+                        //setTab(rootView, 0);
                         return;
                     }
                     db.close();
@@ -382,7 +399,7 @@ public class TabsActivity extends AppCompatActivity {
                     } else {
                         Log.d("Warning", "No network connection available.");
                         Toast.makeText(getActivity().getBaseContext(), "Brak połączenia z internetem!", Toast.LENGTH_SHORT).show();
-                        setTab(rootView, 0);
+                        //setTab(rootView, 0);
                         return;
                     }
                     db.close();
@@ -435,7 +452,7 @@ public class TabsActivity extends AppCompatActivity {
                     } else {
                         Log.d("Warning", "No network connection available.");
                         Toast.makeText(getActivity().getBaseContext(), "Brak połączenia z internetem!", Toast.LENGTH_SHORT).show();
-                        setTab(rootView, 0);
+                        //setTab(rootView, 0);
                         return;
                     }
                     db.close();

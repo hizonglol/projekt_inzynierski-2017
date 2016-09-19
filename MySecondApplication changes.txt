@@ -1,3 +1,6 @@
+ver. 0.5.1
+~ niezbyt ³adne obejœcie b³êdu z niepoprawn¹ zmian¹ background przycisków w Tabs Activity
+
 ver. 0.5.0
 + ³¹czenie siê z serwerem i wysy³anie zapytania z danymi testu
 ~ poprawiony focus w MainActivity
@@ -52,5 +55,4 @@ ver. 0.1.2
 
 Known bugs:
 * z³e granice przesuwania w trybie landscape w Tabs Activity
-* aplikacja nie pyta siê o przyznanie uprawnieñ do korzystania z kamery
-* brak ustawianego koloru przycisku po jego wciœniêciu
+* aplikacja nie pyta siê o przyznanie uprawnieñ do korzystania z kamery w Android 6
