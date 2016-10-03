@@ -221,8 +221,8 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         /**
-         * Returns a new instance of this fragment for the given section
-         * number.
+         * @param sectionNumber - number of section
+         * @return New instance of fragment to the given section number
          */
         public static QuestionFragment newInstance(int sectionNumber) {
             QuestionFragment fragment = new QuestionFragment();
@@ -233,9 +233,13 @@ public class TabsActivity extends AppCompatActivity {
             return fragment;
         }
 
+        /**
+         *
+         * @param rootView - root view of tab
+         * @param arg - which answer has been chosen
+         */
+
         private void setTab(View rootView, int arg) {
-
-
             Button buttonYes = (Button) rootView.findViewById(R.id.button_yes);
             Button buttonNo = (Button) rootView.findViewById(R.id.button_no);
             Button buttonDunno = (Button) rootView.findViewById(R.id.button_dunno);

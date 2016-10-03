@@ -2,7 +2,7 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Wnukówki</string>
-    <string name="version_number">0.1.2</string>
+    <string name="version_number">0.1.3</string>
 
     <!--*** LABEL strings of MAIN ***-->
     <string name="label_index">Nr indeksu:</string>

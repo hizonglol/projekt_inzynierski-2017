@@ -1,3 +1,7 @@
+ver. 0.1.3
+~ poprawki w angielskim locale
+~ poprawki w gradle scripts i obni¿enie minimalnego API do 15 (Ice Cream Sandwich)
+
 ver. 0.1.2
 ~ uporz¹dkowano plik strings.xml (sekcje)
 ~ w Main Activity edycja pe³noekranowa w trybie landscape zamieniona na soft keyboard input
