@@ -1,4 +1,5 @@
 ver. 0.6.0
++ w Android Marshmallow i wy¿ej pojawia siê zapytanie o dostêp do kamery i pamiêci masowej
 + zapisywanie odpowiedzi do pliku w folderze Haszowki w pamiêci zewnêtrznej
 ~ w razie braku internetu odpowiedzi zapisz¹ siê do pliku, a odpowiedŸ zaznaczy siê wyszarzonym kolorem
 + sprawdzanie czy u¿ytkownik na pewno chcia³ wcisn¹æ przycisk back
