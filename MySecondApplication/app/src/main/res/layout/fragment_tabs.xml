@@ -55,7 +55,7 @@
             android:layout_below="@+id/row_tab_info_labels">
 
             <TextView
-                android:id="@+id/group_number"
+                android:id="@+id/view_group_number"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="4"
@@ -67,7 +67,7 @@
                 android:textSize="30sp" />
 
             <TextView
-                android:id="@+id/question_number"
+                android:id="@+id/view_question_number"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="4"
@@ -128,6 +128,29 @@
                 android:text="@string/button_add_question" />
 
         </TableRow>
+
+        <TextView
+            android:id="@+id/label_session_token"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/buttons"
+            android:gravity="center"
+            android:paddingTop="6dp"
+            android:singleLine="true"
+            android:text="@string/label_session_token"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/view_token"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/label_session_token"
+            android:gravity="center"
+            android:minHeight="50sp"
+            android:singleLine="true"
+            android:text="@string/zero_value"
+            android:textColor="@color/abc_primary_text_material_light"
+            android:textSize="30sp" />
 
     </RelativeLayout>
 

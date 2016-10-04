@@ -1,18 +1,21 @@
 package com.twohe.mysecondapplication;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.util.StringBuilderPrinter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,13 +27,71 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.io.File;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    boolean moduloflag = false;
+    boolean canBeginTestFlag = false;
+
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
 
     SettingsDataSource db = new SettingsDataSource(this);
+
+    public boolean isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v("isStoragePermGranted", "Permission is granted");
+                return true;
+            } else {
+
+                Log.v("isStoragePermGranted", "Permission is revoked");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                return false;
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            Log.v("isStoragePermGranted", "Permission is granted");
+            return true;
+        }
+    }
+
+    public boolean isCameraPermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v("isCameraPermGranted", "Permission is granted");
+                return true;
+            } else {
+
+                Log.v("isCameraPermGranted", "Permission is revoked");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1);
+                return false;
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            Log.v("isCameraPermGranted", "Permission is granted");
+            return true;
+        }
+    }
+
+    private boolean createAppFolder() {
+
+        isStoragePermissionGranted();
+
+        File folder = new File(Environment.getExternalStorageDirectory() + "/Haszowki");
+        boolean success = true;
+        if (!folder.exists()) {
+            success = folder.mkdir();
+        }
+        if (success) {
+            Log.v("createAppFolder", "successful");
+            //MediaScannerConnection.scanFile(this, new String[] { folder.getAbsolutePath() }, null, null);
+        } else {
+            Log.v("createAppFolder", "unsuccessful");
+        }
+
+        return success;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return; // return to prevent from doing unnecessary stuffs
         }
+
+        createAppFolder();
 
         //*****************************************************************************************
 
@@ -60,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         final View.OnClickListener computeButtonHandler = new View.OnClickListener() {
             public void onClick(View v) throws NumberFormatException {
 
-                moduloflag = false;
+                canBeginTestFlag = false;
 
                 int digitsIndex[] = new int[6];
                 int digitsWeights[] = new int[6];
@@ -144,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 int numberModuloResult = numberResult % 16;
-                moduloflag = true;
+                canBeginTestFlag = true;
 
                 TextView viewModuloResult = (TextView) findViewById(R.id.result_modulo_value);
                 String stringModuloResult = null;
@@ -183,8 +246,13 @@ public class MainActivity extends AppCompatActivity {
                             .setAction("Action", null).show();
                             */
 
-                if (!moduloflag) {
-                    Toast.makeText(getBaseContext(), "Wylicz poprawną grupę", Toast.LENGTH_SHORT).show();
+                if(!isStoragePermissionGranted()){
+                    Toast.makeText(getBaseContext(), "Daj uprawnienia do zapisu!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!canBeginTestFlag) {
+                    Toast.makeText(getBaseContext(), "Wylicz poprawną grupę!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -195,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (editRow != null) {
                     if (Integer.parseInt(editRow.getText().toString()) < 1) {
-                        Toast.makeText(getBaseContext(), "Podaj poprawny rząd", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), "Podaj poprawny rząd!", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     db.createSetting("setting_hall_row", editRow.getText().toString());
@@ -203,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (editPlace != null) {
                     if (Integer.parseInt(editPlace.getText().toString()) < 1) {
-                        Toast.makeText(getBaseContext(), "Podaj poprawne miejsce", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), "Podaj poprawne miejsce!", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     db.createSetting("setting_hall_place", editPlace.getText().toString());
@@ -254,17 +322,21 @@ public class MainActivity extends AppCompatActivity {
 
         View.OnClickListener scanQRButtonHandler = new View.OnClickListener() {
             public void onClick(View v) {
-                Log.v("MainActivity", "Scanning");
-                IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
-                integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
-                integrator.setPrompt("Zeskanuj kod QR");
-                integrator.setCameraId(0);  // Use a specific camera of the device
-                integrator.setBeepEnabled(false);
-                integrator.initiateScan(IntentIntegrator.QR_CODE_TYPES);
+                if (isCameraPermissionGranted()) {
+                    IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
+                    integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+                    integrator.setPrompt("Zeskanuj kod QR");
+                    integrator.setCameraId(0);  // Use a specific camera of the device
+                    integrator.setBeepEnabled(false);
+                    integrator.initiateScan(IntentIntegrator.QR_CODE_TYPES);
+
+                    Log.v("scanQRButtonHandler", "Scanned");
+                }
             }
         };
         if (scanQRButton != null)
             scanQRButton.setOnClickListener(scanQRButtonHandler);
+
     }
 
 
@@ -293,6 +365,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Wychodzę z aplikacji")
+                .setMessage("Czy na pewno chcesz wyjść z aplikacji?")
+                .setPositiveButton("Tak", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+
+                })
+                .setNegativeButton("Nie", null)
+                .show();
+    }
 
     @Override
     public void onDestroy() {

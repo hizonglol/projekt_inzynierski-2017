@@ -1,38 +1,38 @@
 package com.twohe.mysecondapplication;
 
-import android.app.TabActivity;
+import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
+import android.content.res.Configuration;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
-import android.util.StringBuilderPrinter;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -40,8 +40,13 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 
 /**
  * Created by TwoHe on 10.07.2016.
@@ -61,17 +66,114 @@ public class TabsActivity extends AppCompatActivity {
     int amount_of_no_answers = 0;
     int amount_of_dunno_answers = 0;
 
+    String token;
+    File fileToWrite;
+
+    boolean wasInBackground = false;
+
+
     private boolean isCallable(Intent intent) {
         List<ResolveInfo> list = getPackageManager().queryIntentActivities(intent,
                 PackageManager.MATCH_DEFAULT_ONLY);
-        Log.v("Ilosc instancji: ", String.valueOf(list.size()));
+        Log.i("isCallable", String.valueOf(list.size()));
         return list.size() < 2;
+    }
+
+    private String generateToken() {
+        SecureRandom randomizer = new SecureRandom();
+        byte bytes[] = new byte[6];
+        randomizer.nextBytes(bytes);
+        String base64 = Base64.encodeToString(bytes, Base64.URL_SAFE | Base64.NO_WRAP);
+        Log.i("generateCode", base64);
+
+        return base64;
+    }
+
+    private boolean createTestFile(String token) {
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss", Locale.getDefault());
+        //SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault());
+        Date now = new Date();
+        String fileName = formatter.format(now) + "-" + token + ".txt";//like 2016_01_12-12_30_00-ABCdef12.txt
+
+        try {
+            File root = new File(Environment.getExternalStorageDirectory() + "/Haszowki");
+            if (!root.exists()) {
+                root.mkdir();
+            }
+            fileToWrite = new File(root, fileName);
+
+
+            FileWriter writer = new FileWriter(fileToWrite, true);
+            writer.append("Twoj kod testu to: ");
+            writer.append(token);
+            writer.append("\n\n");
+            writer.flush();
+            writer.close();
+            Toast.makeText(this, "Twoj plik z testem zostal utworzony", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+
+    public boolean appendToFileCiphered(String text) {
+
+        try {
+            FileWriter writer = new FileWriter(fileToWrite, true);
+            writer.append(text);
+            writer.append("\n");
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    public class MemoryBoss implements ComponentCallbacks2 {
+        @Override
+        public void onConfigurationChanged(final Configuration newConfig) {
+        }
+
+        @Override
+        public void onLowMemory() {
+        }
+
+        @Override
+        public void onTrimMemory(final int level) {
+            if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+                // We're in the Background
+                wasInBackground = true;
+            }
+            // you might as well implement some memory cleanup here and be a nice Android dev.
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabs);
+
+        MemoryBoss mMemoryBoss;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            mMemoryBoss = new MemoryBoss();
+            registerComponentCallbacks(mMemoryBoss);
+        }
+
+        SettingsDataSource db = new SettingsDataSource(this);
+        db.open();
+        token = generateToken();
+        db.createSetting("setting_token", token);
+        db.close();
+
+        createTestFile(token);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -88,53 +190,66 @@ public class TabsActivity extends AppCompatActivity {
         if (tabLayout != null)
             tabLayout.setupWithViewPager(mViewPager);
 
+
         addTab();
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        /*
+        if (wasInBackground) {
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Wyszedłeś z aplikacji")
+                    .setMessage("Test zakończony")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intentMain = new Intent(getApplicationContext(), MainActivity.class);
+                            intentMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intentMain.putExtra("Exit me", true);
+                            startActivity(intentMain);
+                            finish();
+                        }
+
+                    })
+                    .show();
+        }
+        */
+        if (wasInBackground) {
+            Intent intentMain = new Intent(getApplicationContext(), MainActivity.class);
+            intentMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intentMain.putExtra("Exit me", true);
+            startActivity(intentMain);
+            finish();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Wychodzę z testu")
+                .setMessage("Czy na pewno chcesz wyjść z testu?")
+                .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+
+                })
+                .setNegativeButton("Nie", null)
+                .show();
+    }
+
 
     public void addTab() {
         mSectionsPagerAdapter.addFragment();
     }
 
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-
-            Intent intentSettings = new Intent(getApplicationContext(), SettingsActivity.class);
-            startActivity(intentSettings);
-
-            Log.i("Menu", "Settings");
-
-            return true;
-        }
-
-        if (id == R.id.action_info) {
-
-            Intent intentInfo = new Intent(getApplicationContext(), InfoActivity.class);
-            startActivity(intentInfo);
-
-            Log.i("Menu", "Info");
-
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-    */
 
     //*********************************************************************************************
 
@@ -147,6 +262,7 @@ public class TabsActivity extends AppCompatActivity {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String ARG_SECTION_ANSWER = "section_answer";
         private static final String DEBUG_TAG = "HttpExample";
 
         // Reads an InputStream and converts it to a String.
@@ -182,7 +298,8 @@ public class TabsActivity extends AppCompatActivity {
 
                 // Convert the InputStream into a string
                 String contentAsString = readIt(is, len);
-                return contentAsString;
+                //return contentAsString;
+                return String.valueOf(response);
 
                 // Makes sure that the InputStream is closed after the app is
                 // finished using it.
@@ -199,6 +316,9 @@ public class TabsActivity extends AppCompatActivity {
         // an InputStream. Finally, the InputStream is converted into a string, which is
         // displayed in the UI by the AsyncTask's onPostExecute method.
         private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
+            View rootView;
+            int tab;
+
             @Override
             protected String doInBackground(String... urls) {
 
@@ -213,7 +333,15 @@ public class TabsActivity extends AppCompatActivity {
             // onPostExecute displays the results of the AsyncTask.
             @Override
             protected void onPostExecute(String result) {
+                if (result.equals("200"))
+                    setTab(rootView, tab);
+
                 Log.d("Wynik", result);
+            }
+
+            void configure(View passedView, int passedTab) {
+                rootView = passedView;
+                tab = passedTab;
             }
         }
 
@@ -228,15 +356,14 @@ public class TabsActivity extends AppCompatActivity {
             QuestionFragment fragment = new QuestionFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            args.putInt("choosen_answer", 0);
+            args.putInt(ARG_SECTION_ANSWER, 0);
             fragment.setArguments(args);
             return fragment;
         }
 
         /**
-         *
          * @param rootView - root view of tab
-         * @param arg - which answer has been chosen
+         * @param arg      - which answer has been chosen
          */
 
         private void setTab(View rootView, int arg) {
@@ -244,56 +371,142 @@ public class TabsActivity extends AppCompatActivity {
             Button buttonNo = (Button) rootView.findViewById(R.id.button_no);
             Button buttonDunno = (Button) rootView.findViewById(R.id.button_dunno);
 
-            int last_answer = getArguments().getInt("choosen_answer");
+            int last_answer = getArguments().getInt(ARG_SECTION_ANSWER);
 
             if (last_answer == 1) ((TabsActivity) getActivity()).amount_of_yes_answers--;
             else if (last_answer == 2) ((TabsActivity) getActivity()).amount_of_no_answers--;
             else if (last_answer == 3) ((TabsActivity) getActivity()).amount_of_dunno_answers--;
 
             if (arg == 1) {
-                //buttonYes.getBackground().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
-                //buttonNo.getBackground().clearColorFilter();
-                //buttonDunno.getBackground().clearColorFilter();
                 buttonYes.setBackgroundColor(Color.GREEN);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt("choosen_answer", 1);
+                getArguments().putInt(ARG_SECTION_ANSWER, 1);
                 ((TabsActivity) getActivity()).amount_of_yes_answers++;
             } else if (arg == 2) {
-                //buttonYes.getBackground().clearColorFilter();
-                //buttonNo.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
-                //buttonDunno.getBackground().clearColorFilter();
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundColor(Color.RED);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt("choosen_answer", 2);
+                getArguments().putInt(ARG_SECTION_ANSWER, 2);
                 ((TabsActivity) getActivity()).amount_of_no_answers++;
             } else if (arg == 3) {
-                //buttonYes.getBackground().clearColorFilter();
-                //buttonNo.getBackground().clearColorFilter();
-                //buttonDunno.getBackground().setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundColor(Color.YELLOW);
-                getArguments().putInt("choosen_answer", 3);
+                getArguments().putInt(ARG_SECTION_ANSWER, 3);
                 ((TabsActivity) getActivity()).amount_of_dunno_answers++;
             } else if (arg == 0) {
-                //buttonYes.getBackground().clearColorFilter();
-                //buttonNo.getBackground().clearColorFilter();
-                //buttonDunno.getBackground().clearColorFilter();
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt("choosen_answer", 0);
+                getArguments().putInt(ARG_SECTION_ANSWER, 0);
             }
+        }
+
+        private void setTabGray(View rootView, int arg) {
+            Button buttonYes = (Button) rootView.findViewById(R.id.button_yes);
+            Button buttonNo = (Button) rootView.findViewById(R.id.button_no);
+            Button buttonDunno = (Button) rootView.findViewById(R.id.button_dunno);
+
+            int last_answer = getArguments().getInt(ARG_SECTION_ANSWER);
+
+            if (last_answer == 1) ((TabsActivity) getActivity()).amount_of_yes_answers--;
+            else if (last_answer == 2) ((TabsActivity) getActivity()).amount_of_no_answers--;
+            else if (last_answer == 3) ((TabsActivity) getActivity()).amount_of_dunno_answers--;
+
+            if (arg == 1) {
+                buttonYes.setBackgroundColor(Color.DKGRAY);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
+                getArguments().putInt(ARG_SECTION_ANSWER, 1);
+                ((TabsActivity) getActivity()).amount_of_yes_answers++;
+            } else if (arg == 2) {
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundColor(Color.DKGRAY);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
+                getArguments().putInt(ARG_SECTION_ANSWER, 2);
+                ((TabsActivity) getActivity()).amount_of_no_answers++;
+            } else if (arg == 3) {
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundColor(Color.DKGRAY);
+                getArguments().putInt(ARG_SECTION_ANSWER, 3);
+                ((TabsActivity) getActivity()).amount_of_dunno_answers++;
+            } else if (arg == 0) {
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
+                getArguments().putInt(ARG_SECTION_ANSWER, 0);
+            }
+        }
+
+        private String createUriFromThisPage() {
+            SettingsDataSource db = new SettingsDataSource(getActivity());
+            db.open();
+            String stringServerUrl = "http://www.zpcir.ict.pwr.wroc.pl/~witold/empty.html";
+            StringBuilder sbServerQuery = new StringBuilder();
+            sbServerQuery.append(stringServerUrl).append("?");
+            sbServerQuery.append("token=").append(((TabsActivity) getActivity()).token).append("&");
+            String subject = db.getSetting("setting_subject");
+            sbServerQuery.append("subject=").append(subject).append("&");
+            String testId = db.getSetting("setting_test_id");
+            sbServerQuery.append("test_id=").append(testId).append("&");
+            String name = db.getSetting("setting_name");
+            sbServerQuery.append("name=").append(name).append("&");
+            String surname = db.getSetting("setting_surname");
+            sbServerQuery.append("surname=").append(surname).append("&");
+            String index = db.getSetting("setting_index");
+            sbServerQuery.append("index=").append(index).append("&");
+            String weights = db.getSetting("setting_weights");
+            sbServerQuery.append("weights=").append(weights).append("&");
+            String group = db.getSetting("setting_group");
+            sbServerQuery.append("group=").append(group).append("&");
+            String hall_row = db.getSetting("setting_hall_row");
+            sbServerQuery.append("hall_row=").append(hall_row).append("&");
+            String hall_place = db.getSetting("setting_hall_place");
+            sbServerQuery.append("hall_place=").append(hall_place).append("&");
+            String question_no = String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER));
+            sbServerQuery.append("question_no=").append(question_no).append("&");
+            String answer = "yes";
+            sbServerQuery.append("answer=").append(answer);
+
+            String sentUrl = sbServerQuery.toString();
+            sentUrl = sentUrl.replace(" ", "");
+
+            Log.d("Sent uri", sentUrl);
+
+            db.close();
+
+            return sentUrl;
+        }
+
+        private boolean initialize(View rootView) {
+            SettingsDataSource db = new SettingsDataSource(getActivity());
+
+            db.open();
+
+            TextView viewGroup = (TextView) rootView.findViewById(R.id.view_group_number);
+            TextView viewQuestionNumber = (TextView) rootView.findViewById(R.id.view_question_number);
+            TextView viewSessionToken = (TextView) rootView.findViewById(R.id.view_token);
+
+            if (viewGroup != null)
+                viewGroup.setText(db.getSetting("setting_group"));
+
+            if (viewQuestionNumber != null)
+                viewQuestionNumber.setText(String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER)));
+
+            if (viewSessionToken != null)
+                viewSessionToken.setText(db.getSetting("setting_token"));
+
+            db.close();
+
+            return true;
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  final Bundle savedInstanceState) {
             final View rootView = inflater.inflate(R.layout.fragment_tabs, container, false);
-
-            final SettingsDataSource db = new SettingsDataSource(getActivity());
 
             rootView.findViewById(R.id.button_end_test).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -308,162 +521,94 @@ public class TabsActivity extends AppCompatActivity {
                     startActivity(intentSummary);
                 }
             });
+
             rootView.findViewById(R.id.button_yes).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    db.open();
-                    String stringServerUrl = "http://www.zpcir.ict.pwr.wroc.pl/~witold/empty.html";
-                    StringBuilder sbServerQuery = new StringBuilder();
-                    sbServerQuery.append(stringServerUrl).append("?");
-                    String subject = db.getSetting("setting_subject");
-                    sbServerQuery.append("subject=").append(subject).append("&");
-                    String testId = db.getSetting("setting_test_id");
-                    sbServerQuery.append("test_id=").append(testId).append("&");
-                    String name = db.getSetting("setting_name");
-                    sbServerQuery.append("name=").append(name).append("&");
-                    String surname = db.getSetting("setting_surname");
-                    sbServerQuery.append("surname=").append(surname).append("&");
-                    String index = db.getSetting("setting_index");
-                    sbServerQuery.append("index=").append(index).append("&");
-                    String weights = db.getSetting("setting_weights");
-                    sbServerQuery.append("weights=").append(weights).append("&");
-                    String group = db.getSetting("setting_group");
-                    sbServerQuery.append("group=").append(group).append("&");
-                    String hall_row = db.getSetting("setting_hall_row");
-                    sbServerQuery.append("hall_row=").append(hall_row).append("&");
-                    String hall_place = db.getSetting("setting_hall_place");
-                    sbServerQuery.append("hall_place=").append(hall_place).append("&");
-                    String question_no = String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER));
-                    sbServerQuery.append("question_no=").append(question_no).append("&");
-                    String answer = "yes";
-                    sbServerQuery.append("answer=").append(answer);
 
-                    String sentUrl = sbServerQuery.toString();
-                    sentUrl = sentUrl.replace(" ", "");
+                    String sentUrl = createUriFromThisPage();
 
-                    Log.d("Sent uri", sentUrl);
+                    if (((TabsActivity) getActivity()).appendToFileCiphered(sentUrl)) {
+                        setTabGray(rootView, 1);
+                    }
 
                     ConnectivityManager connMgr = (ConnectivityManager)
                             getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
                     NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
                     if (networkInfo != null && networkInfo.isConnected()) {
-                        new DownloadWebpageTask().execute(sentUrl);
+                        DownloadWebpageTask task = new DownloadWebpageTask();
+                        task.configure(rootView, 1);
+                        task.execute(sentUrl);
                     } else {
                         Log.d("Warning", "No network connection available.");
                         Toast.makeText(getActivity().getBaseContext(), "Brak połączenia z internetem!", Toast.LENGTH_SHORT).show();
                         //setTab(rootView, 0);
                         return;
                     }
-                    db.close();
 
-                    setTab(rootView, 1);
+                    //setTab(rootView, 1);
                 }
             });
+
             rootView.findViewById(R.id.button_no).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    db.open();
-                    String stringServerUrl = "http://www.zpcir.ict.pwr.wroc.pl/~witold/empty.html";
-                    StringBuilder sbServerQuery = new StringBuilder();
-                    sbServerQuery.append(stringServerUrl).append("?");
-                    String subject = db.getSetting("setting_subject");
-                    sbServerQuery.append("subject=").append(subject).append("&");
-                    String testId = db.getSetting("setting_test_id");
-                    sbServerQuery.append("test_id=").append(testId).append("&");
-                    String name = db.getSetting("setting_name");
-                    sbServerQuery.append("name=").append(name).append("&");
-                    String surname = db.getSetting("setting_surname");
-                    sbServerQuery.append("surname=").append(surname).append("&");
-                    String index = db.getSetting("setting_index");
-                    sbServerQuery.append("index=").append(index).append("&");
-                    String weights = db.getSetting("setting_weights");
-                    sbServerQuery.append("weights=").append(weights).append("&");
-                    String group = db.getSetting("setting_group");
-                    sbServerQuery.append("group=").append(group).append("&");
-                    String hall_row = db.getSetting("setting_hall_row");
-                    sbServerQuery.append("hall_row=").append(hall_row).append("&");
-                    String hall_place = db.getSetting("setting_hall_place");
-                    sbServerQuery.append("hall_place=").append(hall_place).append("&");
-                    String question_no = String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER));
-                    sbServerQuery.append("question_no=").append(question_no).append("&");
-                    String answer = "no";
-                    sbServerQuery.append("answer=").append(answer);
+                    String sentUrl = createUriFromThisPage();
 
-                    String sentUrl = sbServerQuery.toString();
-                    sentUrl = sentUrl.replace(" ", "");
-
-                    Log.d("Sent uri", sentUrl);
+                    if (((TabsActivity) getActivity()).appendToFileCiphered(sentUrl)) {
+                        setTabGray(rootView, 2);
+                    }
 
                     ConnectivityManager connMgr = (ConnectivityManager)
                             getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
                     NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
                     if (networkInfo != null && networkInfo.isConnected()) {
-                        new DownloadWebpageTask().execute(sentUrl);
+                        //new DownloadWebpageTask().execute(sentUrl);
+                        DownloadWebpageTask task = new DownloadWebpageTask();
+                        task.configure(rootView, 2);
+                        task.execute(sentUrl);
                     } else {
                         Log.d("Warning", "No network connection available.");
                         Toast.makeText(getActivity().getBaseContext(), "Brak połączenia z internetem!", Toast.LENGTH_SHORT).show();
                         //setTab(rootView, 0);
                         return;
                     }
-                    db.close();
 
-                    setTab(rootView, 2);
+                    //setTab(rootView, 2);
 
                 }
             });
+
             rootView.findViewById(R.id.button_dunno).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    db.open();
-                    String stringServerUrl = "http://www.zpcir.ict.pwr.wroc.pl/~witold/empty.html";
-                    StringBuilder sbServerQuery = new StringBuilder();
-                    sbServerQuery.append(stringServerUrl).append("?");
-                    String subject = db.getSetting("setting_subject");
-                    sbServerQuery.append("subject=").append(subject).append("&");
-                    String testId = db.getSetting("setting_test_id");
-                    sbServerQuery.append("test_id=").append(testId).append("&");
-                    String name = db.getSetting("setting_name");
-                    sbServerQuery.append("name=").append(name).append("&");
-                    String surname = db.getSetting("setting_surname");
-                    sbServerQuery.append("surname=").append(surname).append("&");
-                    String index = db.getSetting("setting_index");
-                    sbServerQuery.append("index=").append(index).append("&");
-                    String weights = db.getSetting("setting_weights");
-                    sbServerQuery.append("weights=").append(weights).append("&");
-                    String group = db.getSetting("setting_group");
-                    sbServerQuery.append("group=").append(group).append("&");
-                    String hall_row = db.getSetting("setting_hall_row");
-                    sbServerQuery.append("hall_row=").append(hall_row).append("&");
-                    String hall_place = db.getSetting("setting_hall_place");
-                    sbServerQuery.append("hall_place=").append(hall_place).append("&");
-                    String question_no = String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER));
-                    sbServerQuery.append("question_no=").append(question_no).append("&");
-                    String answer = "dunno";
-                    sbServerQuery.append("answer=").append(answer);
+                    String sentUrl = createUriFromThisPage();
 
-                    String sentUrl = sbServerQuery.toString();
-                    sentUrl = sentUrl.replace(" ", "");
-
-                    Log.d("Sent uri", sentUrl);
+                    if (((TabsActivity) getActivity()).appendToFileCiphered(sentUrl)) {
+                        setTabGray(rootView, 3);
+                    }
 
                     ConnectivityManager connMgr = (ConnectivityManager)
                             getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
                     NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
                     if (networkInfo != null && networkInfo.isConnected()) {
-                        new DownloadWebpageTask().execute(sentUrl);
+                        //new DownloadWebpageTask().execute(sentUrl);
+                        DownloadWebpageTask task = new DownloadWebpageTask();
+                        task.configure(rootView, 3);
+                        task.execute(sentUrl);
                     } else {
                         Log.d("Warning", "No network connection available.");
                         Toast.makeText(getActivity().getBaseContext(), "Brak połączenia z internetem!", Toast.LENGTH_SHORT).show();
                         //setTab(rootView, 0);
                         return;
                     }
-                    db.close();
 
-                    setTab(rootView, 3);
+                    //setTab(rootView, 3);
                 }
             });
+
             rootView.findViewById(R.id.button_add_question).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -478,19 +623,7 @@ public class TabsActivity extends AppCompatActivity {
                 }
             });
 
-
-            db.open();
-
-            TextView viewGroup = (TextView) rootView.findViewById(R.id.group_number);
-            TextView viewQuestionNumber = (TextView) rootView.findViewById(R.id.question_number);
-
-            if (viewGroup != null)
-                viewGroup.setText(db.getSetting("setting_group"));
-
-            if (viewQuestionNumber != null)
-                viewQuestionNumber.setText(String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER)));
-
-            db.close();
+            initialize(rootView);
 
             return rootView;
         }

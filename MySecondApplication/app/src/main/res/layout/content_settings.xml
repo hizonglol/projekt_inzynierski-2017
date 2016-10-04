@@ -47,9 +47,10 @@
                 android:layout_width="match_parent"
                 android:selectAllOnFocus="true"
                 android:layout_height="wrap_content"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:ems="10"
                 android:imeOptions="flagNoExtractUi"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName|textNoSuggestions" />
 
             <TextView
                 android:id="@+id/label_surname"
@@ -60,11 +61,12 @@
             <EditText
                 android:id="@+id/surname_value"
                 android:layout_width="match_parent"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:layout_height="wrap_content"
                 android:selectAllOnFocus="true"
                 android:ems="10"
                 android:imeOptions="flagNoExtractUi"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName|textNoSuggestions" />
 
             <TextView
                 android:id="@+id/label_index"
@@ -93,9 +95,10 @@
                 android:id="@+id/subject_value"
                 android:layout_width="match_parent"
                 android:selectAllOnFocus="true"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:layout_height="wrap_content"
                 android:imeOptions="flagNoExtractUi"
-                android:inputType="text" />
+                android:inputType="text|textNoSuggestions" />
 
             <Button
                 android:id="@+id/button_save"

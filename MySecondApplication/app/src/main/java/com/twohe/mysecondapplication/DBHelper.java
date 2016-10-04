@@ -23,7 +23,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE = "create table "
             + TABLE_SETTINGS + "( " + COLUMN_SETTING
             + " text not null unique, " + COLUMN_SETTING_VALUE
-            + " text not null);";
+            + " text);";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

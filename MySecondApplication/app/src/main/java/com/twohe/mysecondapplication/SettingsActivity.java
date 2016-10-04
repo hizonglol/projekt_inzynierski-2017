@@ -11,6 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import static android.R.attr.data;
 
 /**
  * Created by TwoHe on 10.07.2016.
@@ -40,19 +43,41 @@ public class SettingsActivity extends AppCompatActivity {
                 EditText index = (EditText) findViewById(R.id.index_value);
                 EditText subject = (EditText) findViewById(R.id.subject_value);
 
-                if (name != null)
+                if (name != null) {
+                    if (name.getText().toString().equals("")) {
+                        Toast.makeText(getBaseContext(), "Podaj imię!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     db.createSetting("setting_name", name.getText().toString());
+                }
 
-                if(surname != null)
+                if (surname != null) {
+                    if (surname.getText().toString().equals("")) {
+                        Toast.makeText(getBaseContext(), "Podaj nazwisko!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     db.createSetting("setting_surname", surname.getText().toString());
+                }
 
-                if(index != null)
+                if (index != null) {
+                    if (index.getText().toString().length() != 6) {
+                        Toast.makeText(getBaseContext(), "Podaj poprawny indeks!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     db.createSetting("setting_index", index.getText().toString());
+                }
 
-                if(subject != null)
+                if (subject != null) {
+                    if (subject.getText().toString().equals("")) {
+                        Toast.makeText(getBaseContext(), "Podaj przedmiot!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     db.createSetting("setting_subject", subject.getText().toString());
+                }
 
-                Log.d("Settings", "Dane zapisane");
+                Log.d("saveButtonHandler", "Dane zapisane");
+
+                Toast.makeText(getBaseContext(), "Dane zapisane", Toast.LENGTH_SHORT).show();
             }
         };
         if (saveButton != null)
@@ -69,7 +94,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-    void resumeState(){
+    void resumeState() {
 
         SettingsDataSource resume_db = new SettingsDataSource(this);
         resume_db.open();
@@ -88,13 +113,13 @@ public class SettingsActivity extends AppCompatActivity {
         if (editName != null)
             editName.setText(stringName);
 
-        if(editSurname != null)
+        if (editSurname != null)
             editSurname.setText(stringSurname);
 
-        if(editIndex != null)
+        if (editIndex != null)
             editIndex.setText(stringIndex);
 
-        if(editSubject != null)
+        if (editSubject != null)
             editSubject.setText(stringSubject);
 
         resume_db.close();

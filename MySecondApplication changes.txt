@@ -1,3 +1,12 @@
+ver. 0.6.0
++ zapisywanie odpowiedzi do pliku w folderze Haszowki w pamiêci zewnêtrznej
+~ w razie braku internetu odpowiedzi zapisz¹ siê do pliku, a odpowiedŸ zaznaczy siê wyszarzonym kolorem
++ sprawdzanie czy u¿ytkownik na pewno chcia³ wcisn¹æ przycisk back
++ w razie wciœniêcia przycisków home lub czegoœ innego, co przeniesie aplikacjê w t³o aplikacja koñczy test
+  (potrzebne ³adniejsze rozwi¹zanie jakimœ promptem i zakoñczeniem aplikacji po delay)
+~ poprawki w gradle scripts i obni¿enie minimalnego API do 14 (Ice Cream Sandwich)
+~ poprawa czytelnoœci kodu
+
 ver. 0.5.1
 ~ niezbyt ³adne obejœcie b³êdu z niepoprawn¹ zmian¹ background przycisków w Tabs Activity
 

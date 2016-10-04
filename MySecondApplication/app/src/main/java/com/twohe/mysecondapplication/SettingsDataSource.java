@@ -61,7 +61,7 @@ public class SettingsDataSource {
 
     /* gets setting. If setting does not exist, creates setting and returns space */
     public String getSetting(String setting) {
-        String setting_value = " ";
+        String setting_value = "";
 
         Cursor cursor = database.query(DBHelper.TABLE_SETTINGS,
                 allColumns, DBHelper.COLUMN_SETTING + "=?", new String[]{setting}, null, null, null, null);
@@ -69,7 +69,7 @@ public class SettingsDataSource {
         if (cursor != null) {
 
             if (cursor.getCount() < 1) {
-                createSetting(setting, " ");
+                createSetting(setting, "");
                 cursor.close();
                 return setting_value;
             }
