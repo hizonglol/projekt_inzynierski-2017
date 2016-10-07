@@ -42,12 +42,26 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 
 /**
@@ -84,7 +98,7 @@ public class TabsActivity extends AppCompatActivity {
     }
     */
 
-    Thread thread = new Thread(){
+    Thread thread = new Thread() {
         @Override
         public void run() {
             try {
@@ -138,7 +152,12 @@ public class TabsActivity extends AppCompatActivity {
         return true;
     }
 
+
     public boolean appendToFileCiphered(String text) {
+
+        text = encryptIt(text);
+
+        decryptIt(text);
 
         try {
             FileWriter writer = new FileWriter(fileToWrite, true);
@@ -152,6 +171,78 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    private static String cryptoPass = "Moje haslo to brak hasla";
+
+    String encryptIt(String text) {
+
+        try {
+            DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
+            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+            SecretKey key = keyFactory.generateSecret(keySpec);
+
+            byte[] clearText = text.getBytes("UTF8");
+            // Cipher is not thread safe
+            Cipher cipher = Cipher.getInstance("DES");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+
+            text = Base64.encodeToString(cipher.doFinal(clearText), Base64.DEFAULT);
+            Log.d("appendToFileCiphered", "Encrypted: " + text + " -> " + text);
+
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+
+        return text;
+    }
+
+    String decryptIt(String text) {
+
+        try {
+            DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
+            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+            SecretKey key = keyFactory.generateSecret(keySpec);
+
+            byte[] encrypedPwdBytes = Base64.decode(text, Base64.DEFAULT);
+            // cipher is not thread safe
+            Cipher cipher = Cipher.getInstance("DES");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
+
+            String decrypedValue = new String(decrypedValueBytes);
+            Log.d("decryptIt", "Decrypted: " + text + " -> " + decrypedValue);
+            return decrypedValue;
+
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+        return text;
+
     }
 
     public class MemoryBoss implements ComponentCallbacks2 {
@@ -545,7 +636,6 @@ public class TabsActivity extends AppCompatActivity {
                         setTabGray(rootView, 1);
                         getArguments().putBoolean(ARG_SECTION_SENT, false);
                     }
-
 
 
                     ConnectivityManager connMgr = (ConnectivityManager)
