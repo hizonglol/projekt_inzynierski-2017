@@ -4,6 +4,7 @@ import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
@@ -14,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -53,6 +55,8 @@ import java.util.Locale;
  */
 public class TabsActivity extends AppCompatActivity {
 
+    // Create object of SharedPreferences.
+    SharedPreferences sharedPref;
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -71,13 +75,26 @@ public class TabsActivity extends AppCompatActivity {
 
     boolean wasInBackground = false;
 
-
+    /*
     private boolean isCallable(Intent intent) {
         List<ResolveInfo> list = getPackageManager().queryIntentActivities(intent,
                 PackageManager.MATCH_DEFAULT_ONLY);
         Log.i("isCallable", String.valueOf(list.size()));
         return list.size() < 2;
     }
+    */
+
+    Thread thread = new Thread(){
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(3500); // As I am using LENGTH_LONG in Toast
+                TabsActivity.this.finish();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
     private String generateToken() {
         SecureRandom randomizer = new SecureRandom();
@@ -86,7 +103,9 @@ public class TabsActivity extends AppCompatActivity {
         String base64 = Base64.encodeToString(bytes, Base64.URL_SAFE | Base64.NO_WRAP);
         Log.i("generateCode", base64);
 
-        return base64;
+        String shortenedBase64 = base64.substring(0, 4).toLowerCase();
+
+        return shortenedBase64;
     }
 
     private boolean createTestFile(String token) {
@@ -118,7 +137,6 @@ public class TabsActivity extends AppCompatActivity {
 
         return true;
     }
-
 
     public boolean appendToFileCiphered(String text) {
 
@@ -160,6 +178,7 @@ public class TabsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabs);
 
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         MemoryBoss mMemoryBoss;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -199,33 +218,23 @@ public class TabsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        /*
+        Boolean endTest = sharedPref.getBoolean("End test", false);
+
+        if (endTest)
+            TabsActivity.this.finish();
+
+
         if (wasInBackground) {
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("Wyszedłeś z aplikacji")
                     .setMessage("Test zakończony")
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent intentMain = new Intent(getApplicationContext(), MainActivity.class);
-                            intentMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intentMain.putExtra("Exit me", true);
-                            startActivity(intentMain);
-                            finish();
-                        }
-
-                    })
+                    .setCancelable(false)
                     .show();
+
+            thread.start();
         }
-        */
-        if (wasInBackground) {
-            Intent intentMain = new Intent(getApplicationContext(), MainActivity.class);
-            intentMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intentMain.putExtra("Exit me", true);
-            startActivity(intentMain);
-            finish();
-        }
+
     }
 
     @Override
@@ -263,6 +272,7 @@ public class TabsActivity extends AppCompatActivity {
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static final String ARG_SECTION_ANSWER = "section_answer";
+        private static final String ARG_SECTION_SENT = "section_sent";
         private static final String DEBUG_TAG = "HttpExample";
 
         // Reads an InputStream and converts it to a String.
@@ -333,8 +343,10 @@ public class TabsActivity extends AppCompatActivity {
             // onPostExecute displays the results of the AsyncTask.
             @Override
             protected void onPostExecute(String result) {
-                if (result.equals("200"))
+                if (result.equals("200")) {
                     setTab(rootView, tab);
+                    getArguments().putBoolean(ARG_SECTION_SENT, true);
+                }
 
                 Log.d("Wynik", result);
             }
@@ -357,6 +369,7 @@ public class TabsActivity extends AppCompatActivity {
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             args.putInt(ARG_SECTION_ANSWER, 0);
+            args.putBoolean(ARG_SECTION_SENT, false);
             fragment.setArguments(args);
             return fragment;
         }
@@ -530,7 +543,10 @@ public class TabsActivity extends AppCompatActivity {
 
                     if (((TabsActivity) getActivity()).appendToFileCiphered(sentUrl)) {
                         setTabGray(rootView, 1);
+                        getArguments().putBoolean(ARG_SECTION_SENT, false);
                     }
+
+
 
                     ConnectivityManager connMgr = (ConnectivityManager)
                             getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -558,13 +574,13 @@ public class TabsActivity extends AppCompatActivity {
 
                     if (((TabsActivity) getActivity()).appendToFileCiphered(sentUrl)) {
                         setTabGray(rootView, 2);
+                        getArguments().putBoolean(ARG_SECTION_SENT, false);
                     }
 
                     ConnectivityManager connMgr = (ConnectivityManager)
                             getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
                     NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
                     if (networkInfo != null && networkInfo.isConnected()) {
-                        //new DownloadWebpageTask().execute(sentUrl);
                         DownloadWebpageTask task = new DownloadWebpageTask();
                         task.configure(rootView, 2);
                         task.execute(sentUrl);
@@ -588,13 +604,13 @@ public class TabsActivity extends AppCompatActivity {
 
                     if (((TabsActivity) getActivity()).appendToFileCiphered(sentUrl)) {
                         setTabGray(rootView, 3);
+                        getArguments().putBoolean(ARG_SECTION_SENT, false);
                     }
 
                     ConnectivityManager connMgr = (ConnectivityManager)
                             getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
                     NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
                     if (networkInfo != null && networkInfo.isConnected()) {
-                        //new DownloadWebpageTask().execute(sentUrl);
                         DownloadWebpageTask task = new DownloadWebpageTask();
                         task.configure(rootView, 3);
                         task.execute(sentUrl);
@@ -633,10 +649,16 @@ public class TabsActivity extends AppCompatActivity {
             super.onResume();
 
             View rootView = getView();
-            int odpowiedz = getArguments().getInt("choosen_answer");
+            int answer = getArguments().getInt(ARG_SECTION_ANSWER);
+            boolean sent = getArguments().getBoolean(ARG_SECTION_SENT);
 
-            Log.v("Tabs Activity", "Restoring tab");
-            setTab(rootView, odpowiedz);
+            Log.v("onResume", "Restoring tab");
+            Log.w("onResume", String.valueOf(answer));
+
+            if (sent)
+                setTab(rootView, answer);
+            else
+                setTabGray(rootView, answer);
         }
     }
 

@@ -1,3 +1,9 @@
+ver. 0.6.1
+~ poprawa b³êdnego odtwarzania siê zak³adek w Tabs Activity
+~ poprawa koñczenia testu w przypadku wyrzucenia aplikacji w background. Teraz wyœwietla siê monit
+  i aplikacja wychodzi z testu po 3.5 sekundy
+! do poprawienia t³umaczenia toastów, monitów i promptów
+
 ver. 0.6.0
 + w Android Marshmallow i wy¿ej pojawia siê zapytanie o dostêp do kamery i pamiêci masowej
 + zapisywanie odpowiedzi do pliku w folderze Haszowki w pamiêci zewnêtrznej

@@ -3,6 +3,7 @@ package com.twohe.mysecondapplication;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.media.MediaScannerConnection;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -37,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
 
     SettingsDataSource db = new SettingsDataSource(this);
+
+
+    // Create object of SharedPreferences.
+    SharedPreferences sharedPref;
 
     public boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
@@ -103,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return; // return to prevent from doing unnecessary stuffs
         }
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
         createAppFolder();
 
@@ -296,10 +304,10 @@ public class MainActivity extends AppCompatActivity {
                 if (isCallable(intentTabs)) {
                     Log.i("Main", "Setting up tabs/navigating to them");
                     startActivity(intentTabs);
-                } else if (!isCallable(intentTabs)) {
+                }/* else if (!isCallable(intentTabs)) {
                     Log.i("Main", "Navigating to tabs");
                     navigateUpTo(intentTabs);
-                }
+                }*/
             }
         };
         if (startTestButton != null)
@@ -367,11 +375,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Wychodzę z aplikacji")
                 .setMessage("Czy na pewno chcesz wyjść z aplikacji?")
-                .setPositiveButton("Tak", new DialogInterface.OnClickListener()
+                .setPositiveButton(getResources().getString(R.string.button_yes), new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -379,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 })
-                .setNegativeButton("Nie", null)
+                .setNegativeButton(getResources().getString(R.string.button_no), null)
                 .show();
     }
 
@@ -422,6 +431,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
+
+        //now get Editor
+        SharedPreferences.Editor editor = sharedPref.edit();
+        //put your value
+        editor.putBoolean("End test", false);
+
+        //commits your edits
+        //editor.commit();
+        editor.apply();
 
         resumeState();
     }
