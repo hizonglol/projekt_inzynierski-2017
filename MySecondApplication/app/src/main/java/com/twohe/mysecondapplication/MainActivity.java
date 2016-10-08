@@ -1,26 +1,27 @@
 package com.twohe.mysecondapplication;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Create object of SharedPreferences.
     SharedPreferences sharedPref;
+
 
     public boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
@@ -164,14 +166,14 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < 6; ++i) {
                         try {
                             digitsIndex[i] = Integer.parseInt(Character.toString(stringIndex.charAt(i)));
-                            Log.v("Index", String.valueOf(digitsIndex[i]));
+                            //Log.v("Index", String.valueOf(digitsIndex[i]));
                         } catch (NumberFormatException e) {
-                            Toast.makeText(getBaseContext(), "Podaj poprawny indeks", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_student_number), Toast.LENGTH_SHORT).show();
                             return;
                         }
                     }
                 } catch (StringIndexOutOfBoundsException e) {
-                    Toast.makeText(getBaseContext(), "Podaj poprawny indeks", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_student_number), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -180,22 +182,17 @@ public class MainActivity extends AppCompatActivity {
                 //*******************************************************
 
                 if (stringWeights != null) {
-                    try { //sprawdzamy czy podano numer indeksu
                         for (int i = 0; i < 6; ++i) {
                             digitsWeights[i] = Integer.parseInt(Character.toString(stringWeights.charAt(i)));
-                            Log.v("Waga", String.valueOf(digitsWeights[i]));
+                            //Log.v("Waga", String.valueOf(digitsWeights[i]));
                         }
-                    } catch (StringIndexOutOfBoundsException e) {
-                        Toast.makeText(getBaseContext(), "Podaj poprawną wagę", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
                 }
 
                 int numberResult = 0;
                 for (int i = 0; i < 6; ++i) {
                     digitsResult[i] = digitsIndex[i] * digitsWeights[i];
                     numberResult += digitsResult[i];
-                    Log.v("Wynik", String.valueOf(digitsResult[i]));
+                    //Log.v("Wynik", String.valueOf(digitsResult[i]));
                 }
 
 
@@ -249,60 +246,23 @@ public class MainActivity extends AppCompatActivity {
 
         View.OnClickListener startTestButtonHandler = new View.OnClickListener() {
             public void onClick(View v) throws NumberFormatException {
-                    /*
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                            */
 
-                if(!isStoragePermissionGranted()){
-                    Toast.makeText(getBaseContext(), "Daj uprawnienia do zapisu!", Toast.LENGTH_SHORT).show();
+                if (!isStoragePermissionGranted()) {
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_writing_permission), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if (!canBeginTestFlag) {
-                    Toast.makeText(getBaseContext(), "Wylicz poprawną grupę!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_compute_group), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                EditText editRow = (EditText) findViewById(R.id.hall_row_value);
-                EditText editPlace = (EditText) findViewById(R.id.hall_place_value);
-                EditText editTestId = (EditText) findViewById(R.id.exam_id_value);
-                TextView viewSubjectValue = (TextView) findViewById(R.id.subject_value);
-
-                if (editRow != null) {
-                    if (Integer.parseInt(editRow.getText().toString()) < 1) {
-                        Toast.makeText(getBaseContext(), "Podaj poprawny rząd!", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    db.createSetting("setting_hall_row", editRow.getText().toString());
-                }
-
-                if (editPlace != null) {
-                    if (Integer.parseInt(editPlace.getText().toString()) < 1) {
-                        Toast.makeText(getBaseContext(), "Podaj poprawne miejsce!", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    db.createSetting("setting_hall_place", editPlace.getText().toString());
-                }
-
-                if (editTestId != null) {
-                    if (editTestId.getText().length() == 0) {
-                        Toast.makeText(getBaseContext(), "Wprowadź ID testu", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    db.createSetting("setting_test_id", editTestId.getText().toString());
-                }
-
-                if (viewSubjectValue != null) {
-                    if (viewSubjectValue.getText().length() < 2) {
-                        Toast.makeText(getBaseContext(), "Wprowadź nazwę przedmiotu", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                }
+                if (!checkIfEditableValuesProper())
+                    return;
 
                 Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
                 if (isCallable(intentTabs)) {
-                    Log.i("Main", "Setting up tabs/navigating to them");
+                    //Log.i("Main", "Setting up tabs/navigating to them");
                     startActivity(intentTabs);
                 }/* else if (!isCallable(intentTabs)) {
                     Log.i("Main", "Navigating to tabs");
@@ -333,18 +293,75 @@ public class MainActivity extends AppCompatActivity {
                 if (isCameraPermissionGranted()) {
                     IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
                     integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
-                    integrator.setPrompt("Zeskanuj kod QR");
+                    integrator.setPrompt(getResources().getString(R.string.message_scan_qr_code));
                     integrator.setCameraId(0);  // Use a specific camera of the device
                     integrator.setBeepEnabled(false);
                     integrator.initiateScan(IntentIntegrator.QR_CODE_TYPES);
 
-                    Log.v("scanQRButtonHandler", "Scanned");
+                    //Log.v("scanQRButtonHandler", "Scanned");
                 }
             }
         };
         if (scanQRButton != null)
             scanQRButton.setOnClickListener(scanQRButtonHandler);
 
+
+        EditText editTestId = (EditText) findViewById(R.id.exam_id_value);
+        EditText.OnEditorActionListener doneKeyboardButton = new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+            }
+        };
+        if (editTestId != null)
+            editTestId.setOnEditorActionListener(doneKeyboardButton);
+
+    }
+
+    private boolean checkIfEditableValuesProper() {
+
+        EditText editRow = (EditText) findViewById(R.id.hall_row_value);
+        EditText editPlace = (EditText) findViewById(R.id.hall_place_value);
+        EditText editTestId = (EditText) findViewById(R.id.exam_id_value);
+        TextView viewSubjectValue = (TextView) findViewById(R.id.subject_value);
+
+        if (editRow != null) {
+            if (Integer.parseInt(editRow.getText().toString()) < 1) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_row_higher_than_0), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            db.createSetting("setting_hall_row", editRow.getText().toString());
+        }
+
+        if (editPlace != null) {
+            if (Integer.parseInt(editPlace.getText().toString()) < 1) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_place_higher_than_0), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            db.createSetting("setting_hall_place", editPlace.getText().toString());
+        }
+
+        if (editTestId != null) {
+            if (editTestId.getText().length() == 0) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_ID_name), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            db.createSetting("setting_test_id", editTestId.getText().toString());
+        }
+
+        if (viewSubjectValue != null) {
+            if (viewSubjectValue.getText().length() < 2) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_subject_name), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
@@ -365,10 +382,10 @@ public class MainActivity extends AppCompatActivity {
                 if (editTestId != null)
                     editTestId.setText(contentsTable[1]);
                 // handle scan result
-                Log.v("Scan result:", contents);
+                //Log.v("Scan result:", contents);
             } else {
                 // else continue with any other code you need in the method
-                Log.v("MainActivity", "scanResult is null.");
+                //Log.v("MainActivity", "scanResult is null.");
             }
         }
     }
@@ -378,10 +395,9 @@ public class MainActivity extends AppCompatActivity {
 
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Wychodzę z aplikacji")
-                .setMessage("Czy na pewno chcesz wyjść z aplikacji?")
-                .setPositiveButton(getResources().getString(R.string.button_yes), new DialogInterface.OnClickListener()
-                {
+                .setTitle(getResources().getString(R.string.message_i_quit_app))
+                .setMessage(getResources().getString(R.string.message_do_you_want_to_quit_app))
+                .setPositiveButton(getResources().getString(R.string.button_yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finish();
@@ -447,7 +463,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isCallable(Intent intent) {
         List<ResolveInfo> list = getPackageManager().queryIntentActivities(intent,
                 PackageManager.MATCH_DEFAULT_ONLY);
-        Log.v("Ilosc instancji: ", String.valueOf(list.size()));
+        //Log.v("Ilosc instancji: ", String.valueOf(list.size()));
         return list.size() < 2;
     }
 
@@ -471,7 +487,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intentSettings = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(intentSettings);
 
-            Log.i("Menu", "Settings");
+            //Log.i("Menu", "Settings");
 
             return true;
         }
@@ -481,7 +497,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intentInfo = new Intent(getApplicationContext(), InfoActivity.class);
             startActivity(intentInfo);
 
-            Log.i("Menu", "Info");
+            //Log.i("Menu", "Info");
 
             return true;
         }

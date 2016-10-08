@@ -3,7 +3,6 @@ package com.twohe.mysecondapplication;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
 /**
  * Created by TwoHe on 10.07.2016.

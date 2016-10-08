@@ -1,6 +1,7 @@
 package com.twohe.mysecondapplication;
 
 import android.content.ComponentCallbacks2;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -95,7 +96,7 @@ public class SummaryActivity extends AppCompatActivity {
 
                 finish();
 
-                Log.i("Summary", "Going back to tabs");
+                //Log.i("Summary", "Going back to tabs");
             }
         };
         if (backToTestButton != null)
@@ -139,8 +140,8 @@ public class SummaryActivity extends AppCompatActivity {
         if (wasInBackground) {
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Wyszedłeś z aplikacji")
-                    .setMessage("Test zakończony")
+                    .setTitle(getResources().getString(R.string.message_you_quit_test))
+                    .setMessage(getResources().getString(R.string.message_test_ended))
                     .setCancelable(false)
                     .show();
 

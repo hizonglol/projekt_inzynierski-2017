@@ -1,19 +1,19 @@
 package com.twohe.mysecondapplication;
 
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.media.audiofx.BassBoost;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static android.R.attr.data;
 
 /**
  * Created by TwoHe on 10.07.2016.
@@ -45,7 +45,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 if (name != null) {
                     if (name.getText().toString().equals("")) {
-                        Toast.makeText(getBaseContext(), "Podaj imię!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_name), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     db.createSetting("setting_name", name.getText().toString());
@@ -53,7 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 if (surname != null) {
                     if (surname.getText().toString().equals("")) {
-                        Toast.makeText(getBaseContext(), "Podaj nazwisko!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_surname), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     db.createSetting("setting_surname", surname.getText().toString());
@@ -61,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 if (index != null) {
                     if (index.getText().toString().length() != 6) {
-                        Toast.makeText(getBaseContext(), "Podaj poprawny indeks!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_student_number), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     db.createSetting("setting_index", index.getText().toString());
@@ -69,19 +69,34 @@ public class SettingsActivity extends AppCompatActivity {
 
                 if (subject != null) {
                     if (subject.getText().toString().equals("")) {
-                        Toast.makeText(getBaseContext(), "Podaj przedmiot!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_subject), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     db.createSetting("setting_subject", subject.getText().toString());
                 }
 
-                Log.d("saveButtonHandler", "Dane zapisane");
+                //Log.d("saveButtonHandler", "Dane zapisane");
 
-                Toast.makeText(getBaseContext(), "Dane zapisane", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_data_saved), Toast.LENGTH_SHORT).show();
             }
         };
         if (saveButton != null)
             saveButton.setOnClickListener(saveButtonHandler);
+
+        EditText editTestId = (EditText) findViewById(R.id.subject_value);
+        EditText.OnEditorActionListener doneKeyboardButton = new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+            }
+        };
+        if (editTestId != null)
+            editTestId.setOnEditorActionListener(doneKeyboardButton);
 
     }
 

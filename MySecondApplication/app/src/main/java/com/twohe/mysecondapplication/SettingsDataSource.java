@@ -52,7 +52,7 @@ public class SettingsDataSource {
         try {
             database.insertOrThrow(DBHelper.TABLE_SETTINGS, null, values);
         } catch (SQLiteConstraintException e) {
-            Log.d("DB", "Setting already exists. Updating...");
+            //Log.d("DB", "Setting already exists. Updating...");
             updateSetting(setting, setting_value);
         }
 

@@ -45,12 +45,13 @@
             <EditText
                 android:id="@+id/name_value"
                 android:layout_width="match_parent"
-                android:selectAllOnFocus="true"
                 android:layout_height="wrap_content"
                 android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:ems="10"
                 android:imeOptions="flagNoExtractUi"
-                android:inputType="textPersonName|textNoSuggestions" />
+                android:inputType="textPersonName|textNoSuggestions"
+                android:selectAllOnFocus="true"
+                android:singleLine="true" />
 
             <TextView
                 android:id="@+id/label_surname"
@@ -61,12 +62,13 @@
             <EditText
                 android:id="@+id/surname_value"
                 android:layout_width="match_parent"
-                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:layout_height="wrap_content"
-                android:selectAllOnFocus="true"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:ems="10"
                 android:imeOptions="flagNoExtractUi"
-                android:inputType="textPersonName|textNoSuggestions" />
+                android:inputType="textPersonName|textNoSuggestions"
+                android:selectAllOnFocus="true"
+                android:singleLine="true" />
 
             <TextView
                 android:id="@+id/label_index"
@@ -78,12 +80,12 @@
                 android:id="@+id/index_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:selectAllOnFocus="true"
                 android:digits="0123456789"
                 android:ems="10"
-                android:imeOptions="flagNoExtractUi"
+                android:imeOptions="flagNoExtractUi|actionNext"
                 android:inputType="phone"
-                android:maxLength="6" />
+                android:maxLength="6"
+                android:selectAllOnFocus="true" />
 
             <TextView
                 android:id="@+id/label_subject_value"
@@ -94,11 +96,12 @@
             <EditText
                 android:id="@+id/subject_value"
                 android:layout_width="match_parent"
-                android:selectAllOnFocus="true"
-                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:layout_height="wrap_content"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:imeOptions="flagNoExtractUi"
-                android:inputType="text|textNoSuggestions" />
+                android:inputType="text|textNoSuggestions"
+                android:selectAllOnFocus="true"
+                android:singleLine="true" />
 
             <Button
                 android:id="@+id/button_save"

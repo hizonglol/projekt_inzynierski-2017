@@ -2,7 +2,9 @@ ver. 0.6.1
 ~ poprawa b³êdnego odtwarzania siê zak³adek w Tabs Activity
 ~ poprawa koñczenia testu w przypadku wyrzucenia aplikacji w background. Teraz wyœwietla siê monit
   i aplikacja wychodzi z testu po 3.5 sekundy
-! do poprawienia t³umaczenia toastów, monitów i promptów
+~ poprawa plików XML layoutów do wspierania starszych wersji systemu Android
+~ zak³adki w Tabs Activity przesuwaj¹ siê teraz poprawnie po chwytaniu tekstu
+~ zamiana sta³ych stringów na stringi pobierane z zasobów (wsparcie do t³umaczenia)
 
 ver. 0.6.0
 + w Android Marshmallow i wy¿ej pojawia siê zapytanie o dostêp do kamery i pamiêci masowej
@@ -71,4 +73,4 @@ ver. 0.1.2
 
 Known bugs:
 * z³e granice przesuwania w trybie landscape w Tabs Activity
-* aplikacja nie pyta siê o przyznanie uprawnieñ do korzystania z kamery w Android 6
+* nie da siê przechwyciæ przycisków home i list applications

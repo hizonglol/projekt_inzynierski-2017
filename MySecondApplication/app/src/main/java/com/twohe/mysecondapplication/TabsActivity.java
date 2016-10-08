@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -42,13 +40,16 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.AlgorithmParameters;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
+import java.security.spec.KeySpec;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.text.SimpleDateFormat;
@@ -61,6 +62,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 
@@ -89,15 +92,6 @@ public class TabsActivity extends AppCompatActivity {
 
     boolean wasInBackground = false;
 
-    /*
-    private boolean isCallable(Intent intent) {
-        List<ResolveInfo> list = getPackageManager().queryIntentActivities(intent,
-                PackageManager.MATCH_DEFAULT_ONLY);
-        Log.i("isCallable", String.valueOf(list.size()));
-        return list.size() < 2;
-    }
-    */
-
     Thread thread = new Thread() {
         @Override
         public void run() {
@@ -115,7 +109,7 @@ public class TabsActivity extends AppCompatActivity {
         byte bytes[] = new byte[6];
         randomizer.nextBytes(bytes);
         String base64 = Base64.encodeToString(bytes, Base64.URL_SAFE | Base64.NO_WRAP);
-        Log.i("generateCode", base64);
+        //Log.i("generateCode", base64);
 
         String shortenedBase64 = base64.substring(0, 4).toLowerCase();
 
@@ -138,14 +132,16 @@ public class TabsActivity extends AppCompatActivity {
 
 
             FileWriter writer = new FileWriter(fileToWrite, true);
-            writer.append("Twoj kod testu to: ");
             writer.append(token);
+            writer.append("\t");
+            writer.append(getResources().getString(R.string.version_value));
             writer.append("\n\n");
             writer.flush();
             writer.close();
-            Toast.makeText(this, "Twoj plik z testem zostal utworzony", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.message_your_test_file_was_created), Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
+            finish();
             return false;
         }
 
@@ -175,6 +171,95 @@ public class TabsActivity extends AppCompatActivity {
 
     private static String cryptoPass = "Moje haslo to brak hasla";
 
+    private static char[] password = cryptoPass.toCharArray();
+
+    private static byte[] salt = {
+            (byte) 0xc7, (byte) 0x73, (byte) 0x21, (byte) 0x8c,
+            (byte) 0x7e, (byte) 0xc8, (byte) 0xee, (byte) 0x99
+    };
+
+    private static byte[] random_bytes = {
+
+            (byte) 0x68, (byte) 0xfd, (byte) 0x97, (byte) 0x69,
+            (byte) 0x2b, (byte) 0xcf, (byte) 0xab, (byte) 0x05,
+            (byte) 0xd1, (byte) 0x27, (byte) 0x9b, (byte) 0xab,
+            (byte) 0x79, (byte) 0x30, (byte) 0x4c, (byte) 0xd6,
+            (byte) 0xa4, (byte) 0x72, (byte) 0x7c, (byte) 0x66,
+            (byte) 0x49, (byte) 0xfa, (byte) 0x74, (byte) 0xe1,
+            (byte) 0x98, (byte) 0xb6, (byte) 0xca, (byte) 0x9f,
+            (byte) 0x85, (byte) 0x53
+    };
+
+    String encryptItAes(String text) {
+
+        try {
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+            KeySpec spec = new PBEKeySpec(password, salt, 65536, 256);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+            byte[] ciphertext = cipher.doFinal(text.getBytes("UTF-8"));
+            text = Base64.encodeToString(cipher.doFinal(ciphertext), Base64.DEFAULT);
+
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+
+        return text;
+
+    }
+
+    String decryptItAes(String text) {
+
+        try {
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+            KeySpec spec = new PBEKeySpec(password, salt, 65536, 256);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            AlgorithmParameters params = cipher.getParameters();
+            byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
+
+            cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
+            byte[] ciphertext = cipher.doFinal(text.getBytes("UTF-8"));
+            text = new String(cipher.doFinal(ciphertext), "UTF-8");
+
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        } catch (InvalidParameterSpecException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        }
+        return text;
+
+    }
+
     String encryptIt(String text) {
 
         try {
@@ -184,7 +269,7 @@ public class TabsActivity extends AppCompatActivity {
 
             byte[] clearText = text.getBytes("UTF8");
             // Cipher is not thread safe
-            Cipher cipher = Cipher.getInstance("DES");
+            Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, key);
 
             text = Base64.encodeToString(cipher.doFinal(clearText), Base64.DEFAULT);
@@ -218,7 +303,7 @@ public class TabsActivity extends AppCompatActivity {
 
             byte[] encrypedPwdBytes = Base64.decode(text, Base64.DEFAULT);
             // cipher is not thread safe
-            Cipher cipher = Cipher.getInstance("DES");
+            Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, key);
             byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
 
@@ -318,8 +403,8 @@ public class TabsActivity extends AppCompatActivity {
         if (wasInBackground) {
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Wyszedłeś z aplikacji")
-                    .setMessage("Test zakończony")
+                    .setTitle(getResources().getString(R.string.message_you_quit_test))
+                    .setMessage(getResources().getString(R.string.message_test_ended))
                     .setCancelable(false)
                     .show();
 
@@ -332,16 +417,16 @@ public class TabsActivity extends AppCompatActivity {
     public void onBackPressed() {
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Wychodzę z testu")
-                .setMessage("Czy na pewno chcesz wyjść z testu?")
-                .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                .setTitle(getResources().getString(R.string.message_i_quit_test))
+                .setMessage(getResources().getString(R.string.message_do_you_want_to_quit_test))
+                .setPositiveButton(getResources().getString(R.string.button_yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finish();
                     }
 
                 })
-                .setNegativeButton("Nie", null)
+                .setNegativeButton(getResources().getString(R.string.button_no), null)
                 .show();
     }
 
@@ -365,6 +450,9 @@ public class TabsActivity extends AppCompatActivity {
         private static final String ARG_SECTION_ANSWER = "section_answer";
         private static final String ARG_SECTION_SENT = "section_sent";
         private static final String DEBUG_TAG = "HttpExample";
+
+        private String serverResponse = "";
+        private Integer serverResponseCode = 404;
 
         // Reads an InputStream and converts it to a String.
         public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
@@ -394,11 +482,13 @@ public class TabsActivity extends AppCompatActivity {
                 // Starts the query
                 conn.connect();
                 int response = conn.getResponseCode();
+                serverResponseCode = response;
                 Log.d(DEBUG_TAG, "The response is: " + response);
                 is = conn.getInputStream();
 
                 // Convert the InputStream into a string
                 String contentAsString = readIt(is, len);
+                serverResponse = contentAsString;
                 //return contentAsString;
                 return String.valueOf(response);
 
@@ -437,9 +527,11 @@ public class TabsActivity extends AppCompatActivity {
                 if (result.equals("200")) {
                     setTab(rootView, tab);
                     getArguments().putBoolean(ARG_SECTION_SENT, true);
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getResources().getString(R.string.message_unable_to_send_answer), Toast.LENGTH_SHORT).show();
                 }
 
-                Log.d("Wynik", result);
+                //Log.d("Wynik", result);
             }
 
             void configure(View passedView, int passedTab) {
@@ -544,40 +636,53 @@ public class TabsActivity extends AppCompatActivity {
             }
         }
 
-        private String createUriFromThisPage() {
+        private String createDataURL(String mode, String answer) {
+
+            String divider = "";
+
             SettingsDataSource db = new SettingsDataSource(getActivity());
             db.open();
-            String stringServerUrl = "http://www.zpcir.ict.pwr.wroc.pl/~witold/empty.html";
             StringBuilder sbServerQuery = new StringBuilder();
-            sbServerQuery.append(stringServerUrl).append("?");
-            sbServerQuery.append("token=").append(((TabsActivity) getActivity()).token).append("&");
+
+            if (mode.equals("to_server")) {
+                divider = "&";
+                String stringServerUrl = "http://www.zpcir.ict.pwr.wroc.pl/~witold/empty.html";
+                sbServerQuery.append(stringServerUrl).append("?");
+            } else if (mode.equals("to_file")) {
+                divider = ";";
+                SimpleDateFormat formatter = new SimpleDateFormat("HH_mm_ss", Locale.getDefault());
+                Date now = new Date();
+                String time = formatter.format(now);
+                sbServerQuery.append("time=").append(time).append(divider);
+            }
+
+            sbServerQuery.append("token=").append(((TabsActivity) getActivity()).token).append(divider);
             String subject = db.getSetting("setting_subject");
-            sbServerQuery.append("subject=").append(subject).append("&");
+            sbServerQuery.append("subject=").append(subject).append(divider);
             String testId = db.getSetting("setting_test_id");
-            sbServerQuery.append("test_id=").append(testId).append("&");
+            sbServerQuery.append("test_id=").append(testId).append(divider);
             String name = db.getSetting("setting_name");
-            sbServerQuery.append("name=").append(name).append("&");
+            sbServerQuery.append("name=").append(name).append(divider);
             String surname = db.getSetting("setting_surname");
-            sbServerQuery.append("surname=").append(surname).append("&");
+            sbServerQuery.append("surname=").append(surname).append(divider);
             String index = db.getSetting("setting_index");
-            sbServerQuery.append("index=").append(index).append("&");
+            sbServerQuery.append("index=").append(index).append(divider);
             String weights = db.getSetting("setting_weights");
-            sbServerQuery.append("weights=").append(weights).append("&");
+            sbServerQuery.append("weights=").append(weights).append(divider);
             String group = db.getSetting("setting_group");
-            sbServerQuery.append("group=").append(group).append("&");
+            sbServerQuery.append("group=").append(group).append(divider);
             String hall_row = db.getSetting("setting_hall_row");
-            sbServerQuery.append("hall_row=").append(hall_row).append("&");
+            sbServerQuery.append("hall_row=").append(hall_row).append(divider);
             String hall_place = db.getSetting("setting_hall_place");
-            sbServerQuery.append("hall_place=").append(hall_place).append("&");
+            sbServerQuery.append("hall_place=").append(hall_place).append(divider);
             String question_no = String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER));
-            sbServerQuery.append("question_no=").append(question_no).append("&");
-            String answer = "yes";
+            sbServerQuery.append("question_no=").append(question_no).append(divider);
             sbServerQuery.append("answer=").append(answer);
 
             String sentUrl = sbServerQuery.toString();
             sentUrl = sentUrl.replace(" ", "");
 
-            Log.d("Sent uri", sentUrl);
+            //Log.d("Sent uri", sentUrl);
 
             db.close();
 
@@ -630,9 +735,7 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    String sentUrl = createUriFromThisPage();
-
-                    if (((TabsActivity) getActivity()).appendToFileCiphered(sentUrl)) {
+                    if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", "yes"))) {
                         setTabGray(rootView, 1);
                         getArguments().putBoolean(ARG_SECTION_SENT, false);
                     }
@@ -644,12 +747,11 @@ public class TabsActivity extends AppCompatActivity {
                     if (networkInfo != null && networkInfo.isConnected()) {
                         DownloadWebpageTask task = new DownloadWebpageTask();
                         task.configure(rootView, 1);
-                        task.execute(sentUrl);
+                        task.execute(createDataURL("to_server", "yes"));
                     } else {
-                        Log.d("Warning", "No network connection available.");
-                        Toast.makeText(getActivity().getBaseContext(), "Brak połączenia z internetem!", Toast.LENGTH_SHORT).show();
+                        //Log.d("Warning", "No network connection available.");
+                        Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
                         //setTab(rootView, 0);
-                        return;
                     }
 
                     //setTab(rootView, 1);
@@ -660,9 +762,8 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    String sentUrl = createUriFromThisPage();
 
-                    if (((TabsActivity) getActivity()).appendToFileCiphered(sentUrl)) {
+                    if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", "no"))) {
                         setTabGray(rootView, 2);
                         getArguments().putBoolean(ARG_SECTION_SENT, false);
                     }
@@ -673,12 +774,11 @@ public class TabsActivity extends AppCompatActivity {
                     if (networkInfo != null && networkInfo.isConnected()) {
                         DownloadWebpageTask task = new DownloadWebpageTask();
                         task.configure(rootView, 2);
-                        task.execute(sentUrl);
+                        task.execute(createDataURL("to_server", "no"));
                     } else {
-                        Log.d("Warning", "No network connection available.");
-                        Toast.makeText(getActivity().getBaseContext(), "Brak połączenia z internetem!", Toast.LENGTH_SHORT).show();
+                        //Log.d("Warning", "No network connection available.");
+                        Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
                         //setTab(rootView, 0);
-                        return;
                     }
 
                     //setTab(rootView, 2);
@@ -690,9 +790,7 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    String sentUrl = createUriFromThisPage();
-
-                    if (((TabsActivity) getActivity()).appendToFileCiphered(sentUrl)) {
+                    if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", "dunno"))) {
                         setTabGray(rootView, 3);
                         getArguments().putBoolean(ARG_SECTION_SENT, false);
                     }
@@ -703,12 +801,11 @@ public class TabsActivity extends AppCompatActivity {
                     if (networkInfo != null && networkInfo.isConnected()) {
                         DownloadWebpageTask task = new DownloadWebpageTask();
                         task.configure(rootView, 3);
-                        task.execute(sentUrl);
+                        task.execute(createDataURL("to_server", "dunno"));
                     } else {
-                        Log.d("Warning", "No network connection available.");
-                        Toast.makeText(getActivity().getBaseContext(), "Brak połączenia z internetem!", Toast.LENGTH_SHORT).show();
+                        //Log.d("Warning", "No network connection available.");
+                        Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
                         //setTab(rootView, 0);
-                        return;
                     }
 
                     //setTab(rootView, 3);
@@ -718,10 +815,10 @@ public class TabsActivity extends AppCompatActivity {
             rootView.findViewById(R.id.button_add_question).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int liczba = getArguments().getInt(ARG_SECTION_NUMBER);
-                    CharSequence toast = "Dodano pytanie nr: " + String.valueOf(liczba + 1);
-                    Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
-                    wyswietl.show();
+                    //int liczba = getArguments().getInt(ARG_SECTION_NUMBER);
+                    //CharSequence toast = "Dodano pytanie nr: " + String.valueOf(liczba + 1);
+                    //Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
+                    //wyswietl.show();
 
                     ((TabsActivity) getActivity()).addTab();
                     int nextTab = ((TabsActivity) getActivity()).amount_of_questions++;
@@ -742,8 +839,8 @@ public class TabsActivity extends AppCompatActivity {
             int answer = getArguments().getInt(ARG_SECTION_ANSWER);
             boolean sent = getArguments().getBoolean(ARG_SECTION_SENT);
 
-            Log.v("onResume", "Restoring tab");
-            Log.w("onResume", String.valueOf(answer));
+            //Log.v("onResume", "Restoring tab");
+            //Log.w("onResume", String.valueOf(answer));
 
             if (sent)
                 setTab(rootView, answer);

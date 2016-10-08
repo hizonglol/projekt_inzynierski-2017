@@ -21,6 +21,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
             android:layout_alignParentStart="true">
 
             <TextView
@@ -60,6 +62,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/row_index_labels">
 
@@ -68,11 +72,10 @@
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="4"
-                android:editable="false"
                 android:gravity="center"
                 android:maxLength="6"
+                android:maxLines="1"
                 android:minHeight="50dp"
-                android:singleLine="true"
                 android:text="@string/zero_value"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
@@ -84,13 +87,13 @@
                 android:layout_weight="1"
                 android:digits="0123456789"
                 android:gravity="center"
-                android:imeOptions="flagNoExtractUi"
+                android:imeOptions="flagNoExtractUi|actionNext"
                 android:inputType="phone"
                 android:maxLength="2"
-                android:singleLine="true"
-                android:text="@string/zero_value"
-                android:selectAllOnFocus="true"
+                android:maxLines="1"
                 android:nextFocusForward="@+id/hall_place_value"
+                android:selectAllOnFocus="true"
+                android:text="@string/zero_value"
                 android:textSize="30sp" />
 
             <EditText
@@ -98,14 +101,14 @@
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
-                android:selectAllOnFocus="true"
                 android:digits="0123456789"
                 android:gravity="center"
-                android:imeOptions="flagNoExtractUi"
+                android:imeOptions="flagNoExtractUi|actionNext"
                 android:inputType="phone"
                 android:maxLength="2"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:nextFocusForward="@+id/weight_value"
+                android:selectAllOnFocus="true"
                 android:text="@string/zero_value"
                 android:textSize="30sp" />
 
@@ -124,6 +127,7 @@
             android:id="@+id/label_weight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/index_number_line"
             android:text="@string/label_weight"
@@ -136,6 +140,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/label_weight">
 
@@ -146,12 +152,12 @@
                 android:layout_weight="4"
                 android:digits="0123456789"
                 android:gravity="center"
-                android:selectAllOnFocus="true"
-                android:imeOptions="flagNoExtractUi"
+                android:imeOptions="flagNoExtractUi|actionNext"
                 android:inputType="phone"
-                android:nextFocusForward="@+id/exam_id_value"
                 android:maxLength="6"
-                android:singleLine="true"
+                android:maxLines="1"
+                android:nextFocusForward="@+id/exam_id_value"
+                android:selectAllOnFocus="true"
                 android:textAlignment="gravity"
                 android:textSize="30sp" />
 
@@ -182,6 +188,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/weight_row_line">
 
@@ -213,6 +221,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/row_result_labels">
 
@@ -226,9 +236,9 @@
                 android:focusableInTouchMode="true"
                 android:gravity="center"
                 android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
                 android:minHeight="50dp"
                 android:scrollHorizontally="true"
-                android:singleLine="true"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
@@ -239,8 +249,8 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="2"
                 android:gravity="center"
+                android:maxLines="1"
                 android:minHeight="50dp"
-                android:singleLine="true"
                 android:text="@string/zero_value"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
@@ -263,6 +273,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/result_row_line">
 
@@ -293,6 +305,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/row_exam_infos_labels">
 
@@ -302,8 +316,8 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="4"
                 android:gravity="center"
+                android:maxLines="1"
                 android:minHeight="50sp"
-                android:singleLine="true"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
@@ -313,13 +327,14 @@
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
                 android:layout_weight="2"
-                android:gravity="center"
-                android:imeOptions="flagNoExtractUi"
-                android:inputType="text|textNoSuggestions"
                 android:digits="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
-                android:selectAllOnFocus="true"
-                android:minHeight="50sp"
+                android:gravity="center"
+                android:imeOptions="flagNoExtractUi|actionDone"
                 android:singleLine="true"
+                android:inputType="text|textNoSuggestions"
+                android:maxLines="1"
+                android:minHeight="50sp"
+                android:selectAllOnFocus="true"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
@@ -333,6 +348,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/row_exam_infos">
 
