@@ -37,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
                 int maska;
                 try { //sprawdzamy czy podano numer indeksu
                     indeks = Integer.parseInt(poleIndeks.getText().toString());
-                    Log.v("Wartość indeksu", String.valueOf(indeks));
+                    //Log.v("Wartość indeksu", String.valueOf(indeks));
                 } catch (NumberFormatException e) {
-                    Toast.makeText(getBaseContext(), "Podaj indeks", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_index_number), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
                 String temp = poleMaska.getText().toString();
                 int s = temp.length();
                 if (s == 0) {
-                    Toast.makeText(getBaseContext(), "Podaj maskę", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_mask_number), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 maska = 0;
@@ -62,17 +62,17 @@ public class MainActivity extends AppCompatActivity {
                         maska &= 0xFFFFFFFE;
                     }
                 }
-                Log.v("Maska", String.valueOf(maska));
+                //Log.v("Maska", String.valueOf(maska));
 
                 //porownujemy obie cyfry ekstrahujac bity
                 int temp_maska = 1;
                 temp_maska <<= s - 1;
-                Log.v("Temp maska", String.valueOf(temp_maska));
+                //Log.v("Temp maska", String.valueOf(temp_maska));
                 int max_ilosc_bitow = 0;
 
                 for (int i = 0; i < s; ++i) {
                     if ((maska & temp_maska) != 0) {
-                        Log.v("Trafiony bit w pozycji: ", String.valueOf(temp_maska));
+                        //Log.v("Trafiony bit w pozycji: ", String.valueOf(temp_maska));
                         if ((indeks & temp_maska) == (maska & temp_maska)) {
                             wynik <<= 1;
                             wynik |= 1;
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //sprawdzamy czy wprowadzona maska byla poprawna
                 if (max_ilosc_bitow > 3) {
-                    Toast.makeText(getBaseContext(), "Nieprawidłowa maska", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_invalid_mask_number), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
-                    Log.i("maskListener", "no focus");
+                    //Log.i("maskListener", "no focus");
                     String mask = poleMaska.getText().toString();
                     int s = mask.length();
                     StringBuilder sb = new StringBuilder(mask);
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intentInfo = new Intent(getApplicationContext(), InfoActivity.class);
             startActivity(intentInfo);
 
-            Log.i("Menu", "Info");
+            //Log.i("Menu", "Info");
         }
 
         return super.onOptionsItemSelected(item);

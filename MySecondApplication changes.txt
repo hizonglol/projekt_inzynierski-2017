@@ -5,6 +5,10 @@ ver. 0.6.1
 ~ poprawa plików XML layoutów do wspierania starszych wersji systemu Android
 ~ zak³adki w Tabs Activity przesuwaj¹ siê teraz poprawnie po chwytaniu tekstu
 ~ zamiana sta³ych stringów na stringi pobierane z zasobów (wsparcie do t³umaczenia)
++ dodane pe³ne angielskie t³umaczenie i zmieniony na domyœlny jêzyk angielski
+~ poprawa krytycznego b³êdu nie pojawiania siê pliku z odpowiedziami w pamiêci telefonu
+~ poprawa krytycznego b³êdu z wysy³aniem do serwera wadliwych odpowiedzi
++ dodany numer wersji programu do nag³ówków plików z odpowiedziami
 
 ver. 0.6.0
 + w Android Marshmallow i wy¿ej pojawia siê zapytanie o dostêp do kamery i pamiêci masowej

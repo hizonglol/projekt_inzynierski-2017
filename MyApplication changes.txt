@@ -1,3 +1,6 @@
+ver. 0.1.5
+~ poprawa t³umaczeñ toastów
+
 ver. 0.1.4
 ~ znaleziony b³¹d w t³umaczeniu jednego ze stringów w aplikacji
 ~ zmienione domyœlne locale aplikacji na jêzyk angielski

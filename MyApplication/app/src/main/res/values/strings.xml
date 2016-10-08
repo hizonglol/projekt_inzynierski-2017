@@ -8,6 +8,9 @@
     <string name="hint_index">type decimal number</string>
     <string name="label_mask">Mask number:</string>
     <string name="hint_mask">type binary mask</string>
-    <string name="version_number">0.1.4</string>
+    <string name="version_number">0.1.5</string>
     <string name="label_version">Version</string>
+    <string name="message_invalid_mask_number">Invalid mask!</string>
+    <string name="message_give_mask_number">Type mask!</string>
+    <string name="message_give_index_number">Type student number!</string>
 </resources>

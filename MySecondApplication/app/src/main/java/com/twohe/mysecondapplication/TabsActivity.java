@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,7 +45,6 @@ import java.net.URL;
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -130,6 +131,13 @@ public class TabsActivity extends AppCompatActivity {
             }
             fileToWrite = new File(root, fileName);
 
+            fileToWrite.setReadable(true);
+            fileToWrite.setWritable(true);
+
+// initiate media scan and put the new things into the path array to
+// make the scanner aware of the location and the files you want to see
+            MediaScannerConnection.scanFile(this, new String[]{fileToWrite.getAbsolutePath()}, null, null);
+
 
             FileWriter writer = new FileWriter(fileToWrite, true);
             writer.append(token);
@@ -138,6 +146,7 @@ public class TabsActivity extends AppCompatActivity {
             writer.append("\n\n");
             writer.flush();
             writer.close();
+            MediaScannerConnection.scanFile(this, new String[] { fileToWrite.getAbsolutePath() }, null, null);
             Toast.makeText(this, getResources().getString(R.string.message_your_test_file_was_created), Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -150,10 +159,11 @@ public class TabsActivity extends AppCompatActivity {
 
 
     public boolean appendToFileCiphered(String text) {
+        //Log.v("appendToFileCiphered", text);
 
         text = encryptIt(text);
 
-        decryptIt(text);
+        //decryptIt(text);
 
         try {
             FileWriter writer = new FileWriter(fileToWrite, true);
@@ -161,6 +171,7 @@ public class TabsActivity extends AppCompatActivity {
             writer.append("\n");
             writer.flush();
             writer.close();
+            //Log.v("appendToFileCiphered", text);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -273,7 +284,7 @@ public class TabsActivity extends AppCompatActivity {
             cipher.init(Cipher.ENCRYPT_MODE, key);
 
             text = Base64.encodeToString(cipher.doFinal(clearText), Base64.DEFAULT);
-            Log.d("appendToFileCiphered", "Encrypted: " + text + " -> " + text);
+            //Log.d("appendToFileCiphered", "Encrypted: " + text + " -> " + text);
 
         } catch (InvalidKeyException e) {
             e.printStackTrace();
@@ -720,6 +731,7 @@ public class TabsActivity extends AppCompatActivity {
             rootView.findViewById(R.id.button_end_test).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     Intent intentSummary = new Intent(getActivity().getApplication(), SummaryActivity.class);
                     Bundle b = new Bundle();
                     b.putInt("amount_of_questions", ((TabsActivity) getActivity()).amount_of_questions);

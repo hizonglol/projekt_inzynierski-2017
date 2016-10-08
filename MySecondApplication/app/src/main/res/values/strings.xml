@@ -1,106 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!--*** General strings ***-->
-    <string name="label_app">Haszówki</string>
+    <string name="button_dunno">Dunno</string>
+    <string name="button_add_question">Add question</string>
+    <string name="button_back_to_test">Back to test</string>
+    <string name="button_compute">Compute</string>
+    <string name="button_end_test">Finish test</string>
+    <string name="button_exit">Exit</string>
+    <string name="button_no">No</string>
+    <string name="button_qr_code">Scan QR code</string>
+    <string name="button_save">Save</string>
+    <string name="button_start_test">Begin test</string>
+    <string name="button_yes">Yes</string>
+    <string name="label_app">Haszowki</string>
+    <string name="label_dunno_answers">Answers DUNNO:</string>
+    <string name="label_exam_id_value">Test ID:</string>
+    <string name="label_group_number">Group nr:</string>
+    <string name="label_hall_place">Seat</string>
+    <string name="label_hall_row">Row</string>
+    <string name="label_info_activity">Information</string>
+    <string name="label_index">Index number</string>
+    <string name="label_name">Name:</string>
+    <string name="label_no_answers">Answers NO:</string>
+    <string name="label_null">null</string>
+    <string name="label_question_number">Question nr:</string>
+    <string name="label_result">Result:</string>
+    <string name="label_result_modulo">Modulo 16:</string>
+    <string name="label_section">Question nr %1$d</string>
+    <string name="label_session_token">Session identificator:</string>
+    <string name="label_settings_activity">Settings</string>
+    <string name="label_subject_value">Subject name:</string>
+    <string name="label_sum_of_answers">Sum of questions:</string>
+    <string name="label_summary_activity">Summary</string>
+    <string name="label_surname">Surname:</string>
+    <string name="label_version">Version</string>
+    <string name="label_weight">Weights vector:</string>
+    <string name="label_yes_answers">Answers YES:</string>
+    <string name="six_zeros_value">000000</string>
     <string name="version_value">0.6.1</string>
     <string name="zero_value">0</string>
-    <string name="six_zeros_value">000000</string>
-    <string name="label_null">null</string>
-
-
-    <!--*** LABEL strings of MAIN ***-->
-    <string name="label_index">Numer indeksu:</string>
-    <string name="label_hall_row">Rząd</string>
-    <string name="label_hall_place">Miejsce</string>
-    <string name="label_weight">Wektor wag:</string>
-    <string name="label_result">Wynik:</string>
-    <string name="label_result_modulo">Modulo 16:</string>
-    <string name="label_subject_value">Nazwa przedmiotu:</string>
-    <string name="label_exam_id_value">ID testu:</string>
-
-
-    <!--*** BUTTON strings of MAIN ***-->
-    <string name="button_qr_code">Skanuj kod QR</string>
-    <string name="button_exit">Wyjdź</string>
-    <string name="button_start_test">Rozpocznij test</string>
-    <string name="button_compute">Wylicz</string>
-
-    <!--*** MESSAGES strings of MAIN ***-->
-    <string name="message_i_quit_app">Wychodzę z aplikacji</string>
-    <string name="message_do_you_want_to_quit_app">Czy na pewno chcesz wyjść z aplikacji?</string>
-    <string name="message_scan_qr_code">Zeskanuj kod QR</string>
-    <string name="message_type_subject_name">Wprowadź nazwę przedmiotu!</string>
-    <string name="message_type_ID_name">Wprowadź ID testu!</string>
-    <string name="message_type_place_higher_than_0">Podaj miejsce więsze od 0!</string>
-    <string name="message_type_row_higher_than_0">Podaj rząd więszy od 0!</string>
-    <string name="message_compute_group">Wylicz grupę!</string>
-    <string name="message_give_writing_permission">Daj uprawnienia do zapisu!</string>
-    <string name="message_give_proper_student_number">Podaj poprawny indeks!</string>
-
-
-    <!--*** LABEL strings of INFO ***-->
-    <string name="label_info_activity">Informacje</string>
-    <string name="label_version">Wersja</string>
-    <!--
-    @string/number_version
-    w general strings -->
-
-
-    <!--*** LABEL strings of SETTINGS ***-->
-    <string name="label_settings_activity">Ustawienia</string>
-    <string name="label_name">Imię:</string>
-    <string name="label_surname">Nazwisko:</string>
-    <!--
-    @string/title_index_number
-    @string/title_subject_name
-    w title strings of main -->
-
-
-    <!--*** BUTTON strings of SETTINGS ***-->
-    <string name="button_save">Zapisz</string>
-
-
-    <!--*** MESSAGES strings of SETTINGS ***-->
-    <string name="message_give_name">Podaj imię!</string>
-    <string name="message_give_surname">Podaj nazwisko!</string>
-    <string name="message_give_subject">Podaj przedmiot!</string>
-    <string name="message_data_saved">Dane zapisane</string>
-
-
-    <!--*** LABEL strings of TABS ***-->
-    <string name="label_section">Pytanie nr %1$d</string>
-    <string name="label_group_number">Nr grupy:</string>
-    <string name="label_question_number">Pytanie nr:</string>
-    <string name="label_session_token">Identyfikator sesji:</string>
-
-
-    <!--*** BUTTON strings of TABS ***-->
-    <string name="button_yes">Tak</string>
-    <string name="button_no">Nie</string>
-    <string name="button_dunno">Nie wiem</string>
-    <string name="button_end_test">Zakończ test</string>
-    <string name="button_add_question">Dodaj pytanie</string>
-
-
-    <!--*** MESSAGES strings of TABS ***-->
-    <string name="message_i_quit_test">Wychodzę z testu</string>
-    <string name="message_do_you_want_to_quit_test">Czy na pewno chcesz wyjść z testu?</string>
-    <string name="message_your_test_file_was_created">Twój plik z testem został utworzony</string>
-    <string name="message_you_quit_test">Wyszedłeś z aplikacji</string>
-    <string name="message_test_ended">Test zakończony</string>
-    <string name="message_unable_to_send_answer">Nie udało się wysłać odpowiedzi!</string>
-    <string name="message_no_internet_connection">Brak połączenia z Internetem!</string>
-
-
-    <!--*** LABEL strings of SUMMARY ***-->
-    <string name="label_summary_activity">Podsumowanie</string>
-    <string name="label_yes_answers">Odpowiedzi TAK:</string>
-    <string name="label_no_answers">Odpowiedzi NIE:</string>
-    <string name="label_dunno_answers">Odpowiedzi NIE WIEM:</string>
-    <string name="label_sum_of_answers">Suma pytań:</string>
-
-
-    <!--*** BUTTON strings of SUMMARY ***-->
-    <string name="button_back_to_test">Wróć do testu</string>
-
+    <string name="message_your_test_file_was_created">Your test file has been created</string>
+    <string name="message_you_quit_test">You have left application</string>
+    <string name="message_unable_to_send_answer">Unable to send answer!</string>
+    <string name="message_type_subject_name">Type subject name!</string>
+    <string name="message_type_row_higher_than_0">Type row higher than 0!</string>
+    <string name="message_type_place_higher_than_0">Type seat higher than 0!</string>
+    <string name="message_type_ID_name">Type test ID!</string>
+    <string name="message_test_ended">Test finished</string>
+    <string name="message_scan_qr_code">Scan QR code</string>
+    <string name="message_no_internet_connection">No internet connection!</string>
+    <string name="message_i_quit_test">Leaving test</string>
+    <string name="message_i_quit_app">Leaving application</string>
+    <string name="message_give_writing_permission">Give writing permission!</string>
+    <string name="message_give_surname">Type surname!</string>
+    <string name="message_give_subject">Type subject name!</string>
+    <string name="message_give_proper_student_number">Type proper student number!</string>
+    <string name="message_give_name">Type name!</string>
+    <string name="message_do_you_want_to_quit_test">Do you want to leave the test?</string>
+    <string name="message_do_you_want_to_quit_app">Do you want to leave the application?</string>
+    <string name="message_data_saved">Data saved</string>
+    <string name="message_compute_group">Compute group!</string>
 </resources>
