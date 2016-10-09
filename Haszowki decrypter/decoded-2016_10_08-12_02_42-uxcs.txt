@@ -1,0 +1,4 @@
+time=12_02_44;token=uxcs;subject=Informatyka;test_id=dg;name=Filip;surname=Malinowski;index=209193;weights=000206;group=4;hall_row=2;hall_place=2;question_no=1;answer=yes
+time=12_02_53;token=uxcs;subject=Informatyka;test_id=dg;name=Filip;surname=Malinowski;index=209193;weights=000206;group=4;hall_row=2;hall_place=2;question_no=1;answer=no
+time=12_02_57;token=uxcs;subject=Informatyka;test_id=dg;name=Filip;surname=Malinowski;index=209193;weights=000206;group=4;hall_row=2;hall_place=2;question_no=5;answer=yes
+time=12_02_58;token=uxcs;subject=Informatyka;test_id=dg;name=Filip;surname=Malinowski;index=209193;weights=000206;group=4;hall_row=2;hall_place=2;question_no=6;answer=dunno
