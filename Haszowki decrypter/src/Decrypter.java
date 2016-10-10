@@ -1,5 +1,3 @@
-import org.apache.commons.cli.*;
-
 import java.io.*;
 import java.util.Base64;
 
@@ -20,8 +18,18 @@ public class Decrypter {
 
     private static String VERSION_NUMBER = "0.0.1";
     private static String cryptoPass = "Moje haslo to brak hasla";
-    private static String fileName = "";
 
+    /*
+    private static List<String> argsList = new ArrayList<>();
+    private static List<Option> optsList = new ArrayList<>();
+    private static List<String> doubleOptsList = new ArrayList<>();
+*/
+
+    private static boolean flagVersion = false;
+    private static boolean flagInput = false;
+    private static String inputFileName = "";
+    private static boolean flagOutput = false;
+    private static String outputFileName = "";
 
     private static String decryptIt(String text) {
 
@@ -103,7 +111,7 @@ public class Decrypter {
     private static boolean writeDecodedToFile(List<String> decodedText) {
 
         try {
-            PrintWriter writer = new PrintWriter(fileName + "_dec", "UTF-8");
+            PrintWriter writer = new PrintWriter(outputFileName, "UTF-8");
 
             for (int i = 0; i < decodedText.size(); ++i) {
                 writer.println(decodedText.get(i));
@@ -147,56 +155,125 @@ public class Decrypter {
         return true;
     }
 
-    private static void parseArguments(String[] args) {
+    /*
+    private static class Option {
+        String flag, opt;
 
-        Options options = new Options();
+        public Option(String flag, String opt) {
+            this.flag = flag;
+            this.opt = opt;
+        }
+    }
+    */
 
-        Option version = new Option("v", "version");
-        version.setRequired(false);
-        options.addOption(version);
+    private static void decodeArguments(String[] args) throws IllegalArgumentException {
 
-        Option output = new Option("o", "output", true, "output file");
-        output.setRequired(false);
-        options.addOption(output);
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i].charAt(0)) {
+                case '-':
+                    /*
+                    if (args[i].length() < 2)
+                        throw new IllegalArgumentException("Not a valid argument: " + args[i]);
+                    if (args[i].charAt(1) == '-') {
+                        if (args[i].length() < 3)
+                            throw new IllegalArgumentException("Not a valid argument: " + args[i]);
+                        // --opt
+                        doubleOptsList.add(args[i].substring(2, args[i].length()));
+                    } else {
+                        if (args.length - 1 == i)
+                            throw new IllegalArgumentException("Expected arg after: " + args[i]);
+                        // -opt
+                        optsList.add(new Option(args[i], args[i + 1]));
+                        i++;
+                    }
+                    */
 
-        CommandLineParser parser = new DefaultParser();
-        HelpFormatter formatter = new HelpFormatter();
-        CommandLine cmd;
+                    if (args[i].length() == 2) {
+                        switch (args[i].charAt(1)) {
+                            case 'v':
+                                flagVersion = true;
+                                ++i;
+                                break;
 
-        try {
-            cmd = parser.parse(options, args);
-        } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            formatter.printHelp("utility-name", options);
+                            case 'o':
+                                flagOutput = true;
+                                ++i;
+                                if (i < args.length)
+                                    outputFileName = args[i];
+                                else {
+                                    flagOutput = false;
+                                    throw new IllegalArgumentException("Give output file name");
+                                }
+                                break;
 
-            System.exit(1);
-            return;
+                            case 'i':
+                                flagInput = true;
+                                ++i;
+                                if (i < args.length)
+                                    inputFileName = args[i];
+                                else {
+                                    flagInput = false;
+                                    throw new IllegalArgumentException("Give input file name");
+                                }
+                                break;
+
+                            default:
+                                throw new IllegalArgumentException("Not recognised options");
+                        }
+                    } else
+                        throw new IllegalArgumentException("Not recognised options");
+
+                    break;
+
+                default:
+                    // arg
+                    //argsList.add(args[i]);
+                    throw new IllegalArgumentException("Not recognised options");
+                    //break;
+            }
+
         }
 
-        String inputFilePath = cmd.getOptionValue("input");
-        String outputFilePath = cmd.getOptionValue("output");
+    }
 
-        System.out.println(inputFilePath);
-        System.out.println(outputFilePath);
+    private static boolean parseArguments(String[] args) {
+
+        try {
+            decodeArguments(args);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 
     public static void main(String[] args) {
 
+
         parseArguments(args);
 
-        /*
-        fileName = args[0];
+        if (flagVersion) {
+            System.out.println("Version " + VERSION_NUMBER);
+            return;
+        }
 
-        List<String> input;
+        if (flagInput){
+            List<String> input;
 
-        input = readFile(fileName);
+            input = readFile(inputFileName);
 
-        input = reformatInput(input);
+            input = reformatInput(input);
 
-        input = runDecrypter(input);
+            input = runDecrypter(input);
 
-        writeDecodedToFile(input);
-        */
+            if (flagOutput){
+                writeDecodedToFile(input);
+                return;
+            }
+
+            writeDecodedToOutput(input);
+        }
     }
 }
 
