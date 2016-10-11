@@ -17,6 +17,9 @@ out/
 .gradle/
 build/
 
+# Crashlytics configuations
+com_crashlytics_export_strings.xml
+
 # Local configuration file (sdk path, etc)
 local.properties
 
@@ -33,8 +36,27 @@ proguard/
 captures/
 
 # Intellij
-#*.iml
+#.idea/libraries/
 #.idea/workspace.xml
+#.idea/tasks.xml
+#.idea/.name
+#.idea/compiler.xml
+#.idea/copyright/profiles_settings.xml
+#.idea/encodings.xml
+#.idea/misc.xml
+#.idea/modules.xml
+#.idea/scopes/scope_settings.xml
+#.idea/vcs.xml
+#*.iml
 
 # Keystore files
-*.jks
+#*.jks
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
