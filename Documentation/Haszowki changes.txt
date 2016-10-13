@@ -1,5 +1,8 @@
 ver. 0.6.2
 ~ przeniesienie zawartoœci projektu do wzorca Android Studio nowszego typu
+~ uzupe³nienie dokumentacji
+~ uporz¹dkowanie kodu
+~ zmiana formatu URL z odpowiedziami
 
 ver. 0.6.1
 ~ poprawa b³êdnego odtwarzania siê zak³adek w Tabs Activity
