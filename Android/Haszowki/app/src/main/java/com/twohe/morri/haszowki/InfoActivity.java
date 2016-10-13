@@ -5,7 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 /**
- * Created by TwoHe on 10.07.2016.
+ * Created by morri on 10.07.2016.
+ *
+ * Models an activity where information about this app are viewed.
+ * It shows version of current application build.
  */
 public class InfoActivity extends AppCompatActivity {
 
@@ -15,9 +18,11 @@ public class InfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_info);
 
         /* obsluga toolbar w Info */
-        Toolbar infoToolbar = (Toolbar) findViewById(R.id.infoToolbar);
+        infoToolbar = (Toolbar) findViewById(R.id.infoToolbar);
         if (infoToolbar != null)
             infoToolbar.setTitle(R.string.label_info_activity);
 
     }
+
+    Toolbar infoToolbar;
 }

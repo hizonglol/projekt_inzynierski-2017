@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -40,8 +39,8 @@ public class SettingsActivity extends AppCompatActivity {
 
                 EditText name = (EditText) findViewById(R.id.name_value);
                 EditText surname = (EditText) findViewById(R.id.surname_value);
-                EditText index = (EditText) findViewById(R.id.index_value);
-                EditText subject = (EditText) findViewById(R.id.subject_value);
+                EditText studentNo = (EditText) findViewById(R.id.index_value);
+                EditText course = (EditText) findViewById(R.id.viewMain_course);
 
                 if (name != null) {
                     if (name.getText().toString().equals("")) {
@@ -59,20 +58,20 @@ public class SettingsActivity extends AppCompatActivity {
                     db.createSetting("setting_surname", surname.getText().toString());
                 }
 
-                if (index != null) {
-                    if (index.getText().toString().length() != 6) {
+                if (studentNo != null) {
+                    if (studentNo.getText().toString().length() != 6) {
                         Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_student_number), Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    db.createSetting("setting_index", index.getText().toString());
+                    db.createSetting("setting_studentNo", studentNo.getText().toString());
                 }
 
-                if (subject != null) {
-                    if (subject.getText().toString().equals("")) {
-                        Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_subject), Toast.LENGTH_SHORT).show();
+                if (course != null) {
+                    if (course.getText().toString().equals("")) {
+                        Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_course), Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    db.createSetting("setting_subject", subject.getText().toString());
+                    db.createSetting("setting_course", course.getText().toString());
                 }
 
                 //Log.d("saveButtonHandler", "Dane zapisane");
@@ -83,7 +82,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (saveButton != null)
             saveButton.setOnClickListener(saveButtonHandler);
 
-        EditText editTestId = (EditText) findViewById(R.id.subject_value);
+        EditText editTestId = (EditText) findViewById(R.id.viewMain_course);
         EditText.OnEditorActionListener doneKeyboardButton = new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -116,13 +115,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         EditText editName = (EditText) findViewById(R.id.name_value);
         EditText editSurname = (EditText) findViewById(R.id.surname_value);
-        EditText editIndex = (EditText) findViewById(R.id.index_value);
-        EditText editSubject = (EditText) findViewById(R.id.subject_value);
+        EditText editStudentNo = (EditText) findViewById(R.id.index_value);
+        EditText editCourse = (EditText) findViewById(R.id.viewMain_course);
 
         String stringName = resume_db.getSetting("setting_name");
         String stringSurname = resume_db.getSetting("setting_surname");
-        String stringIndex = resume_db.getSetting("setting_index");
-        String stringSubject = resume_db.getSetting("setting_subject");
+        String stringStudentNo = resume_db.getSetting("setting_studentNo");
+        String stringCourse = resume_db.getSetting("setting_course");
 
 
         if (editName != null)
@@ -131,11 +130,11 @@ public class SettingsActivity extends AppCompatActivity {
         if (editSurname != null)
             editSurname.setText(stringSurname);
 
-        if (editIndex != null)
-            editIndex.setText(stringIndex);
+        if (editStudentNo != null)
+            editStudentNo.setText(stringStudentNo);
 
-        if (editSubject != null)
-            editSubject.setText(stringSubject);
+        if (editCourse != null)
+            editCourse.setText(stringCourse);
 
         resume_db.close();
 

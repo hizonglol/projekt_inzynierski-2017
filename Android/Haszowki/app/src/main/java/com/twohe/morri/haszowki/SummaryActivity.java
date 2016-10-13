@@ -1,7 +1,6 @@
 package com.twohe.morri.haszowki;
 
 import android.content.ComponentCallbacks2;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -11,7 +10,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -75,7 +73,7 @@ public class SummaryActivity extends AppCompatActivity {
         if (infoToolbar != null)
             infoToolbar.setTitle(R.string.label_summary_activity);
 
-        Button exitButton = (Button) findViewById(R.id.button_exit);
+        Button exitButton = (Button) findViewById(R.id.buttonMain_exitApp);
         Button backToTestButton = (Button) findViewById(R.id.button_back_to_test);
 
         View.OnClickListener exitButtonHandler = new View.OnClickListener() {

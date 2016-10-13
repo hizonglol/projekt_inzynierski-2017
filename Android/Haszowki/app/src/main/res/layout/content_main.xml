@@ -26,11 +26,11 @@
             android:layout_alignParentStart="true">
 
             <TextView
-                android:id="@+id/label_index"
+                android:id="@+id/label_studentNo"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="4"
-                android:text="@string/label_index"
+                android:text="@string/label_studentNo"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="17sp" />
 
@@ -45,12 +45,12 @@
                 android:textSize="15sp" />
 
             <TextView
-                android:id="@+id/label_hall_place"
+                android:id="@+id/label_hall_seat"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/label_hall_place"
+                android:text="@string/label_hall_seat"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="15sp" />
 
@@ -68,7 +68,7 @@
             android:layout_below="@+id/row_index_labels">
 
             <TextView
-                android:id="@+id/index_value"
+                android:id="@+id/viewMain_studentNo"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="4"
@@ -81,7 +81,7 @@
                 android:textSize="30sp" />
 
             <EditText
-                android:id="@+id/hall_row_value"
+                android:id="@+id/editMain_hallRow"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -91,13 +91,13 @@
                 android:inputType="phone"
                 android:maxLength="2"
                 android:maxLines="1"
-                android:nextFocusForward="@+id/hall_place_value"
+                android:nextFocusForward="@+id/editMain_hallSeat"
                 android:selectAllOnFocus="true"
                 android:text="@string/zero_value"
                 android:textSize="30sp" />
 
             <EditText
-                android:id="@+id/hall_place_value"
+                android:id="@+id/editMain_hallSeat"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -107,7 +107,7 @@
                 android:inputType="phone"
                 android:maxLength="2"
                 android:maxLines="1"
-                android:nextFocusForward="@+id/weight_value"
+                android:nextFocusForward="@+id/editMain_vector"
                 android:selectAllOnFocus="true"
                 android:text="@string/zero_value"
                 android:textSize="30sp" />
@@ -146,7 +146,7 @@
             android:layout_below="@+id/label_weight">
 
             <EditText
-                android:id="@+id/weight_value"
+                android:id="@+id/editMain_vector"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="4"
@@ -156,14 +156,14 @@
                 android:inputType="phone"
                 android:maxLength="6"
                 android:maxLines="1"
-                android:nextFocusForward="@+id/exam_id_value"
+                android:nextFocusForward="@+id/editMain_testID"
                 android:selectAllOnFocus="true"
                 android:textAlignment="gravity"
                 android:textSize="30sp" />
 
 
             <Button
-                android:id="@+id/button_qr_code"
+                android:id="@+id/buttonMain_scanQR"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="2"
@@ -227,7 +227,7 @@
             android:layout_below="@+id/row_result_labels">
 
             <TextView
-                android:id="@+id/result_value"
+                android:id="@+id/viewMain_result"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="4"
@@ -236,15 +236,15 @@
                 android:focusableInTouchMode="true"
                 android:gravity="center"
                 android:marqueeRepeatLimit="marquee_forever"
-                android:singleLine="true"
                 android:minHeight="50dp"
                 android:scrollHorizontally="true"
+                android:singleLine="true"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
 
             <TextView
-                android:id="@+id/result_modulo_value"
+                android:id="@+id/editMain_moduloResult"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="2"
@@ -268,7 +268,7 @@
             android:background="@android:color/darker_gray" />
 
         <TableRow
-            android:id="@+id/row_exam_infos_labels"
+            android:id="@+id/row_exam_info_labels"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
@@ -279,11 +279,11 @@
             android:layout_below="@+id/result_row_line">
 
             <TextView
-                android:id="@+id/label_subject_value"
+                android:id="@+id/label_course_value"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="4"
-                android:text="@string/label_subject_value"
+                android:text="@string/label_course_value"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="17sp" />
 
@@ -308,10 +308,10 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="false"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/row_exam_infos_labels">
+            android:layout_below="@+id/row_exam_info_labels">
 
             <TextView
-                android:id="@+id/subject_value"
+                android:id="@+id/viewMain_course"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="4"
@@ -323,18 +323,18 @@
 
 
             <EditText
-                android:id="@+id/exam_id_value"
+                android:id="@+id/editMain_testID"
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
                 android:layout_weight="2"
                 android:digits="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
                 android:gravity="center"
                 android:imeOptions="flagNoExtractUi|actionDone"
-                android:singleLine="true"
                 android:inputType="text|textNoSuggestions"
                 android:maxLines="1"
                 android:minHeight="50sp"
                 android:selectAllOnFocus="true"
+                android:singleLine="true"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
@@ -354,7 +354,7 @@
             android:layout_below="@+id/row_exam_infos">
 
             <Button
-                android:id="@+id/button_exit"
+                android:id="@+id/buttonMain_exitApp"
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -362,7 +362,7 @@
                 android:text="@string/button_exit" />
 
             <Button
-                android:id="@+id/button_compute"
+                android:id="@+id/buttonMain_compute"
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -370,7 +370,7 @@
                 android:text="@string/button_compute" />
 
             <Button
-                android:id="@+id/button_start_test"
+                android:id="@+id/buttonMain_startTest"
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"

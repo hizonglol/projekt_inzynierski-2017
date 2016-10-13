@@ -74,7 +74,7 @@
                 android:id="@+id/label_index"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/label_index" />
+                android:text="@string/label_studentNo" />
 
             <EditText
                 android:id="@+id/index_value"
@@ -91,10 +91,10 @@
                 android:id="@+id/label_subject_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/label_subject_value" />
+                android:text="@string/label_course_value" />
 
             <EditText
-                android:id="@+id/subject_value"
+                android:id="@+id/viewMain_course"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

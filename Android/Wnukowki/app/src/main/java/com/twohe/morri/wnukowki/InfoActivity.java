@@ -7,7 +7,7 @@ import android.support.v7.widget.Toolbar;
 /**
  * Created by morri on 03.07.2016.
  *
- * Models an activity where information about this app is viewed.
+ * Models an activity where information about this app are viewed.
  * It shows version of current application build.
  */
 public class InfoActivity extends AppCompatActivity {

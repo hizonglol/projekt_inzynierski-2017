@@ -32,17 +32,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*
+        Association of elements from layout with local variables
+         */
         toolbarMain = (Toolbar) findViewById(R.id.toolbarMain);
         viewMain_result = (TextView) findViewById(R.id.viewMain_result);
         editMain_studNum = (EditText) findViewById(R.id.editMain_studNum);
         editMain_mask = (EditText) findViewById(R.id.editMain_mask);
-        buttonMain = (Button) findViewById(R.id.buttonMain);
+        buttonMain_compute = (Button) findViewById(R.id.buttonMain_compute);
 
         if (toolbarMain != null)
             setSupportActionBar(toolbarMain);
 
-        if (buttonMain != null)
-            buttonMain.setOnClickListener(buttonMainCallback);
+        if (buttonMain_compute != null)
+            buttonMain_compute.setOnClickListener(buttonMainCallback);
 
         if (editMain_mask != null)
             editMain_mask.setOnFocusChangeListener(maskListener);
@@ -70,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up buttonMain, so long
+        // automatically handle clicks on the Home/Up buttonMain_compute, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
@@ -86,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     TextView viewMain_result;
     EditText editMain_studNum;
     EditText editMain_mask;
-    Button buttonMain;
+    Button buttonMain_compute;
     Toolbar toolbarMain;
 
     /**

@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,22 +31,82 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.io.File;
-import java.util.List;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class MainActivity extends AppCompatActivity {
 
-    boolean canBeginTestFlag = false;
+    /**
+     * Initializes variables with viewed layout and sets up listeners.
+     * Creates database handler and initializes canBeginTest flag with false value.
+     *
+     * @param savedInstanceState bundle with dynamic instance state
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
+        checkIfCloseRequested();
+        canBeginTestFlag = false;
 
-    SettingsDataSource db = new SettingsDataSource(this);
+        createAppFolder();
+
+        sharedPrefMain = PreferenceManager.getDefaultSharedPreferences(this);
+        databaseMain = new SettingsDataSource(this);
+
+        toolbarMain = (Toolbar) findViewById(R.id.toolbarMain);
+        buttonMain_startTest = (Button) findViewById(R.id.buttonMain_startTest);
+        buttonMain_exitApp = (Button) findViewById(R.id.buttonMain_exitApp);
+        buttonMain_scanQR = (Button) findViewById(R.id.buttonMain_scanQR);
+        editMain_vector = (EditText) findViewById(R.id.editMain_vector);
+        viewMain_result = (TextView) findViewById(R.id.viewMain_result);
+        buttonMain_compute = (Button) findViewById(R.id.buttonMain_compute);
+        editMain_testID = (EditText) findViewById(R.id.editMain_testID);
+        viewMain_moduloResult = (TextView) findViewById(R.id.editMain_moduloResult);
+        editMain_hallRow = (EditText) findViewById(R.id.editMain_hallRow);
+        editMain_hallSeat = (EditText) findViewById(R.id.editMain_hallSeat);
+        viewMain_course = (TextView) findViewById(R.id.viewMain_course);
+
+        databaseMain.open();
+        setSupportActionBar(toolbarMain);
 
 
-    // Create object of SharedPreferences.
-    SharedPreferences sharedPref;
+        if (buttonMain_compute != null)
+            buttonMain_compute.setOnClickListener(computeButtonHandler);
 
+        if (buttonMain_startTest != null)
+            buttonMain_startTest.setOnClickListener(startTestButtonHandler);
 
-    public boolean isStoragePermissionGranted() {
+        if (buttonMain_exitApp != null)
+            buttonMain_exitApp.setOnClickListener(exitButtonHandler);
+
+        if (buttonMain_scanQR != null)
+            buttonMain_scanQR.setOnClickListener(scanQRButtonHandler);
+
+        if (editMain_testID != null)
+            editMain_testID.setOnEditorActionListener(doneKeyboardButton);
+
+    }
+
+    /**
+     * Checks if there is parameter "Exit me" with true value.
+     * Exits intent if there is. Does nothing if there is not or is with false value.
+     */
+    private void checkIfCloseRequested() {
+
+        if (getIntent().getBooleanExtra("Exit me", false)) {
+            finish();
+        }
+    }
+
+    /**
+     * Checks if host system is Marshmallow or higher.
+     * Then checks permission for writing external memory.
+     * If permission is not granted, makes request and asks to grant permission.
+     *
+     * @return true if permission has been granted, false if not
+     */
+    private boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
@@ -65,7 +124,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public boolean isCameraPermissionGranted() {
+    /**
+     * Checks if host system is Marshmallow or higher.
+     * Then checks permission for using camera.
+     * If permission is not granted, makes request and asks to grant permission.
+     *
+     * @return true if permission has been granted, false if not
+     */
+    private boolean isCameraPermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(android.Manifest.permission.CAMERA)
                     == PackageManager.PERMISSION_GRANTED) {
@@ -83,6 +149,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Used to create folder for tests data.
+     *
+     * Checks if external memoery write permission has been granted.
+     * Afterwards creates folder for tests files.
+     *
+     * @return true if folder creation successful, false if not
+     */
     private boolean createAppFolder() {
 
         isStoragePermissionGranted();
@@ -102,295 +176,34 @@ public class MainActivity extends AppCompatActivity {
         return success;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        /* check if the app is intended to close */
-        if (getIntent().getBooleanExtra("Exit me", false)) {
-            finish();
-            return; // return to prevent from doing unnecessary stuffs
-        }
-
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-
-        createAppFolder();
-
-        //*****************************************************************************************
-
-        db.open();
-
-        //*****************************************************************************************
-
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
-        setSupportActionBar(mainToolbar);
-
-        Button startTestButton = (Button) findViewById(R.id.button_start_test);
-        Button exitButton = (Button) findViewById(R.id.button_exit);
-        Button scanQRButton = (Button) findViewById(R.id.button_qr_code);
-
-        final Button computeButton = (Button) findViewById(R.id.button_compute);
-        final View.OnClickListener computeButtonHandler = new View.OnClickListener() {
-            public void onClick(View v) throws NumberFormatException {
-
-                canBeginTestFlag = false;
-
-                int digitsIndex[] = new int[6];
-                int digitsWeights[] = new int[6];
-                int digitsResult[] = new int[6];
-
-                //*******************************************************
-                //SPRAWDZAMY TERAZ INDEKS
-                //*******************************************************
-
-                EditText editWeights = (EditText) findViewById(R.id.weight_value);
-                TextView viewResult = (TextView) findViewById(R.id.result_value);
-
-                String stringIndex = db.getSetting("setting_index");
-                String stringWeights = null;
-
-                if (editWeights != null) {
-                    stringWeights = editWeights.getText().toString();
-
-                    if (stringWeights.length() != 6) {
-                        StringBuilder builderStringWeights = new StringBuilder(stringWeights);
-                        while (builderStringWeights.length() < 6) {
-                            builderStringWeights.insert(0, "0");
-                        }
-                        editWeights.setText(builderStringWeights);
-                        stringWeights = builderStringWeights.toString();
-                    }
-                }
-
-                try {
-                    for (int i = 0; i < 6; ++i) {
-                        try {
-                            digitsIndex[i] = Integer.parseInt(Character.toString(stringIndex.charAt(i)));
-                            //Log.v("Index", String.valueOf(digitsIndex[i]));
-                        } catch (NumberFormatException e) {
-                            Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_student_number), Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                    }
-                } catch (StringIndexOutOfBoundsException e) {
-                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_student_number), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                //*******************************************************
-                //SPRAWDZAMY TERAZ WAGI
-                //*******************************************************
-
-                if (stringWeights != null) {
-                    for (int i = 0; i < 6; ++i) {
-                        digitsWeights[i] = Integer.parseInt(Character.toString(stringWeights.charAt(i)));
-                        //Log.v("Waga", String.valueOf(digitsWeights[i]));
-                    }
-                }
-
-                int numberResult = 0;
-                for (int i = 0; i < 6; ++i) {
-                    digitsResult[i] = digitsIndex[i] * digitsWeights[i];
-                    numberResult += digitsResult[i];
-                    //Log.v("Wynik", String.valueOf(digitsResult[i]));
-                }
-
-
-                if (viewResult != null) {
-                    String stringResult = "";
-
-                    for (int i = 0; i < 5; ++i) {
-                        stringResult += String.valueOf(digitsResult[i]) + " + ";
-                    }
-
-                    stringResult += digitsResult[5] + " = " + numberResult;
-
-                    viewResult.setText(stringResult);
-                    viewResult.setSelected(true);
-
-                }
-
-
-                int numberModuloResult = numberResult % 16;
-                canBeginTestFlag = true;
-
-                TextView viewModuloResult = (TextView) findViewById(R.id.result_modulo_value);
-                String stringModuloResult = null;
-
-                if (numberModuloResult < 10)
-                    stringModuloResult = String.valueOf(numberModuloResult);
-                else if (numberModuloResult == 10)
-                    stringModuloResult = "A";
-                else if (numberModuloResult == 11)
-                    stringModuloResult = "B";
-                else if (numberModuloResult == 12)
-                    stringModuloResult = "C";
-                else if (numberModuloResult == 13)
-                    stringModuloResult = "D";
-                else if (numberModuloResult == 14)
-                    stringModuloResult = "E";
-                else if (numberModuloResult == 15)
-                    stringModuloResult = "F";
-
-                if (viewModuloResult != null) {
-                    viewModuloResult.setText(stringModuloResult);
-                }
-
-                db.createSetting("setting_weights", stringWeights);
-                db.createSetting("setting_group", stringModuloResult);
-            }
-        };
-        if (computeButton != null) {
-            computeButton.setOnClickListener(computeButtonHandler);
-        }
-
-        View.OnClickListener startTestButtonHandler = new View.OnClickListener() {
-            public void onClick(View v) throws NumberFormatException {
-
-                if (!isStoragePermissionGranted()) {
-                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_writing_permission), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (!canBeginTestFlag) {
-                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_compute_group), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (!checkIfEditableValuesProper())
-                    return;
-
-                Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
-                if (isCallable(intentTabs)) {
-                    //Log.i("Main", "Setting up tabs/navigating to them");
-                    startActivity(intentTabs);
-                }/* else if (!isCallable(intentTabs)) {
-                    Log.i("Main", "Navigating to tabs");
-                    navigateUpTo(intentTabs);
-                }*/
-            }
-        };
-        if (startTestButton != null)
-            startTestButton.setOnClickListener(startTestButtonHandler);
-
-        View.OnClickListener exitButtonHandler = new View.OnClickListener() {
-            public void onClick(View v) throws NumberFormatException {
-
-                Intent intentMain = getIntent();
-                intentMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intentMain.putExtra("Exit me", true);
-                startActivity(intentMain);
-                finish();
-
-            }
-        };
-        if (exitButton != null)
-            exitButton.setOnClickListener(exitButtonHandler);
-
-
-        View.OnClickListener scanQRButtonHandler = new View.OnClickListener() {
-            public void onClick(View v) {
-                if (isCameraPermissionGranted()) {
-                    IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
-                    integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
-                    integrator.setPrompt(getResources().getString(R.string.message_scan_qr_code));
-                    integrator.setCameraId(0);  // Use a specific camera of the device
-                    integrator.setBeepEnabled(false);
-                    integrator.initiateScan(IntentIntegrator.QR_CODE_TYPES);
-
-                    //Log.v("scanQRButtonHandler", "Scanned");
-                }
-            }
-        };
-        if (scanQRButton != null)
-            scanQRButton.setOnClickListener(scanQRButtonHandler);
-
-
-        EditText editTestId = (EditText) findViewById(R.id.exam_id_value);
-        EditText.OnEditorActionListener doneKeyboardButton = new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    return true;
-                }
-                return false;
-            }
-        };
-        if (editTestId != null)
-            editTestId.setOnEditorActionListener(doneKeyboardButton);
-
-    }
-
-    private boolean checkIfEditableValuesProper() {
-
-        EditText editRow = (EditText) findViewById(R.id.hall_row_value);
-        EditText editPlace = (EditText) findViewById(R.id.hall_place_value);
-        EditText editTestId = (EditText) findViewById(R.id.exam_id_value);
-        TextView viewSubjectValue = (TextView) findViewById(R.id.subject_value);
-
-        if (editRow != null) {
-            if (Integer.parseInt(editRow.getText().toString()) < 1) {
-                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_row_higher_than_0), Toast.LENGTH_SHORT).show();
-                return false;
-            }
-            db.createSetting("setting_hall_row", editRow.getText().toString());
-        }
-
-        if (editPlace != null) {
-            if (Integer.parseInt(editPlace.getText().toString()) < 1) {
-                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_place_higher_than_0), Toast.LENGTH_SHORT).show();
-                return false;
-            }
-            db.createSetting("setting_hall_place", editPlace.getText().toString());
-        }
-
-        if (editTestId != null) {
-            if (editTestId.getText().length() == 0) {
-                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_ID_name), Toast.LENGTH_SHORT).show();
-                return false;
-            }
-            db.createSetting("setting_test_id", editTestId.getText().toString());
-        }
-
-        if (viewSubjectValue != null) {
-            if (viewSubjectValue.getText().length() < 2) {
-                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_subject_name), Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-
+    /**
+     * Used to handle data received from OR code scanner.
+     * Updates editMain_vector and editMain_testID with received data.
+     *
+     * @param requestCode The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
+     * @param resultCode The integer result code returned by the child activity through its setResult().
+     * @param data An Intent, which can return result data to the caller (various data can be attached to Intent "extras").
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        EditText editTestWeight = (EditText) findViewById(R.id.weight_value);
-        EditText editTestId = (EditText) findViewById(R.id.exam_id_value);
 
         if (requestCode == IntentIntegrator.REQUEST_CODE && data != null) {
             IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
             if (scanResult != null) {
                 String contents = scanResult.getContents();
                 String[] contentsTable = contents.split("\\s+");
-                if (editTestWeight != null)
-                    editTestWeight.setText(contentsTable[0]);
-                if (editTestId != null)
-                    editTestId.setText(contentsTable[1]);
-                // handle scan result
-                //Log.v("Scan result:", contents);
-            } else {
-                // else continue with any other code you need in the method
-                //Log.v("MainActivity", "scanResult is null.");
+                if (editMain_vector != null)
+                    editMain_vector.setText(contentsTable[0]);
+                if (editMain_testID != null)
+                    editMain_testID.setText(contentsTable[1]);
             }
         }
     }
 
+    /**
+     * Used to make a check if user really wants to press back button.
+     */
     @Override
     public void onBackPressed() {
 
@@ -409,65 +222,82 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * Used to close database when this activity is being destroyed.
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        db.close();
+        databaseMain.close();
     }
 
-
-    void resumeState() {
-
-        SettingsDataSource db = new SettingsDataSource(this);
-        db.open();
-
-
-        TextView viewIndex = (TextView) findViewById(R.id.index_value);
-        TextView viewSubject = (TextView) findViewById(R.id.subject_value);
-
-        String stringIndex = db.getSetting("setting_index");
-        String stringSubject = db.getSetting("setting_subject");
-
-        if (viewIndex != null)
-            viewIndex.setText(stringIndex);
-
-        if (viewSubject != null)
-            viewSubject.setText(stringSubject);
-
-        db.close();
-    }
-
+    /**
+     * Called everytime when this activity is being re-initialized.
+     * Always after onCreate() and before onPostCreate().
+     *
+     * @param savedInstanceState the data most recently supplied in onSaveInstanceState(Bundle).
+     */
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        // Always call the superclass so it can restore the view hierarchy
         super.onRestoreInstanceState(savedInstanceState);
 
         resumeState();
     }
 
+    /**
+     * Called everytime when this activity comes back from background.
+     * <p>
+     * Resets shared preferences to prevent TabsActivity closing itself.
+     * Loads all the fields on this activity with saved data by calling
+     * resumeState().
+     */
     @Override
     public void onResume() {
-        super.onResume();  // Always call the superclass method first
+        super.onResume();
 
-        //now get Editor
-        SharedPreferences.Editor editor = sharedPref.edit();
-        //put your value
+        /*
+        Reset sharedPrefMain to prevent closing TabsActivity itself
+         */
+        SharedPreferences.Editor editor = sharedPrefMain.edit();
         editor.putBoolean("End test", false);
-
-        //commits your edits
-        //editor.commit();
         editor.apply();
 
         resumeState();
     }
 
-    private boolean isCallable(Intent intent) {
-        List<ResolveInfo> list = getPackageManager().queryIntentActivities(intent,
-                PackageManager.MATCH_DEFAULT_ONLY);
-        //Log.v("Ilosc instancji: ", String.valueOf(list.size()));
-        return list.size() < 2;
+    /**
+     * Is being used to restore two significant fields in this activity:
+     * student number and course name.
+     * <p>
+     * To avoid database leakage this method uses it's own SettingsDataSource.
+     */
+    private void resumeState() {
+
+        SettingsDataSource db = new SettingsDataSource(this);
+        db.open();
+
+
+        TextView viewStudentNo = (TextView) findViewById(R.id.viewMain_studentNo);
+        TextView viewCourse = (TextView) findViewById(R.id.viewMain_course);
+
+        String stringStudentNo = db.getSetting("setting_studentNo");
+        String stringCourse = db.getSetting("setting_course");
+
+        if (viewStudentNo != null)
+            viewStudentNo.setText(stringStudentNo);
+
+        if (viewCourse != null)
+            viewCourse.setText(stringCourse);
+
+        db.close();
     }
 
+    /**
+     * Inflates the menu. Adds items to the action bar if it is present.
+     *
+     * @param menu interface for managing the items in a menu
+     * @return you must return true for the menu to be displayed; if you return false it will not be shown
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -475,34 +305,361 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Handles action bar item clicks.
+     *
+     * @param item interface for direct access to a previously created menu item
+     * @return false to allow normal menu processing to proceed, true to consume it here
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
 
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-
             Intent intentSettings = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(intentSettings);
-
-            //Log.i("Menu", "Settings");
-
             return true;
         }
 
         if (id == R.id.action_info) {
-
             Intent intentInfo = new Intent(getApplicationContext(), InfoActivity.class);
             startActivity(intentInfo);
-
-            //Log.i("Menu", "Info");
-
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * Callback for clicking buttonMain_compute.
+     * <p>
+     * Does all procedures with group computation.
+     * Updates corresponding editTexts with computed data.
+     * Changes flag canBeginTest into true if computation has been completed.
+     */
+    View.OnClickListener computeButtonHandler = new View.OnClickListener() {
+        public void onClick(View v) throws NumberFormatException {
+
+            canBeginTestFlag = false;
+
+            int digitsStudentNo[] = new int[6];
+            int digitsVector[] = new int[6];
+            int digitsResult[] = new int[6];
+
+            String stringStudentNo = databaseMain.getSetting("setting_studentNo");
+            String stringVector = checkTestVector();
+
+            if (parseStudentNo(stringStudentNo, digitsStudentNo)) return;
+
+            if (parseTestVector(stringVector, digitsVector)) return;
+
+            int integerResult = computeIntegerResult(digitsStudentNo, digitsVector, digitsResult);
+
+            assembleStringResultAndView(digitsResult, integerResult);
+
+            convertIntegerToStringModuloAndView(integerResult);
+
+            canBeginTestFlag = true;
+        }
+    };
+
+    /**
+     * Checks test vector taken from editMain_vector for too short length and fills front of it
+     * with zeros until there are 6 digits total.
+     * Updates editMain_vector with checked vector if needed.
+     *
+     * @return string with test vector
+     */
+    private String checkTestVector() {
+        StringBuilder builderStringVector = new StringBuilder("");
+
+        if (editMain_vector != null) {
+            builderStringVector.append(editMain_vector.getText().toString());
+
+            if (builderStringVector.length() != 6) {
+                while (builderStringVector.length() < 6) {
+                    builderStringVector.insert(0, "0");
+                }
+                editMain_vector.setText(builderStringVector.toString());
+            }
+        }
+
+        databaseMain.createSetting("setting_vector", builderStringVector.toString());
+
+        return builderStringVector.toString();
+    }
+
+    /**
+     * Parses string contained in stringStudentNo into table of digits called digitsStudentNo.
+     * Handles exceptions if something goes wrong with parsing.
+     *
+     * @param stringStudentNo table containing student number
+     * @param digitsStudentNo table containing digits of student number
+     * @return false if everything goes well, true if catches an exception
+     */
+    private boolean parseStudentNo(String stringStudentNo, int[] digitsStudentNo) {
+        try {
+            for (int i = 0; i < 6; ++i) {
+                try {
+                    digitsStudentNo[i] = Integer.parseInt(Character.toString(stringStudentNo.charAt(i)));
+                } catch (NumberFormatException e) {
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_student_number), Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            }
+        } catch (StringIndexOutOfBoundsException e) {
+            Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_student_number), Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Parses string contained in stringVector into table of digits.
+     * Handles exceptions if something goes wrong with parsing.
+     *
+     * @param stringVector string containing test vector
+     * @param digitsVector table containing digits of test vector
+     * @return false if everything goes well, true if catches an exception
+     */
+    private boolean parseTestVector(String stringVector, int[] digitsVector) {
+        try {
+            if (stringVector != null) {
+                for (int i = 0; i < 6; ++i) {
+                    try {
+                        digitsVector[i] = Integer.parseInt(Character.toString(stringVector.charAt(i)));
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_vector_number), Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                }
+            }
+        } catch (StringIndexOutOfBoundsException e) {
+            Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_vector_number), Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Computes digitsResult by multiplying digitsStudentNo fields with corresponding digitsVector fields.
+     * Sums up fields from digitsResult and puts into integerResult.
+     *
+     * @param digitsStudentNo table containing digits of student number
+     * @param digitsVector    table containing digits of test vector
+     * @param digitsResult    table containing digits of the result
+     * @return sum of all digitsResult fields
+     */
+    private int computeIntegerResult(int[] digitsStudentNo, int[] digitsVector, int[] digitsResult) {
+        int integerResult = 0;
+
+        for (int i = 0; i < 6; ++i) {
+            digitsResult[i] = digitsStudentNo[i] * digitsVector[i];
+            integerResult += digitsResult[i];
+        }
+
+        return integerResult;
+    }
+
+    /**
+     * Assembles result string and puts it into viewMain_result
+     *
+     * @param digitsResult  table of each digit from student number multiplied by corresponded vector digit
+     * @param integerResult sum of all fields from digitResult
+     */
+    private void assembleStringResultAndView(int[] digitsResult, int integerResult) {
+        String stringResult = "";
+
+        for (int i = 0; i < 5; ++i) {
+            stringResult += String.valueOf(digitsResult[i]) + " + ";
+        }
+
+        stringResult += digitsResult[5] + " = " + integerResult;
+
+        if (viewMain_result != null) {
+            viewMain_result.setText(stringResult);
+            viewMain_result.setSelected(true);
+        }
+    }
+
+    /**
+     * Converts group from integer to string modulo result (0-F)
+     * and puts it into viewMain_moduloResult.
+     * It also updates corresponding key-pair in database.
+     *
+     * @param integerResult computed group that is in a range from 0 to 15
+     */
+    private void convertIntegerToStringModuloAndView(Integer integerResult) {
+
+        integerResult = integerResult % 16;
+
+        String stringModuloResult = null;
+
+        if (integerResult < 10)
+            stringModuloResult = String.valueOf(integerResult);
+        else if (integerResult == 10)
+            stringModuloResult = "A";
+        else if (integerResult == 11)
+            stringModuloResult = "B";
+        else if (integerResult == 12)
+            stringModuloResult = "C";
+        else if (integerResult == 13)
+            stringModuloResult = "D";
+        else if (integerResult == 14)
+            stringModuloResult = "E";
+        else if (integerResult == 15)
+            stringModuloResult = "F";
+
+        if (viewMain_moduloResult != null) {
+            viewMain_moduloResult.setText(stringModuloResult);
+        }
+
+        databaseMain.createSetting("setting_group", stringModuloResult);
+    }
+
+    /**
+     * Callback for clicking buttonMain_startTest.
+     * <p>
+     * Checks if app has been granted permission to write to external storage.
+     * Checks if process of computing group number has been succeeded.
+     * Checks if all editable fields consists proper data.
+     * If all checks are passed, starts TabsActivity.
+     */
+    View.OnClickListener startTestButtonHandler = new View.OnClickListener() {
+        public void onClick(View v) throws NumberFormatException {
+
+            if (!isStoragePermissionGranted()) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_writing_permission), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!canBeginTestFlag) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_compute_group), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (checkEditableValues())
+                return;
+
+            Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
+            startActivity(intentTabs);
+        }
+    };
+
+    /**
+     * Checks if row and seat is higher than 0.
+     * Checks if testId contains at least one character.
+     * Checks if course name contains at least two characters.
+     *
+     * @return false if checks are passed, true if any check has been failed
+     */
+    private boolean checkEditableValues() {
+
+        if (editMain_hallRow != null) {
+            if (Integer.parseInt(editMain_hallRow.getText().toString()) < 1) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_row_higher_than_0), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            databaseMain.createSetting("setting_hall_row", editMain_hallRow.getText().toString());
+        }
+
+        if (editMain_hallSeat != null) {
+            if (Integer.parseInt(editMain_hallSeat.getText().toString()) < 1) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_seat_higher_than_0), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            databaseMain.createSetting("setting_hall_seat", editMain_hallSeat.getText().toString());
+        }
+
+        if (editMain_testID != null) {
+            if (editMain_testID.getText().length() == 0) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_ID_name), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            databaseMain.createSetting("setting_test_id", editMain_testID.getText().toString());
+        }
+
+        if (viewMain_course != null) {
+            if (viewMain_course.getText().length() < 2) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_course_name), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Callback for clicking buttonMain_exitApp.
+     * <p>
+     * Launches second main intent with cleaning the rest of intents,
+     * gives it parameter "Exit me" to force quit it on it's onCreate
+     * and finishes current intent.
+     */
+    View.OnClickListener exitButtonHandler = new View.OnClickListener() {
+        public void onClick(View v) throws NumberFormatException {
+
+            Intent intentMain = getIntent();
+            intentMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intentMain.putExtra("Exit me", true);
+            startActivity(intentMain);
+            finish();
+
+        }
+    };
+
+    /**
+     * Callback for clicking buttonMain_scanQR.
+     * <p>
+     * Configures scan of QR code and launches it.
+     */
+    View.OnClickListener scanQRButtonHandler = new View.OnClickListener() {
+        public void onClick(View v) {
+            if (isCameraPermissionGranted()) {
+                IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
+                integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+                integrator.setPrompt(getResources().getString(R.string.message_scan_qr_code));
+                integrator.setCameraId(0);
+                integrator.setBeepEnabled(false);
+                integrator.initiateScan(IntentIntegrator.QR_CODE_TYPES);
+            }
+        }
+    };
+
+    /**
+     * Callback for clicking keys on soft keyboard while editing editMain_testID.
+     * <p>
+     * If DONE key has been clicked then it hides soft keyboard and returns true.
+     * Otherwise it returns false.
+     */
+    EditText.OnEditorActionListener doneKeyboardButton = new EditText.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                return true;
+            }
+            return false;
+        }
+    };
+
+    private Boolean canBeginTestFlag;
+    private SettingsDataSource databaseMain;
+    private SharedPreferences sharedPrefMain;
+    private Toolbar toolbarMain;
+    private Button buttonMain_startTest;
+    private Button buttonMain_exitApp;
+    private Button buttonMain_scanQR;
+    private EditText editMain_testID;
+    private EditText editMain_vector;
+    private TextView viewMain_result;
+    private Button buttonMain_compute;
+    private TextView viewMain_moduloResult;
+    private EditText editMain_hallRow;
+    private EditText editMain_hallSeat;
+    private TextView viewMain_course;
 }

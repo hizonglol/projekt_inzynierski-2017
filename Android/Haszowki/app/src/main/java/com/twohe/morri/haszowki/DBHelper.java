@@ -15,7 +15,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_SETTING = "setting";
     public static final String COLUMN_SETTING_VALUE = "setting_value";
 
-    private static final String DATABASE_NAME = "settings.db";
+    private static final String DATABASE_NAME = "settings.dataBaseMain";
     private static final int DATABASE_VERSION = 1;
 
     // Database creation sql statement

@@ -15,10 +15,10 @@
     <string name="label_dunno_answers">Answers DUNNO:</string>
     <string name="label_exam_id_value">Test ID:</string>
     <string name="label_group_number">Group nr:</string>
-    <string name="label_hall_place">Seat</string>
+    <string name="label_hall_seat">Seat</string>
     <string name="label_hall_row">Row</string>
     <string name="label_info_activity">Information</string>
-    <string name="label_index">Index number</string>
+    <string name="label_studentNo">Student number</string>
     <string name="label_name">Name:</string>
     <string name="label_no_answers">Answers NO:</string>
     <string name="label_null">null</string>
@@ -28,7 +28,7 @@
     <string name="label_section">Question nr %1$d</string>
     <string name="label_session_token">Session identificator:</string>
     <string name="label_settings_activity">Settings</string>
-    <string name="label_subject_value">Subject name:</string>
+    <string name="label_course_value">Course name:</string>
     <string name="label_sum_of_answers">Sum of questions:</string>
     <string name="label_summary_activity">Summary</string>
     <string name="label_surname">Surname:</string>
@@ -41,9 +41,9 @@
     <string name="message_your_test_file_was_created">Your test file has been created</string>
     <string name="message_you_quit_test">You have left application</string>
     <string name="message_unable_to_send_answer">Unable to send answer!</string>
-    <string name="message_type_subject_name">Type subject name!</string>
+    <string name="message_type_course_name">Type course name!</string>
     <string name="message_type_row_higher_than_0">Type row higher than 0!</string>
-    <string name="message_type_place_higher_than_0">Type seat higher than 0!</string>
+    <string name="message_type_seat_higher_than_0">Type seat higher than 0!</string>
     <string name="message_type_ID_name">Type test ID!</string>
     <string name="message_test_ended">Test finished</string>
     <string name="message_scan_qr_code">Scan QR code</string>
@@ -52,8 +52,9 @@
     <string name="message_i_quit_app">Leaving application</string>
     <string name="message_give_writing_permission">Give writing permission!</string>
     <string name="message_give_surname">Type surname!</string>
-    <string name="message_give_subject">Type subject name!</string>
+    <string name="message_give_course">Type course name!</string>
     <string name="message_give_proper_student_number">Type proper student number!</string>
+    <string name="message_give_proper_vector_number">Type proper test vector!</string>
     <string name="message_give_name">Type name!</string>
     <string name="message_do_you_want_to_quit_test">Do you want to leave the test?</string>
     <string name="message_do_you_want_to_quit_app">Do you want to leave the application?</string>

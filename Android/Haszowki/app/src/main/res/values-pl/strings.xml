@@ -9,13 +9,13 @@
 
 
     <!--*** LABEL strings of MAIN ***-->
-    <string name="label_index">Numer indeksu:</string>
+    <string name="label_studentNo">Numer indeksu:</string>
     <string name="label_hall_row">Rząd</string>
-    <string name="label_hall_place">Miejsce</string>
+    <string name="label_hall_seat">Miejsce</string>
     <string name="label_weight">Wektor wag:</string>
     <string name="label_result">Wynik:</string>
     <string name="label_result_modulo">Modulo 16:</string>
-    <string name="label_subject_value">Nazwa przedmiotu:</string>
+    <string name="label_course_value">Nazwa przedmiotu:</string>
     <string name="label_exam_id_value">ID testu:</string>
 
 
@@ -29,13 +29,14 @@
     <string name="message_i_quit_app">Wychodzę z aplikacji</string>
     <string name="message_do_you_want_to_quit_app">Czy na pewno chcesz wyjść z aplikacji?</string>
     <string name="message_scan_qr_code">Zeskanuj kod QR</string>
-    <string name="message_type_subject_name">Wprowadź nazwę przedmiotu!</string>
+    <string name="message_type_course_name">Wprowadź nazwę przedmiotu!</string>
     <string name="message_type_ID_name">Wprowadź ID testu!</string>
-    <string name="message_type_place_higher_than_0">Podaj miejsce więsze od 0!</string>
+    <string name="message_type_seat_higher_than_0">Podaj miejsce więsze od 0!</string>
     <string name="message_type_row_higher_than_0">Podaj rząd więszy od 0!</string>
     <string name="message_compute_group">Wylicz grupę!</string>
     <string name="message_give_writing_permission">Daj uprawnienia do zapisu!</string>
     <string name="message_give_proper_student_number">Podaj poprawny indeks!</string>
+    <string name="message_give_proper_vector_number">Podaj poprawne wagi!</string>
 
 
     <!--*** LABEL strings of INFO ***-->
@@ -51,8 +52,8 @@
     <string name="label_name">Imię:</string>
     <string name="label_surname">Nazwisko:</string>
     <!--
-    @string/title_index_number
-    @string/title_subject_name
+    @string/title_studentNo
+    @string/title_course_name
     w title strings of main -->
 
 
@@ -63,7 +64,7 @@
     <!--*** MESSAGES strings of SETTINGS ***-->
     <string name="message_give_name">Podaj imię!</string>
     <string name="message_give_surname">Podaj nazwisko!</string>
-    <string name="message_give_subject">Podaj przedmiot!</string>
+    <string name="message_give_course">Podaj przedmiot!</string>
     <string name="message_data_saved">Dane zapisane</string>
 
 

@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -88,7 +87,7 @@ public class TabsActivity extends AppCompatActivity {
     int amount_of_no_answers = 0;
     int amount_of_dunno_answers = 0;
 
-    String token;
+    String sessionID;
     File fileToWrite;
 
     boolean wasInBackground = false;
@@ -120,7 +119,6 @@ public class TabsActivity extends AppCompatActivity {
     private boolean createTestFile(String token) {
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss", Locale.getDefault());
-        //SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault());
         Date now = new Date();
         String fileName = formatter.format(now) + "-" + token + ".txt";//like 2016_01_12-12_30_00-ABCdef12.txt
 
@@ -375,11 +373,11 @@ public class TabsActivity extends AppCompatActivity {
 
         SettingsDataSource db = new SettingsDataSource(this);
         db.open();
-        token = generateToken();
-        db.createSetting("setting_token", token);
+        sessionID = generateToken();
+        db.createSetting("setting_token", sessionID);
         db.close();
 
-        createTestFile(token);
+        createTestFile(sessionID);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -649,51 +647,52 @@ public class TabsActivity extends AppCompatActivity {
 
         private String createDataURL(String mode, String answer) {
 
-            String divider = "";
-
             SettingsDataSource db = new SettingsDataSource(getActivity());
             db.open();
+
             StringBuilder sbServerQuery = new StringBuilder();
+            String divider = "&";
+
+            //Get current timestamp
+            SimpleDateFormat formatter = new SimpleDateFormat("HH_mm_ss_SSS", Locale.getDefault());
+            Date timestamp = new Date();
+            String stringTimestamp = formatter.format(timestamp);
 
             if (mode.equals("to_server")) {
-                divider = "&";
                 String stringServerUrl = "http://www.zpcir.ict.pwr.wroc.pl/~witold/empty.html";
                 sbServerQuery.append(stringServerUrl).append("?");
-            } else if (mode.equals("to_file")) {
-                divider = ";";
-                SimpleDateFormat formatter = new SimpleDateFormat("HH_mm_ss", Locale.getDefault());
-                Date now = new Date();
-                String time = formatter.format(now);
-                sbServerQuery.append("time=").append(time).append(divider);
             }
 
-            sbServerQuery.append("token=").append(((TabsActivity) getActivity()).token).append(divider);
-            String subject = db.getSetting("setting_subject");
-            sbServerQuery.append("subject=").append(subject).append(divider);
+            String studentNo = db.getSetting("setting_studentNo");
+            String course = db.getSetting("setting_course");
             String testId = db.getSetting("setting_test_id");
-            sbServerQuery.append("test_id=").append(testId).append(divider);
-            String name = db.getSetting("setting_name");
-            sbServerQuery.append("name=").append(name).append(divider);
-            String surname = db.getSetting("setting_surname");
-            sbServerQuery.append("surname=").append(surname).append(divider);
-            String index = db.getSetting("setting_index");
-            sbServerQuery.append("index=").append(index).append(divider);
-            String weights = db.getSetting("setting_weights");
-            sbServerQuery.append("weights=").append(weights).append(divider);
-            String group = db.getSetting("setting_group");
-            sbServerQuery.append("group=").append(group).append(divider);
             String hall_row = db.getSetting("setting_hall_row");
-            sbServerQuery.append("hall_row=").append(hall_row).append(divider);
-            String hall_place = db.getSetting("setting_hall_place");
-            sbServerQuery.append("hall_place=").append(hall_place).append(divider);
+            String hall_seat = db.getSetting("setting_hall_seat");
+            String name = db.getSetting("setting_name");
+            String surname = db.getSetting("setting_surname");
+            String vector = db.getSetting("setting_vector");
+            String group = db.getSetting("setting_group");
             String question_no = String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER));
+
+            sbServerQuery.append("student_no=").append(studentNo).append(divider);
+            sbServerQuery.append("course=").append(course).append(divider);
+            sbServerQuery.append("test_id=").append(testId).append(divider);
+            sbServerQuery.append("hall_row=").append(hall_row).append(divider);
+            sbServerQuery.append("hall_seat=").append(hall_seat).append(divider);
+            sbServerQuery.append("group=").append(group).append(divider);
+            sbServerQuery.append("timestamp=").append(stringTimestamp).append(divider);
             sbServerQuery.append("question_no=").append(question_no).append(divider);
-            sbServerQuery.append("answer=").append(answer);
+            sbServerQuery.append("answer=").append(answer).append(divider);
+            sbServerQuery.append("vector=").append(vector).append(divider);
+            sbServerQuery.append("version=").append(getResources().getString(R.string.version_value)).append(divider);
+            sbServerQuery.append("session_id=").append(((TabsActivity) getActivity()).sessionID).append(divider);
+            sbServerQuery.append("name=").append(name).append(divider);
+            sbServerQuery.append("surname=").append(surname);
 
             String sentUrl = sbServerQuery.toString();
             sentUrl = sentUrl.replace(" ", "");
 
-            //Log.d("Sent uri", sentUrl);
+            Log.d("Sent uri", sentUrl);
 
             db.close();
 
