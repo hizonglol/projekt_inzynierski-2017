@@ -1,6 +1,5 @@
 package com.twohe.morri.haszowki;
 
-
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -647,7 +646,9 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private Boolean canBeginTestFlag;
+
+    //variables and classes
+    private boolean canBeginTestFlag;
     private SettingsDataSource databaseMain;
     private SharedPreferences sharedPrefMain;
     private Toolbar toolbarMain;

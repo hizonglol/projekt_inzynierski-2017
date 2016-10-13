@@ -41,18 +41,14 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.AlgorithmParameters;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.InvalidParameterSpecException;
-import java.security.spec.KeySpec;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import javax.crypto.BadPaddingException;
@@ -62,54 +58,106 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 
 
 /**
  * Created by TwoHe on 10.07.2016.
  */
+@SuppressWarnings("FieldCanBeLocal")
 public class TabsActivity extends AppCompatActivity {
 
-    // Create object of SharedPreferences.
-    SharedPreferences sharedPref;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_tabs);
 
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+        sharedPrefTabs = PreferenceManager.getDefaultSharedPreferences(this);
+        threadKillerTabs = new threadKiller();
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
+        MemoryBoss mMemoryBoss;
 
-    int amount_of_questions = 1;
-    int amount_of_yes_answers = 0;
-    int amount_of_no_answers = 0;
-    int amount_of_dunno_answers = 0;
-
-    String sessionID;
-    File fileToWrite;
-
-    boolean wasInBackground = false;
-
-    Thread thread = new Thread() {
-        @Override
-        public void run() {
-            try {
-                Thread.sleep(3500); // As I am using LENGTH_LONG in Toast
-                TabsActivity.this.finish();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            mMemoryBoss = new MemoryBoss();
+            registerComponentCallbacks(mMemoryBoss);
         }
-    };
 
-    private String generateToken() {
+        SettingsDataSource databaseTabs = new SettingsDataSource(this);
+        databaseTabs.open();
+        stringTabs_sessionID = generateSessionID();
+        databaseTabs.createSetting("setting_sessionID", stringTabs_sessionID);
+        databaseTabs.close();
+
+        createTestFile(stringTabs_sessionID);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        SectionsPagerAdapterTabs = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        ViewPagerTabs = (ViewPager) findViewById(R.id.container);
+        if (ViewPagerTabs != null)
+            ViewPagerTabs.setAdapter(SectionsPagerAdapterTabs);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        if (tabLayout != null)
+            tabLayout.setupWithViewPager(ViewPagerTabs);
+
+
+        addTab();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Boolean endTest = sharedPrefTabs.getBoolean("End test", false);
+
+        if (endTest)
+            TabsActivity.this.finish();
+
+
+        if (wasInBackgroundTabs) {
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(getResources().getString(R.string.message_you_quit_test))
+                    .setMessage(getResources().getString(R.string.message_test_ended))
+                    .setCancelable(false)
+                    .show();
+
+            threadKillerTabs.start();
+        }
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(getResources().getString(R.string.message_i_quit_test))
+                .setMessage(getResources().getString(R.string.message_do_you_want_to_quit_test))
+                .setPositiveButton(getResources().getString(R.string.button_yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+
+                })
+                .setNegativeButton(getResources().getString(R.string.button_no), null)
+                .show();
+    }
+
+    public void addTab() {
+        SectionsPagerAdapterTabs.addFragment();
+    }
+
+    private String generateSessionID() {
         SecureRandom randomizer = new SecureRandom();
         byte bytes[] = new byte[6];
         randomizer.nextBytes(bytes);
         String base64 = Base64.encodeToString(bytes, Base64.URL_SAFE | Base64.NO_WRAP);
-        //Log.i("generateCode", base64);
 
         String shortenedBase64 = base64.substring(0, 4).toLowerCase();
 
@@ -127,24 +175,21 @@ public class TabsActivity extends AppCompatActivity {
             if (!root.exists()) {
                 root.mkdir();
             }
-            fileToWrite = new File(root, fileName);
+            fileTabs_toWrite = new File(root, fileName);
 
-            fileToWrite.setReadable(true);
-            fileToWrite.setWritable(true);
+            fileTabs_toWrite.setReadable(true);
+            fileTabs_toWrite.setWritable(true);
 
-// initiate media scan and put the new things into the path array to
-// make the scanner aware of the location and the files you want to see
-            MediaScannerConnection.scanFile(this, new String[]{fileToWrite.getAbsolutePath()}, null, null);
+            MediaScannerConnection.scanFile(this, new String[]{fileTabs_toWrite.getAbsolutePath()}, null, null);
 
-
-            FileWriter writer = new FileWriter(fileToWrite, true);
+            FileWriter writer = new FileWriter(fileTabs_toWrite, true);
             writer.append(token);
             writer.append("\t");
             writer.append(getResources().getString(R.string.version_value));
             writer.append("\n\n");
             writer.flush();
             writer.close();
-            MediaScannerConnection.scanFile(this, new String[] { fileToWrite.getAbsolutePath() }, null, null);
+            MediaScannerConnection.scanFile(this, new String[]{fileTabs_toWrite.getAbsolutePath()}, null, null);
             Toast.makeText(this, getResources().getString(R.string.message_your_test_file_was_created), Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -155,7 +200,6 @@ public class TabsActivity extends AppCompatActivity {
         return true;
     }
 
-
     public boolean appendToFileCiphered(String text) {
         //Log.v("appendToFileCiphered", text);
 
@@ -164,7 +208,7 @@ public class TabsActivity extends AppCompatActivity {
         //decryptIt(text);
 
         try {
-            FileWriter writer = new FileWriter(fileToWrite, true);
+            FileWriter writer = new FileWriter(fileTabs_toWrite, true);
             writer.append(text);
             writer.append("\n");
             writer.flush();
@@ -178,98 +222,7 @@ public class TabsActivity extends AppCompatActivity {
         return true;
     }
 
-    private static String cryptoPass = "Moje haslo to brak hasla";
-
-    private static char[] password = cryptoPass.toCharArray();
-
-    private static byte[] salt = {
-            (byte) 0xc7, (byte) 0x73, (byte) 0x21, (byte) 0x8c,
-            (byte) 0x7e, (byte) 0xc8, (byte) 0xee, (byte) 0x99
-    };
-
-    private static byte[] random_bytes = {
-
-            (byte) 0x68, (byte) 0xfd, (byte) 0x97, (byte) 0x69,
-            (byte) 0x2b, (byte) 0xcf, (byte) 0xab, (byte) 0x05,
-            (byte) 0xd1, (byte) 0x27, (byte) 0x9b, (byte) 0xab,
-            (byte) 0x79, (byte) 0x30, (byte) 0x4c, (byte) 0xd6,
-            (byte) 0xa4, (byte) 0x72, (byte) 0x7c, (byte) 0x66,
-            (byte) 0x49, (byte) 0xfa, (byte) 0x74, (byte) 0xe1,
-            (byte) 0x98, (byte) 0xb6, (byte) 0xca, (byte) 0x9f,
-            (byte) 0x85, (byte) 0x53
-    };
-
-    String encryptItAes(String text) {
-
-        try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
-            KeySpec spec = new PBEKeySpec(password, salt, 65536, 256);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secret);
-            byte[] ciphertext = cipher.doFinal(text.getBytes("UTF-8"));
-            text = Base64.encodeToString(cipher.doFinal(ciphertext), Base64.DEFAULT);
-
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-
-        return text;
-
-    }
-
-    String decryptItAes(String text) {
-
-        try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
-            KeySpec spec = new PBEKeySpec(password, salt, 65536, 256);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            AlgorithmParameters params = cipher.getParameters();
-            byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
-
-            cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
-            byte[] ciphertext = cipher.doFinal(text.getBytes("UTF-8"));
-            text = new String(cipher.doFinal(ciphertext), "UTF-8");
-
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        } catch (InvalidParameterSpecException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        }
-        return text;
-
-    }
-
-    String encryptIt(String text) {
+    private String encryptIt(String text) {
 
         try {
             DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
@@ -277,7 +230,7 @@ public class TabsActivity extends AppCompatActivity {
             SecretKey key = keyFactory.generateSecret(keySpec);
 
             byte[] clearText = text.getBytes("UTF8");
-            // Cipher is not thread safe
+            // Cipher is not threadTabs_killer safe
             Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, key);
 
@@ -303,257 +256,138 @@ public class TabsActivity extends AppCompatActivity {
         return text;
     }
 
-    String decryptIt(String text) {
+    protected void summariseTest() {
 
-        try {
-            DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
-            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-            SecretKey key = keyFactory.generateSecret(keySpec);
-
-            byte[] encrypedPwdBytes = Base64.decode(text, Base64.DEFAULT);
-            // cipher is not thread safe
-            Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
-
-            String decrypedValue = new String(decrypedValueBytes);
-            Log.d("decryptIt", "Decrypted: " + text + " -> " + decrypedValue);
-            return decrypedValue;
-
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-        return text;
-
+        Intent intentSummary = new Intent(getApplicationContext(), SummaryActivity.class);
+        Bundle b = new Bundle();
+        b.putInt("guestionsAmount", guestionsAmount);
+        b.putInt("tabs_fileYesAnswers", tabs_fileYesAnswers);
+        b.putInt("tabs_fileNoAnswers", tabs_fileNoAnswers);
+        b.putInt("tabs_fileDunnoAnswers", tabs_fileDunnoAnswers);
+        b.putInt("tabs_serverYesAnswers", tabs_serverYesAnswers);
+        b.putInt("tabs_serverNoAnswers", tabs_serverNoAnswers);
+        b.putInt("tabs_serverDunnoAnswers", tabs_serverDunnoAnswers);
+        intentSummary.putExtras(b);
+        startActivity(intentSummary);
     }
-
-    public class MemoryBoss implements ComponentCallbacks2 {
-        @Override
-        public void onConfigurationChanged(final Configuration newConfig) {
-        }
-
-        @Override
-        public void onLowMemory() {
-        }
-
-        @Override
-        public void onTrimMemory(final int level) {
-            if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
-                // We're in the Background
-                wasInBackground = true;
-            }
-            // you might as well implement some memory cleanup here and be a nice Android dev.
-        }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tabs);
-
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        MemoryBoss mMemoryBoss;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            mMemoryBoss = new MemoryBoss();
-            registerComponentCallbacks(mMemoryBoss);
-        }
-
-        SettingsDataSource db = new SettingsDataSource(this);
-        db.open();
-        sessionID = generateToken();
-        db.createSetting("setting_token", sessionID);
-        db.close();
-
-        createTestFile(sessionID);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        if (mViewPager != null)
-            mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        if (tabLayout != null)
-            tabLayout.setupWithViewPager(mViewPager);
-
-
-        addTab();
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Boolean endTest = sharedPref.getBoolean("End test", false);
-
-        if (endTest)
-            TabsActivity.this.finish();
-
-
-        if (wasInBackground) {
-            new AlertDialog.Builder(this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle(getResources().getString(R.string.message_you_quit_test))
-                    .setMessage(getResources().getString(R.string.message_test_ended))
-                    .setCancelable(false)
-                    .show();
-
-            thread.start();
-        }
-
-    }
-
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(getResources().getString(R.string.message_i_quit_test))
-                .setMessage(getResources().getString(R.string.message_do_you_want_to_quit_test))
-                .setPositiveButton(getResources().getString(R.string.button_yes), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-
-                })
-                .setNegativeButton(getResources().getString(R.string.button_no), null)
-                .show();
-    }
-
-
-    public void addTab() {
-        mSectionsPagerAdapter.addFragment();
-    }
-
-
-    //*********************************************************************************************
 
     /**
-     * A placeholder fragment containing a simple view.
+     * A placeholder fragment containing one question tab.
      */
     public static class QuestionFragment extends Fragment {
+
         /**
-         * The fragment argument representing the section number for this
-         * fragment.
+         * Initializes corresponding tab. Sets up button handlers.
+         *
+         * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment
+         * @param container          If non-null, this is the parent view that the fragment's UI should be attached to. The fragment should not add the view itself, but this can be used to generate the LayoutParams of the view.
+         * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+         * @return Return the View for the fragment's UI, or null.
          */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-        private static final String ARG_SECTION_ANSWER = "section_answer";
-        private static final String ARG_SECTION_SENT = "section_sent";
-        private static final String DEBUG_TAG = "HttpExample";
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 final Bundle savedInstanceState) {
+            final View rootView = inflater.inflate(R.layout.fragment_tabs, container, false);
 
-        private String serverResponse = "";
-        private Integer serverResponseCode = 404;
+            initialize(rootView);
 
-        // Reads an InputStream and converts it to a String.
-        public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-            Reader reader = null;
-            reader = new InputStreamReader(stream, "UTF-8");
-            char[] buffer = new char[len];
-            reader.read(buffer);
-            return new String(buffer);
-        }
+            rootView.findViewById(R.id.button_end_test).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-        // Given a URL, establishes an HttpUrlConnection and retrieves
-        // the web page content as a InputStream, which it returns as
-        // a string.
-        private String downloadUrl(String myurl) throws IOException {
-            InputStream is = null;
-            // Only display the first 500 characters of the retrieved
-            // web page content.
-            int len = 500;
-
-            try {
-                URL url = new URL(myurl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000 /* milliseconds */);
-                conn.setConnectTimeout(15000 /* milliseconds */);
-                conn.setRequestMethod("GET");
-                conn.setDoInput(true);
-                // Starts the query
-                conn.connect();
-                int response = conn.getResponseCode();
-                serverResponseCode = response;
-                Log.d(DEBUG_TAG, "The response is: " + response);
-                is = conn.getInputStream();
-
-                // Convert the InputStream into a string
-                String contentAsString = readIt(is, len);
-                serverResponse = contentAsString;
-                //return contentAsString;
-                return String.valueOf(response);
-
-                // Makes sure that the InputStream is closed after the app is
-                // finished using it.
-            } finally {
-                if (is != null) {
-                    is.close();
+                    ((TabsActivity) getActivity()).summariseTest();
                 }
-            }
-        }
+            });
 
-        // Uses AsyncTask to create a task away from the main UI thread. This task takes a
-        // URL string and uses it to create an HttpUrlConnection. Once the connection
-        // has been established, the AsyncTask downloads the contents of the webpage as
-        // an InputStream. Finally, the InputStream is converted into a string, which is
-        // displayed in the UI by the AsyncTask's onPostExecute method.
-        private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
-            View rootView;
-            int tab;
+            rootView.findViewById(R.id.button_yes).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-            @Override
-            protected String doInBackground(String... urls) {
-
-                // params comes from the execute() call: params[0] is the url.
-                try {
-                    return downloadUrl(urls[0]);
-                } catch (IOException e) {
-                    return "Unable to retrieve web page. URL may be invalid.";
+                    saveToFile(rootView, 1, "yes");
+                    sendToServer(rootView, 1, "yes");
                 }
-            }
+            });
 
-            // onPostExecute displays the results of the AsyncTask.
-            @Override
-            protected void onPostExecute(String result) {
-                if (result.equals("200")) {
-                    setTab(rootView, tab);
-                    getArguments().putBoolean(ARG_SECTION_SENT, true);
-                } else {
-                    Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getResources().getString(R.string.message_unable_to_send_answer), Toast.LENGTH_SHORT).show();
+            rootView.findViewById(R.id.button_no).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    saveToFile(rootView, 2, "no");
+                    sendToServer(rootView, 2, "no");
                 }
+            });
 
-                //Log.d("Wynik", result);
-            }
+            rootView.findViewById(R.id.button_dunno).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-            void configure(View passedView, int passedTab) {
-                rootView = passedView;
-                tab = passedTab;
-            }
-        }
+                    saveToFile(rootView, 3, "dunno");
+                    sendToServer(rootView, 3, "dunno");
+                }
+            });
 
-        public QuestionFragment() {
+            rootView.findViewById(R.id.button_add_question).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    ((TabsActivity) getActivity()).addTab();
+                    int nextTab = ((TabsActivity) getActivity()).guestionsAmount++;
+                    ((TabsActivity) getActivity()).ViewPagerTabs.setCurrentItem(nextTab);
+                }
+            });
+
+            return rootView;
         }
 
         /**
-         * @param sectionNumber - number of section
+         * Checks tab arguments and according to them sets proper color of answer.
+         */
+        @Override
+        public void onResume() {
+            super.onResume();
+
+            View rootView = getView();
+            int answer = getArguments().getInt(ARG_SECTION_ANSWER);
+            boolean sent = getArguments().getBoolean(ARG_SECTION_SENT);
+
+            if (sent)
+                setGivenAnswerBlue(rootView, answer);
+            else
+                setGivenAnswerGray(rootView, answer);
+        }
+
+        /**
+         * Initializes viewGroup and viewSessionID with data stored in app's database.
+         * Initializes viewQuestionNumber with number of corresponding tab.
+         *
+         * @param rootView Root view of corresponding tab
+         */
+        private void initialize(View rootView) {
+            SettingsDataSource database = new SettingsDataSource(getActivity());
+
+            database.open();
+
+            TextView viewGroup = (TextView) rootView.findViewById(R.id.view_group_number);
+            TextView viewQuestionNumber = (TextView) rootView.findViewById(R.id.view_question_number);
+            TextView viewSessionID = (TextView) rootView.findViewById(R.id.view_token);
+
+            if (viewGroup != null)
+                viewGroup.setText(database.getSetting("setting_group"));
+
+            if (viewQuestionNumber != null)
+                viewQuestionNumber.setText(String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER)));
+
+            if (viewSessionID != null)
+                viewSessionID.setText(database.getSetting("setting_sessionID"));
+
+            database.close();
+        }
+
+        /**
+         * Instantiates fragment. Creates bundle with arguments that carry fragment
+         * number, choosen answer for corresponding fragment and
+         *
+         * @param sectionNumber Number of corresponding tab
          * @return New instance of fragment to the given section number
          */
         public static QuestionFragment newInstance(int sectionNumber) {
@@ -567,84 +401,49 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         /**
-         * @param rootView - root view of tab
-         * @param arg      - which answer has been chosen
+         * Used to save an answer of corresponding tab
+         *
+         * @param rootView Root view of corresponding tab
+         * @param question Number of corresponding tab
+         * @param answer   Type of given answer
          */
+        private void saveToFile(View rootView, int question, String answer) {
 
-        private void setTab(View rootView, int arg) {
-            Button buttonYes = (Button) rootView.findViewById(R.id.button_yes);
-            Button buttonNo = (Button) rootView.findViewById(R.id.button_no);
-            Button buttonDunno = (Button) rootView.findViewById(R.id.button_dunno);
-
-            int last_answer = getArguments().getInt(ARG_SECTION_ANSWER);
-
-            if (last_answer == 1) ((TabsActivity) getActivity()).amount_of_yes_answers--;
-            else if (last_answer == 2) ((TabsActivity) getActivity()).amount_of_no_answers--;
-            else if (last_answer == 3) ((TabsActivity) getActivity()).amount_of_dunno_answers--;
-
-            if (arg == 1) {
-                buttonYes.setBackgroundColor(Color.GREEN);
-                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
-                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 1);
-                ((TabsActivity) getActivity()).amount_of_yes_answers++;
-            } else if (arg == 2) {
-                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
-                buttonNo.setBackgroundColor(Color.RED);
-                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 2);
-                ((TabsActivity) getActivity()).amount_of_no_answers++;
-            } else if (arg == 3) {
-                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
-                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
-                buttonDunno.setBackgroundColor(Color.YELLOW);
-                getArguments().putInt(ARG_SECTION_ANSWER, 3);
-                ((TabsActivity) getActivity()).amount_of_dunno_answers++;
-            } else if (arg == 0) {
-                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
-                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
-                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 0);
+            if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", answer))) {
+                setGivenAnswerGray(rootView, question);
+                getArguments().putBoolean(ARG_SECTION_SENT, false);
             }
         }
 
-        private void setTabGray(View rootView, int arg) {
-            Button buttonYes = (Button) rootView.findViewById(R.id.button_yes);
-            Button buttonNo = (Button) rootView.findViewById(R.id.button_no);
-            Button buttonDunno = (Button) rootView.findViewById(R.id.button_dunno);
+        /**
+         * Used to make a GET request on server for given answer on corresponding tab.
+         *
+         * @param rootView Root view of corresponding tab
+         * @param question Number of corresponding tab
+         * @param answer   Type of given answer
+         */
+        private void sendToServer(View rootView, int question, String answer) {
 
-            int last_answer = getArguments().getInt(ARG_SECTION_ANSWER);
-
-            if (last_answer == 1) ((TabsActivity) getActivity()).amount_of_yes_answers--;
-            else if (last_answer == 2) ((TabsActivity) getActivity()).amount_of_no_answers--;
-            else if (last_answer == 3) ((TabsActivity) getActivity()).amount_of_dunno_answers--;
-
-            if (arg == 1) {
-                buttonYes.setBackgroundColor(Color.DKGRAY);
-                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
-                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 1);
-                ((TabsActivity) getActivity()).amount_of_yes_answers++;
-            } else if (arg == 2) {
-                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
-                buttonNo.setBackgroundColor(Color.DKGRAY);
-                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 2);
-                ((TabsActivity) getActivity()).amount_of_no_answers++;
-            } else if (arg == 3) {
-                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
-                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
-                buttonDunno.setBackgroundColor(Color.DKGRAY);
-                getArguments().putInt(ARG_SECTION_ANSWER, 3);
-                ((TabsActivity) getActivity()).amount_of_dunno_answers++;
-            } else if (arg == 0) {
-                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
-                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
-                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 0);
+            ConnectivityManager connMgr = (ConnectivityManager)
+                    getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+                DownloadWebpageTask task = new DownloadWebpageTask();
+                task.configure(rootView, question);
+                task.execute(createDataURL("to_server", answer));
+            } else {
+                Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
             }
         }
 
+        /**
+         * Creates URL for corresponding tab and answer. Gives it in format for server
+         * or for file.
+         *
+         * @param mode   Determines if string has to be built for server or for file
+         * @param answer Type of answer
+         * @return Built URL with all significant data
+         */
         private String createDataURL(String mode, String answer) {
 
             SettingsDataSource db = new SettingsDataSource(getActivity());
@@ -673,6 +472,7 @@ public class TabsActivity extends AppCompatActivity {
             String vector = db.getSetting("setting_vector");
             String group = db.getSetting("setting_group");
             String question_no = String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER));
+            String sessionID = db.getSetting("setting_sessionID");
 
             sbServerQuery.append("student_no=").append(studentNo).append(divider);
             sbServerQuery.append("course=").append(course).append(divider);
@@ -685,7 +485,7 @@ public class TabsActivity extends AppCompatActivity {
             sbServerQuery.append("answer=").append(answer).append(divider);
             sbServerQuery.append("vector=").append(vector).append(divider);
             sbServerQuery.append("version=").append(getResources().getString(R.string.version_value)).append(divider);
-            sbServerQuery.append("session_id=").append(((TabsActivity) getActivity()).sessionID).append(divider);
+            sbServerQuery.append("session_id=").append(sessionID).append(divider);
             sbServerQuery.append("name=").append(name).append(divider);
             sbServerQuery.append("surname=").append(surname);
 
@@ -699,193 +499,247 @@ public class TabsActivity extends AppCompatActivity {
             return sentUrl;
         }
 
-        private boolean initialize(View rootView) {
-            SettingsDataSource db = new SettingsDataSource(getActivity());
+        /**
+         * Sets choosen button's background from corresponding view to gray.
+         *
+         * @param rootView Root view of corresponding tab.
+         * @param arg      Choosen answer
+         */
+        private void setGivenAnswerGray(View rootView, int arg) {
+            Button buttonYes = (Button) rootView.findViewById(R.id.button_yes);
+            Button buttonNo = (Button) rootView.findViewById(R.id.button_no);
+            Button buttonDunno = (Button) rootView.findViewById(R.id.button_dunno);
 
-            db.open();
+            int last_answer = getArguments().getInt(ARG_SECTION_ANSWER);
 
-            TextView viewGroup = (TextView) rootView.findViewById(R.id.view_group_number);
-            TextView viewQuestionNumber = (TextView) rootView.findViewById(R.id.view_question_number);
-            TextView viewSessionToken = (TextView) rootView.findViewById(R.id.view_token);
+            if (last_answer == 1) ((TabsActivity) getActivity()).tabs_fileYesAnswers--;
+            else if (last_answer == 2) ((TabsActivity) getActivity()).tabs_fileNoAnswers--;
+            else if (last_answer == 3) ((TabsActivity) getActivity()).tabs_fileDunnoAnswers--;
 
-            if (viewGroup != null)
-                viewGroup.setText(db.getSetting("setting_group"));
-
-            if (viewQuestionNumber != null)
-                viewQuestionNumber.setText(String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER)));
-
-            if (viewSessionToken != null)
-                viewSessionToken.setText(db.getSetting("setting_token"));
-
-            db.close();
-
-            return true;
+            if (arg == 1) {
+                buttonYes.setBackgroundColor(Color.DKGRAY);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
+                getArguments().putInt(ARG_SECTION_ANSWER, 1);
+                ((TabsActivity) getActivity()).tabs_fileYesAnswers++;
+            } else if (arg == 2) {
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundColor(Color.DKGRAY);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
+                getArguments().putInt(ARG_SECTION_ANSWER, 2);
+                ((TabsActivity) getActivity()).tabs_fileNoAnswers++;
+            } else if (arg == 3) {
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundColor(Color.DKGRAY);
+                getArguments().putInt(ARG_SECTION_ANSWER, 3);
+                ((TabsActivity) getActivity()).tabs_fileDunnoAnswers++;
+            } else if (arg == 0) {
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
+                getArguments().putInt(ARG_SECTION_ANSWER, 0);
+            }
         }
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 final Bundle savedInstanceState) {
-            final View rootView = inflater.inflate(R.layout.fragment_tabs, container, false);
+        /**
+         * Sets choosen button's background from corresponding view to blue.
+         *
+         * @param rootView Root view of corresponding tab.
+         * @param arg      Choosen answer
+         */
+        private void setGivenAnswerBlue(View rootView, int arg) {
+            Button buttonYes = (Button) rootView.findViewById(R.id.button_yes);
+            Button buttonNo = (Button) rootView.findViewById(R.id.button_no);
+            Button buttonDunno = (Button) rootView.findViewById(R.id.button_dunno);
 
-            rootView.findViewById(R.id.button_end_test).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            int last_answer = getArguments().getInt(ARG_SECTION_ANSWER);
 
-                    Intent intentSummary = new Intent(getActivity().getApplication(), SummaryActivity.class);
-                    Bundle b = new Bundle();
-                    b.putInt("amount_of_questions", ((TabsActivity) getActivity()).amount_of_questions);
-                    b.putInt("amount_of_yes_answers", ((TabsActivity) getActivity()).amount_of_yes_answers);
-                    b.putInt("amount_of_no_answers", ((TabsActivity) getActivity()).amount_of_no_answers);
-                    b.putInt("amount_of_dunno_answers", ((TabsActivity) getActivity()).amount_of_dunno_answers);
-                    intentSummary.putExtras(b); //Put your id to your next Intent
-                    startActivity(intentSummary);
-                }
-            });
+            if (last_answer == 1) ((TabsActivity) getActivity()).tabs_serverYesAnswers--;
+            else if (last_answer == 2) ((TabsActivity) getActivity()).tabs_serverNoAnswers--;
+            else if (last_answer == 3) ((TabsActivity) getActivity()).tabs_serverDunnoAnswers--;
 
-            rootView.findViewById(R.id.button_yes).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", "yes"))) {
-                        setTabGray(rootView, 1);
-                        getArguments().putBoolean(ARG_SECTION_SENT, false);
-                    }
-
-
-                    ConnectivityManager connMgr = (ConnectivityManager)
-                            getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-                    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                    if (networkInfo != null && networkInfo.isConnected()) {
-                        DownloadWebpageTask task = new DownloadWebpageTask();
-                        task.configure(rootView, 1);
-                        task.execute(createDataURL("to_server", "yes"));
-                    } else {
-                        //Log.d("Warning", "No network connection available.");
-                        Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
-                        //setTab(rootView, 0);
-                    }
-
-                    //setTab(rootView, 1);
-                }
-            });
-
-            rootView.findViewById(R.id.button_no).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-
-                    if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", "no"))) {
-                        setTabGray(rootView, 2);
-                        getArguments().putBoolean(ARG_SECTION_SENT, false);
-                    }
-
-                    ConnectivityManager connMgr = (ConnectivityManager)
-                            getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-                    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                    if (networkInfo != null && networkInfo.isConnected()) {
-                        DownloadWebpageTask task = new DownloadWebpageTask();
-                        task.configure(rootView, 2);
-                        task.execute(createDataURL("to_server", "no"));
-                    } else {
-                        //Log.d("Warning", "No network connection available.");
-                        Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
-                        //setTab(rootView, 0);
-                    }
-
-                    //setTab(rootView, 2);
-
-                }
-            });
-
-            rootView.findViewById(R.id.button_dunno).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", "dunno"))) {
-                        setTabGray(rootView, 3);
-                        getArguments().putBoolean(ARG_SECTION_SENT, false);
-                    }
-
-                    ConnectivityManager connMgr = (ConnectivityManager)
-                            getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-                    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                    if (networkInfo != null && networkInfo.isConnected()) {
-                        DownloadWebpageTask task = new DownloadWebpageTask();
-                        task.configure(rootView, 3);
-                        task.execute(createDataURL("to_server", "dunno"));
-                    } else {
-                        //Log.d("Warning", "No network connection available.");
-                        Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
-                        //setTab(rootView, 0);
-                    }
-
-                    //setTab(rootView, 3);
-                }
-            });
-
-            rootView.findViewById(R.id.button_add_question).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //int liczba = getArguments().getInt(ARG_SECTION_NUMBER);
-                    //CharSequence toast = "Dodano pytanie nr: " + String.valueOf(liczba + 1);
-                    //Toast wyswietl = Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT);
-                    //wyswietl.show();
-
-                    ((TabsActivity) getActivity()).addTab();
-                    int nextTab = ((TabsActivity) getActivity()).amount_of_questions++;
-                    ((TabsActivity) getActivity()).mViewPager.setCurrentItem(nextTab);
-                }
-            });
-
-            initialize(rootView);
-
-            return rootView;
+            if (arg == 1) {
+                buttonYes.setBackgroundColor(Color.BLUE);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
+                getArguments().putInt(ARG_SECTION_ANSWER, 1);
+                ((TabsActivity) getActivity()).tabs_serverYesAnswers++;
+            } else if (arg == 2) {
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundColor(Color.BLUE);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
+                getArguments().putInt(ARG_SECTION_ANSWER, 2);
+                ((TabsActivity) getActivity()).tabs_serverNoAnswers++;
+            } else if (arg == 3) {
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundColor(Color.BLUE);
+                getArguments().putInt(ARG_SECTION_ANSWER, 3);
+                ((TabsActivity) getActivity()).tabs_serverDunnoAnswers++;
+            } else if (arg == 0) {
+                buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
+                getArguments().putInt(ARG_SECTION_ANSWER, 0);
+            }
         }
 
-        @Override
-        public void onResume() {
-            super.onResume();
+        /**
+         * Uses AsyncTask to create a task away from the main UI threadTabs_killer. This task takes a
+         * URL string and uses it to create an HttpUrlConnection. Once the connection
+         * has been established, the AsyncTask downloads the contents of the webpage.
+         * Finally it sets up corresponding tab if server response code is 200.
+         */
+        private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
+            View rootView;
+            int tab;
 
-            View rootView = getView();
-            int answer = getArguments().getInt(ARG_SECTION_ANSWER);
-            boolean sent = getArguments().getBoolean(ARG_SECTION_SENT);
+            @Override
+            protected String doInBackground(String... urls) {
 
-            //Log.v("onResume", "Restoring tab");
-            //Log.w("onResume", String.valueOf(answer));
+                try {
+                    return downloadUrl(urls[0]);
+                } catch (IOException e) {
+                    return "Unable to retrieve web page. URL may be invalid.";
+                }
+            }
 
-            if (sent)
-                setTab(rootView, answer);
-            else
-                setTabGray(rootView, answer);
+            /**
+             * @param result Response code got from server.
+             */
+            @Override
+            protected void onPostExecute(String result) {
+                if (result.equals("200")) {
+                    setGivenAnswerBlue(rootView, tab);
+                    getArguments().putBoolean(ARG_SECTION_SENT, true);
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getResources().getString(R.string.message_unable_to_send_answer), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            /**
+             * @param passedView Root view of corresponding tab.
+             * @param passedTab  Number of corresponding tab.
+             */
+            void configure(View passedView, int passedTab) {
+                rootView = passedView;
+                tab = passedTab;
+            }
         }
+
+        /**
+         * Given a URL, establishes an HttpUrlConnection and retrieves
+         * the server response code, which it returns as string.
+         *
+         * @param myurl URL of server to which it connects.
+         * @return Server response code
+         * @throws IOException
+         */
+        private String downloadUrl(String myurl) throws IOException {
+            InputStream is = null;
+            // Only display the first 500 characters of the retrieved
+            // web page content.
+            int len = 500;
+
+            try {
+                URL url = new URL(myurl);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(10000 /* milliseconds */);
+                conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setRequestMethod("GET");
+                conn.setDoInput(true);
+                // Starts the query
+                conn.connect();
+                int response = conn.getResponseCode();
+                serverResponseCode = response;
+                Log.d(DEBUG_TAG, "The response is: " + response);
+                is = conn.getInputStream();
+
+                // Convert the InputStream into a string
+                String contentAsString = convertInputStreamToString(is, len);
+                serverResponse = contentAsString;
+                //return contentAsString;
+                return String.valueOf(response);
+
+                // Makes sure that the InputStream is closed after the app is
+                // finished using it.
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+        }
+
+        /**
+         * Reads an InputStream and converts it to a String.
+         *
+         * @param stream Input stream taken from server.
+         * @param len Length of input stream
+         * @return Input stream converted into string.
+         * @throws IOException
+         * @throws UnsupportedEncodingException
+         */
+        public String convertInputStreamToString(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+            Reader reader = null;
+            reader = new InputStreamReader(stream, "UTF-8");
+            char[] buffer = new char[len];
+            reader.read(buffer);
+            return new String(buffer);
+        }
+
+        //variables and classes
+        private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String ARG_SECTION_ANSWER = "section_answer";
+        private static final String ARG_SECTION_SENT = "section_sent";
+        private static final String DEBUG_TAG = "HttpExample";
+
+        private String serverResponse = "";
+        private Integer serverResponseCode = 404;
     }
 
-    //*********************************************************************************************
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
+     * given position of it's tab. Holds an array of instantiated fragments.
+     * Instantiates new fragment when getItem is called.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         private List<Fragment> fragments = new ArrayList<>();
 
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
+        /**
+         * @param fragmentManagerSections Interface for interacting with Fragment objects inside of an Activity
+         */
+        public SectionsPagerAdapter(FragmentManager fragmentManagerSections) {
+            super(fragmentManagerSections);
         }
 
+        /**
+         * Is called to instantiate the fragment for the given page.
+         *
+         * @param position Position of current fragment to be viewed
+         * @return Instantiated fragment corresponding to current view
+         */
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
             return fragments.get(position);
         }
 
+        /**
+         * @return Amount of instantiated fragments.
+         */
         @Override
         public int getCount() {
             return fragments.size();
         }
 
+        /**
+         * Used to title fragments. Titles are then viewed on viewPagerTabs.
+         *
+         * @param position Position of corresponding fragment to be titled
+         * @return Title of fragment.
+         */
         @Override
         public CharSequence getPageTitle(int position) {
 
@@ -895,11 +749,72 @@ public class TabsActivity extends AppCompatActivity {
             return title;
         }
 
+        /**
+         * Used to add new fragment and notify SectionsPagerAdapter that amount of fragments
+         * has been changed.
+         */
         public void addFragment() {
             fragments.add(QuestionFragment.newInstance(fragments.size() + 1));
             notifyDataSetChanged();
         }
 
     }
+
+    /**
+     * A {@link Thread} that is used to finish TabsActivity intent.
+     */
+    public class threadKiller extends Thread {
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(3500);
+                TabsActivity.this.finish();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * A {@link ComponentCallbacks2} which is used to determine if app has been in
+     * background. If it was then wasInBackgroundTabs is changed to true.
+     */
+    public class MemoryBoss implements ComponentCallbacks2 {
+        @Override
+        public void onConfigurationChanged(final Configuration newConfig) {
+        }
+
+        @Override
+        public void onLowMemory() {
+        }
+
+        @Override
+        public void onTrimMemory(final int level) {
+            if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+
+                wasInBackgroundTabs = true;
+            }
+            // you might as well implement some memory cleanup here and be a nice Android dev.
+        }
+    }
+
+
+    //variables and classes
+    private boolean wasInBackgroundTabs = false;
+    threadKiller threadKillerTabs;
+    private SharedPreferences sharedPrefTabs;
+    private SectionsPagerAdapter SectionsPagerAdapterTabs;
+    private ViewPager ViewPagerTabs;
+
+    int guestionsAmount = 1;
+    int tabs_fileYesAnswers = 0;
+    int tabs_fileNoAnswers = 0;
+    int tabs_fileDunnoAnswers = 0;
+    int tabs_serverYesAnswers = 0;
+    int tabs_serverNoAnswers = 0;
+    int tabs_serverDunnoAnswers = 0;
+    private String stringTabs_sessionID;
+    private File fileTabs_toWrite;
+    private static String cryptoPass = "Moje haslo to brak hasla";
 
 }

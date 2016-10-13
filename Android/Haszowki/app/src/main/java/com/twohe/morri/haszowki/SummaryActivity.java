@@ -111,10 +111,10 @@ public class SummaryActivity extends AppCompatActivity {
         int amount_of_no_answers = -1;
         int amount_of_dunno_answers = -1;
         if (b != null) {
-            amount_of_questions = b.getInt("amount_of_questions");
-            amount_of_yes_answers = b.getInt("amount_of_yes_answers");
-            amount_of_no_answers = b.getInt("amount_of_no_answers");
-            amount_of_dunno_answers = b.getInt("amount_of_dunno_answers");
+            amount_of_questions = b.getInt("guestionsAmount");
+            amount_of_yes_answers = b.getInt("tabs_fileYesAnswers");
+            amount_of_no_answers = b.getInt("tabs_fileNoAnswers");
+            amount_of_dunno_answers = b.getInt("tabs_fileDunnoAnswers");
         }
 
         if (viewQuestionsAmount != null)

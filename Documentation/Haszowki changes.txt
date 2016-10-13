@@ -3,6 +3,8 @@ ver. 0.6.2
 ~ uzupe³nienie dokumentacji
 ~ uporz¹dkowanie kodu
 ~ zmiana formatu URL z odpowiedziami
+~ podpis cyfrowy dla aplikacji
+~ skonfigurowanie ProGuard
 
 ver. 0.6.1
 ~ poprawa b³êdnego odtwarzania siê zak³adek w Tabs Activity
