@@ -2,7 +2,7 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Haszówki</string>
-    <string name="version_value">0.6.2</string>
+    <string name="version_value">0.6.5</string>
     <string name="zero_value">0</string>
     <string name="six_zeros_value">000000</string>
     <string name="label_null">null</string>
@@ -37,6 +37,7 @@
     <string name="message_give_writing_permission">Daj uprawnienia do zapisu!</string>
     <string name="message_give_proper_student_number">Podaj poprawny indeks!</string>
     <string name="message_give_proper_vector_number">Podaj poprawne wagi!</string>
+    <string name="message_wrong_qr_button">Niepoprawny kod QR!</string>
 
 
     <!--*** LABEL strings of INFO ***-->
@@ -79,7 +80,7 @@
     <string name="button_yes">Tak</string>
     <string name="button_no">Nie</string>
     <string name="button_dunno">Nie wiem</string>
-    <string name="button_end_test">Zakończ test</string>
+    <string name="button_summarise_test">Podsumuj test</string>
     <string name="button_add_question">Dodaj pytanie</string>
 
 
@@ -95,13 +96,23 @@
 
     <!--*** LABEL strings of SUMMARY ***-->
     <string name="label_summary_activity">Podsumowanie</string>
-    <string name="label_yes_answers">Odpowiedzi TAK:</string>
-    <string name="label_no_answers">Odpowiedzi NIE:</string>
-    <string name="label_dunno_answers">Odpowiedzi NIE WIEM:</string>
-    <string name="label_sum_of_answers">Suma pytań:</string>
-
+    <string name="label_yes_answers">TAK:</string>
+    <string name="label_no_answers">NIE:</string>
+    <string name="label_dunno_answers">NIE WIEM:</string>
+    <string name="label_sum_of_answers">Suma pomyślnie przesłanych odpowiedzi</string>
+    <string name="label_stats">Ilość pomyślnie przesłanych odpowiedzi</string>
 
     <!--*** BUTTON strings of SUMMARY ***-->
     <string name="button_back_to_test">Wróć do testu</string>
+    <string name="button_ok">Ok</string>
+    <string name="button_finish_test">Zakończ test</string>
+
+    <!--*** MESSAGES strings of SUMMARY ***-->
+    <string name="message_answers_error_title">Wystąpił błąd przy wysyłaniu odpowiedzi!</string>
+    <string name="message_answers_error">"Do serwera nie dotarły: "</string>
+    <string name="message_yes_answers_error">odpowiedzi TAK - %1$d</string>
+    <string name="message_no_answers_error">odpowiedzi NIE - %1$d</string>
+    <string name="message_dunno_answers_error">odpowiedzi NIE WIEM - %1$d</string>
+    <string name="message_what_to_do">Wróć do testu i prześlij ponownie brakujące odpowiedzi przez naciśnięcie szarego przycisku na odpowiednich zakładkach.</string>
 
 </resources>

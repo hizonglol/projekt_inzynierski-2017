@@ -70,5 +70,9 @@
     public static final android.os.Parcelable$Creator *;
 }
 
+-keep class com.android.internal.telephony.ITelephony {
+    *;
+}
+
 -dontwarn **CompatHoneycomb
 -dontwarn org.htmlcleaner.*

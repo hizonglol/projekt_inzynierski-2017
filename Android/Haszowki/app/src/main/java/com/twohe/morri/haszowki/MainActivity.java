@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -107,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
                 Log.v("isStoragePermGranted", "Permission is granted");
                 return true;
@@ -132,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private boolean isCameraPermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(android.Manifest.permission.CAMERA)
+            if (checkSelfPermission(Manifest.permission.CAMERA)
                     == PackageManager.PERMISSION_GRANTED) {
                 Log.v("isCameraPermGranted", "Permission is granted");
                 return true;
@@ -149,8 +151,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Used to create folder for tests data.
+     * Checks if host system is Marshmallow or higher.
+     * Then checks permission for using telephone.
+     * If permission is not granted, makes request and asks to grant permission.
      *
+     * @return true if permission has been granted, false if not
+     */
+    private boolean isTelephonyPermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(Manifest.permission.CALL_PHONE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v("isTelephonyPermGranted", "Permission is granted");
+                return true;
+            } else {
+
+                Log.v("isTelephonyPermGranted", "Permission is revoked");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, 1);
+                return false;
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            Log.v("isTelephonyPermGranted", "Permission is granted");
+            return true;
+        }
+    }
+
+    /**
+     * Used to create folder for tests data.
+     * <p>
      * Checks if external memoery write permission has been granted.
      * Afterwards creates folder for tests files.
      *
@@ -177,11 +204,13 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Used to handle data received from OR code scanner.
+     * <p>
+     * Checks if scanResult is valid. Weights vector cannot be negative.
      * Updates editMain_vector and editMain_testID with received data.
      *
      * @param requestCode The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
-     * @param resultCode The integer result code returned by the child activity through its setResult().
-     * @param data An Intent, which can return result data to the caller (various data can be attached to Intent "extras").
+     * @param resultCode  The integer result code returned by the child activity through its setResult().
+     * @param data        An Intent, which can return result data to the caller (various data can be attached to Intent "extras").
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -192,6 +221,18 @@ public class MainActivity extends AppCompatActivity {
             if (scanResult != null) {
                 String contents = scanResult.getContents();
                 String[] contentsTable = contents.split("\\s+");
+
+                try {
+                    if (Integer.parseInt(contentsTable[0]) < 0) {
+                        Toast.makeText(getBaseContext(), getResources().getString(R.string.message_wrong_qr_button), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_wrong_qr_button), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if (editMain_vector != null)
                     editMain_vector.setText(contentsTable[0]);
                 if (editMain_testID != null)
@@ -525,10 +566,16 @@ public class MainActivity extends AppCompatActivity {
      * Checks if app has been granted permission to write to external storage.
      * Checks if process of computing group number has been succeeded.
      * Checks if all editable fields consists proper data.
+     * Checks if app has been granted permission to telephone.
      * If all checks are passed, starts TabsActivity.
      */
     View.OnClickListener startTestButtonHandler = new View.OnClickListener() {
         public void onClick(View v) throws NumberFormatException {
+
+            if (!isOnline()) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             if (!isStoragePermissionGranted()) {
                 Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_writing_permission), Toast.LENGTH_SHORT).show();
@@ -543,10 +590,25 @@ public class MainActivity extends AppCompatActivity {
             if (checkEditableValues())
                 return;
 
+            if (!isTelephonyPermissionGranted())
+                return;
+
             Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
             startActivity(intentTabs);
         }
     };
+
+    /**
+     * Checks whether app has network access.
+     *
+     * @return true if online, false if not
+     */
+    public boolean isOnline() {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
 
     /**
      * Checks if row and seat is higher than 0.

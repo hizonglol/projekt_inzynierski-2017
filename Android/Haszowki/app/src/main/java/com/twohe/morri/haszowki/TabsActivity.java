@@ -106,7 +106,6 @@ public class TabsActivity extends AppCompatActivity {
 
 
         addTab();
-
     }
 
     @Override
@@ -258,9 +257,17 @@ public class TabsActivity extends AppCompatActivity {
 
     protected void summariseTest() {
 
+        /*
+        Log.d("File yes answers", String.valueOf(tabs_fileYesAnswers));
+        Log.d("File no answers", String.valueOf(tabs_fileNoAnswers));
+        Log.d("File dunno answers", String.valueOf(tabs_fileDunnoAnswers));
+        Log.d("Server yes answers", String.valueOf(tabs_serverYesAnswers));
+        Log.d("Server no answers", String.valueOf(tabs_serverNoAnswers));
+        Log.d("Server dunno answers", String.valueOf(tabs_serverDunnoAnswers));
+        */
+
         Intent intentSummary = new Intent(getApplicationContext(), SummaryActivity.class);
         Bundle b = new Bundle();
-        b.putInt("guestionsAmount", guestionsAmount);
         b.putInt("tabs_fileYesAnswers", tabs_fileYesAnswers);
         b.putInt("tabs_fileNoAnswers", tabs_fileNoAnswers);
         b.putInt("tabs_fileDunnoAnswers", tabs_fileDunnoAnswers);
@@ -291,11 +298,15 @@ public class TabsActivity extends AppCompatActivity {
 
             initialize(rootView);
 
-            rootView.findViewById(R.id.button_end_test).setOnClickListener(new View.OnClickListener() {
+            rootView.findViewById(R.id.button_summary).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                     ((TabsActivity) getActivity()).summariseTest();
+                    if ((getArguments().getInt(ARG_SECTION_NUMBER) % 16) == 0 && !anyAnswerSent) {
+                        sendToServer(rootView, 0, "no_answer");
+                        anyAnswerSent = true;
+                    }
                 }
             });
 
@@ -305,6 +316,7 @@ public class TabsActivity extends AppCompatActivity {
 
                     saveToFile(rootView, 1, "yes");
                     sendToServer(rootView, 1, "yes");
+                    anyAnswerSent = true;
                 }
             });
 
@@ -314,6 +326,7 @@ public class TabsActivity extends AppCompatActivity {
 
                     saveToFile(rootView, 2, "no");
                     sendToServer(rootView, 2, "no");
+                    anyAnswerSent = true;
                 }
             });
 
@@ -323,6 +336,7 @@ public class TabsActivity extends AppCompatActivity {
 
                     saveToFile(rootView, 3, "dunno");
                     sendToServer(rootView, 3, "dunno");
+                    anyAnswerSent = true;
                 }
             });
 
@@ -332,6 +346,11 @@ public class TabsActivity extends AppCompatActivity {
 
                     ((TabsActivity) getActivity()).addTab();
                     int nextTab = ((TabsActivity) getActivity()).guestionsAmount++;
+                    if (getArguments().getInt(ARG_SECTION_ANSWER_FILE) == 0 && !anyAnswerSent){
+                        sendToServer(rootView, 0, "no_answer");
+                        anyAnswerSent = true;
+                    }
+
                     ((TabsActivity) getActivity()).ViewPagerTabs.setCurrentItem(nextTab);
                 }
             });
@@ -341,19 +360,23 @@ public class TabsActivity extends AppCompatActivity {
 
         /**
          * Checks tab arguments and according to them sets proper color of answer.
+         *
+         * It also checks if answerServer is not equal to 0. If it is then answer has been
+         * successfully sent to server and last answer in the file is the same as last answer
+         * in server, and because of that button can be coloured to blue.
          */
         @Override
         public void onResume() {
             super.onResume();
 
             View rootView = getView();
-            int answer = getArguments().getInt(ARG_SECTION_ANSWER);
-            boolean sent = getArguments().getBoolean(ARG_SECTION_SENT);
+            int answerFile = getArguments().getInt(ARG_SECTION_ANSWER_FILE);
+            int answerServer = getArguments().getInt(ARG_SECTION_ANSWER_SERVER);
 
-            if (sent)
-                setGivenAnswerBlue(rootView, answer);
+            if (answerServer != 0)
+                setGivenAnswerBlue(rootView, answerServer);
             else
-                setGivenAnswerGray(rootView, answer);
+                setGivenAnswerGray(rootView, answerFile);
         }
 
         /**
@@ -385,7 +408,14 @@ public class TabsActivity extends AppCompatActivity {
 
         /**
          * Instantiates fragment. Creates bundle with arguments that carry fragment
-         * number, choosen answer for corresponding fragment and
+         * number, current choosen answer for file and current choosen answer
+         * that has been sent successfully to server.
+         *
+         * ARG_SECTION_ANSWER_FILE and ARG_SECTION_ANSWER_SERVER parameters explanation:
+         * 0 - no answer
+         * 1 - yes answer
+         * 2 - no answer
+         * 3 - dunno answer
          *
          * @param sectionNumber Number of corresponding tab
          * @return New instance of fragment to the given section number
@@ -394,24 +424,36 @@ public class TabsActivity extends AppCompatActivity {
             QuestionFragment fragment = new QuestionFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            args.putInt(ARG_SECTION_ANSWER, 0);
-            args.putBoolean(ARG_SECTION_SENT, false);
+            args.putInt(ARG_SECTION_ANSWER_FILE, 0);
+            args.putInt(ARG_SECTION_ANSWER_SERVER, 0);
             fragment.setArguments(args);
             return fragment;
         }
 
         /**
-         * Used to save an answer of corresponding tab
+         * Used to save an answer of corresponding tab into test file.
+         *
+         * It also sets up ARG_SECTION_ANSWER_SERVER to 0 before sendToServer() is terminated.
+         * If GER in sendToServer() will be terminated successfully then ARG_SECTION_ANSWER_SERVER
+         * will be set to proper number.
          *
          * @param rootView Root view of corresponding tab
          * @param question Number of corresponding tab
-         * @param answer   Type of given answer
+         * @param answerNo   Type of given answer
          */
-        private void saveToFile(View rootView, int question, String answer) {
+        private void saveToFile(View rootView, int question, String answerNo) {
 
-            if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", answer))) {
+            if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", answerNo))) {
                 setGivenAnswerGray(rootView, question);
-                getArguments().putBoolean(ARG_SECTION_SENT, false);
+
+                //Gets last answer to decrease corresponding variable
+                int last_answer = getArguments().getInt(ARG_SECTION_ANSWER_SERVER);
+                if (last_answer == 1) ((TabsActivity) getActivity()).tabs_serverYesAnswers--;
+                else if (last_answer == 2) ((TabsActivity) getActivity()).tabs_serverNoAnswers--;
+                else if (last_answer == 3) ((TabsActivity) getActivity()).tabs_serverDunnoAnswers--;
+                //Sets it to 0. If sending will be successful then it will be set to proper answer number.
+                //I use it as an information if question has been sent to server or not.
+                getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 0);
             }
         }
 
@@ -420,17 +462,14 @@ public class TabsActivity extends AppCompatActivity {
          *
          * @param rootView Root view of corresponding tab
          * @param question Number of corresponding tab
-         * @param answer   Type of given answer
+         * @param answerNo   Type of given answer
          */
-        private void sendToServer(View rootView, int question, String answer) {
+        private void sendToServer(View rootView, int question, String answerNo) {
 
-            ConnectivityManager connMgr = (ConnectivityManager)
-                    getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected()) {
+            if (isOnline()) {
                 DownloadWebpageTask task = new DownloadWebpageTask();
                 task.configure(rootView, question);
-                task.execute(createDataURL("to_server", answer));
+                task.execute(createDataURL("to_server", answerNo));
             } else {
                 Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
             }
@@ -510,7 +549,7 @@ public class TabsActivity extends AppCompatActivity {
             Button buttonNo = (Button) rootView.findViewById(R.id.button_no);
             Button buttonDunno = (Button) rootView.findViewById(R.id.button_dunno);
 
-            int last_answer = getArguments().getInt(ARG_SECTION_ANSWER);
+            int last_answer = getArguments().getInt(ARG_SECTION_ANSWER_FILE);
 
             if (last_answer == 1) ((TabsActivity) getActivity()).tabs_fileYesAnswers--;
             else if (last_answer == 2) ((TabsActivity) getActivity()).tabs_fileNoAnswers--;
@@ -520,25 +559,25 @@ public class TabsActivity extends AppCompatActivity {
                 buttonYes.setBackgroundColor(Color.DKGRAY);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 1);
+                getArguments().putInt(ARG_SECTION_ANSWER_FILE, 1);
                 ((TabsActivity) getActivity()).tabs_fileYesAnswers++;
             } else if (arg == 2) {
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundColor(Color.DKGRAY);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 2);
+                getArguments().putInt(ARG_SECTION_ANSWER_FILE, 2);
                 ((TabsActivity) getActivity()).tabs_fileNoAnswers++;
             } else if (arg == 3) {
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundColor(Color.DKGRAY);
-                getArguments().putInt(ARG_SECTION_ANSWER, 3);
+                getArguments().putInt(ARG_SECTION_ANSWER_FILE, 3);
                 ((TabsActivity) getActivity()).tabs_fileDunnoAnswers++;
             } else if (arg == 0) {
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 0);
+                getArguments().putInt(ARG_SECTION_ANSWER_FILE, 0);
             }
         }
 
@@ -553,8 +592,7 @@ public class TabsActivity extends AppCompatActivity {
             Button buttonNo = (Button) rootView.findViewById(R.id.button_no);
             Button buttonDunno = (Button) rootView.findViewById(R.id.button_dunno);
 
-            int last_answer = getArguments().getInt(ARG_SECTION_ANSWER);
-
+            int last_answer = getArguments().getInt(ARG_SECTION_ANSWER_SERVER);
             if (last_answer == 1) ((TabsActivity) getActivity()).tabs_serverYesAnswers--;
             else if (last_answer == 2) ((TabsActivity) getActivity()).tabs_serverNoAnswers--;
             else if (last_answer == 3) ((TabsActivity) getActivity()).tabs_serverDunnoAnswers--;
@@ -563,25 +601,25 @@ public class TabsActivity extends AppCompatActivity {
                 buttonYes.setBackgroundColor(Color.BLUE);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 1);
+                getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 1);
                 ((TabsActivity) getActivity()).tabs_serverYesAnswers++;
             } else if (arg == 2) {
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundColor(Color.BLUE);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 2);
+                getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 2);
                 ((TabsActivity) getActivity()).tabs_serverNoAnswers++;
             } else if (arg == 3) {
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundColor(Color.BLUE);
-                getArguments().putInt(ARG_SECTION_ANSWER, 3);
+                getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 3);
                 ((TabsActivity) getActivity()).tabs_serverDunnoAnswers++;
             } else if (arg == 0) {
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                getArguments().putInt(ARG_SECTION_ANSWER, 0);
+                getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 0);
             }
         }
 
@@ -593,7 +631,7 @@ public class TabsActivity extends AppCompatActivity {
          */
         private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
             View rootView;
-            int tab;
+            int answerNo;
 
             @Override
             protected String doInBackground(String... urls) {
@@ -606,13 +644,17 @@ public class TabsActivity extends AppCompatActivity {
             }
 
             /**
+             * Sets color of button according to successfully sent answer.
+             * Updates tab's info about current sent answer - look into
+             * sendToServer() to understand what is going on.
+             *
              * @param result Response code got from server.
              */
             @Override
             protected void onPostExecute(String result) {
                 if (result.equals("200")) {
-                    setGivenAnswerBlue(rootView, tab);
-                    getArguments().putBoolean(ARG_SECTION_SENT, true);
+                    setGivenAnswerBlue(rootView, answerNo);
+                    getArguments().putInt(ARG_SECTION_ANSWER_SERVER, answerNo);
                 } else {
                     Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getResources().getString(R.string.message_unable_to_send_answer), Toast.LENGTH_SHORT).show();
                 }
@@ -620,11 +662,11 @@ public class TabsActivity extends AppCompatActivity {
 
             /**
              * @param passedView Root view of corresponding tab.
-             * @param passedTab  Number of corresponding tab.
+             * @param passedAnswerNo  Number of corresponding tab.
              */
-            void configure(View passedView, int passedTab) {
+            void configure(View passedView, int passedAnswerNo) {
                 rootView = passedView;
-                tab = passedTab;
+                answerNo = passedAnswerNo;
             }
         }
 
@@ -688,16 +730,29 @@ public class TabsActivity extends AppCompatActivity {
             return new String(buffer);
         }
 
+        /**
+         * Checks whether app has network access.
+         *
+         * @return true if online, false if not
+         */
+        public boolean isOnline() {
+            ConnectivityManager connMgr =
+                    (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
+            return netInfo != null && netInfo.isConnectedOrConnecting();
+        }
+
         //variables and classes
         private static final String ARG_SECTION_NUMBER = "section_number";
-        private static final String ARG_SECTION_ANSWER = "section_answer";
-        private static final String ARG_SECTION_SENT = "section_sent";
+        private static final String ARG_SECTION_ANSWER_FILE = "section_answer_file";
+        private static final String ARG_SECTION_ANSWER_SERVER = "section_answer_server";
         private static final String DEBUG_TAG = "HttpExample";
 
         private String serverResponse = "";
         private Integer serverResponseCode = 404;
+        //used to check whether any answer has been choosen or not
+        private boolean anyAnswerSent;
     }
-
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -798,7 +853,6 @@ public class TabsActivity extends AppCompatActivity {
         }
     }
 
-
     //variables and classes
     private boolean wasInBackgroundTabs = false;
     threadKiller threadKillerTabs;
@@ -816,5 +870,4 @@ public class TabsActivity extends AppCompatActivity {
     private String stringTabs_sessionID;
     private File fileTabs_toWrite;
     private static String cryptoPass = "Moje haslo to brak hasla";
-
 }

@@ -1,10 +1,17 @@
-ver. 0.6.2
+ver. 0.6.5
 ~ przeniesienie zawartoœci projektu do wzorca Android Studio nowszego typu
 ~ uzupe³nienie dokumentacji
 ~ uporz¹dkowanie kodu
 ~ zmiana formatu URL z odpowiedziami
-~ podpis cyfrowy dla aplikacji
-~ skonfigurowanie ProGuard
++ podpis cyfrowy dla aplikacji
++ skonfigurowanie ProGuard
++ przy podsumowaniu iloœæ odpowiedzi wys³ana do serwera jest porównywana z iloœci¹ odpowiedzi pomyœlnie wybranych na pytaniach
++ przy próbie rozpoczêcia testu sprawdzane jest po³¹czenie sieciowe (ale nie internetowe!)
+~ przycisk "Zakoñcz test" zamieniony na "Podsumuj test"
++ za ka¿dym razem kiedy ktoœ nie wybierze odpowiedzi to serwer przysy³a odpowiedŸ "no_answer" w celu weryfikacji b³êdów
+~ przeprojektowanie Summary activity layout na czytelniejsze
++ s³uchacz po³¹czeñ przychodz¹cych, który roz³¹cza nadchodz¹ce po³¹czenia
++ weryfikacja kodów QR
 
 ver. 0.6.1
 ~ poprawa b³êdnego odtwarzania siê zak³adek w Tabs Activity

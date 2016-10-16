@@ -4,7 +4,7 @@
     <string name="button_add_question">Add question</string>
     <string name="button_back_to_test">Back to test</string>
     <string name="button_compute">Compute</string>
-    <string name="button_end_test">Finish test</string>
+    <string name="button_summarise_test">Summarise test</string>
     <string name="button_exit">Exit</string>
     <string name="button_no">No</string>
     <string name="button_qr_code">Scan QR code</string>
@@ -12,7 +12,7 @@
     <string name="button_start_test">Begin test</string>
     <string name="button_yes">Yes</string>
     <string name="label_app">Haszowki</string>
-    <string name="label_dunno_answers">Answers DUNNO:</string>
+    <string name="label_dunno_answers">DUNNO:</string>
     <string name="label_exam_id_value">Test ID:</string>
     <string name="label_group_number">Group nr:</string>
     <string name="label_hall_seat">Seat</string>
@@ -20,7 +20,7 @@
     <string name="label_info_activity">Information</string>
     <string name="label_studentNo">Student number</string>
     <string name="label_name">Name:</string>
-    <string name="label_no_answers">Answers NO:</string>
+    <string name="label_no_answers">NO:</string>
     <string name="label_null">null</string>
     <string name="label_question_number">Question nr:</string>
     <string name="label_result">Result:</string>
@@ -29,14 +29,14 @@
     <string name="label_session_token">Session identificator:</string>
     <string name="label_settings_activity">Settings</string>
     <string name="label_course_value">Course name:</string>
-    <string name="label_sum_of_answers">Sum of questions:</string>
+    <string name="label_sum_of_answers">Sum of successfully sent answers</string>
     <string name="label_summary_activity">Summary</string>
     <string name="label_surname">Surname:</string>
     <string name="label_version">Version</string>
     <string name="label_weight">Weights vector:</string>
-    <string name="label_yes_answers">Answers YES:</string>
+    <string name="label_yes_answers">YES:</string>
     <string name="six_zeros_value">000000</string>
-    <string name="version_value">0.6.2</string>
+    <string name="version_value">0.6.5</string>
     <string name="zero_value">0</string>
     <string name="message_your_test_file_was_created">Your test file has been created</string>
     <string name="message_you_quit_test">You have left application</string>
@@ -60,4 +60,14 @@
     <string name="message_do_you_want_to_quit_app">Do you want to leave the application?</string>
     <string name="message_data_saved">Data saved</string>
     <string name="message_compute_group">Compute group!</string>
+    <string name="button_ok">Ok</string>
+    <string name="message_answers_error">\"To server did not arrive: \"</string>
+    <string name="message_answers_error_title">There was an error with sending answers!</string>
+    <string name="message_dunno_answers_error">answers DUNNO - %1$d</string>
+    <string name="message_no_answers_error">answers NO - %1$d</string>
+    <string name="message_yes_answers_error">answers YES - %1$d</string>
+    <string name="message_what_to_do">Go back to test and send missing answers by pressing gray button on corresponding tab.</string>
+    <string name="label_stats">Amount of successfully sent answers</string>
+    <string name="message_wrong_qr_button">Wrong QR code!</string>
+    <string name="button_finish_test">Finish test</string>
 </resources>
