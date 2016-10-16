@@ -17,17 +17,17 @@ import java.lang.reflect.Method;
  */
 
 public class IncomingCallReceiver extends BroadcastReceiver {
-    private ITelephony telephonyService;
+    private ITelephony ITelephonyICR;
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager telephonyManagerICR = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         try {
-            Class<?> c = Class.forName(tm.getClass().getName());
+            Class<?> c = Class.forName(telephonyManagerICR.getClass().getName());
             Method m = c.getDeclaredMethod("getITelephony");
             m.setAccessible(true);
-            ITelephony telephonyService = (ITelephony) m.invoke(tm);
+            ITelephony telephonyService = (ITelephony) m.invoke(telephonyManagerICR);
             Bundle bundle = intent.getExtras();
             String phoneNumber = bundle.getString("incoming_number");
             //Log.e("INCOMING", phoneNumber);

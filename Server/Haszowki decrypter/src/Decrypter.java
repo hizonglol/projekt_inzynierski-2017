@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Decrypter {
 
-    private static String VERSION_NUMBER = "0.6.2";
+    private static String VERSION_NUMBER = "0.6.5";
     private static String cryptoPass = "Moje haslo to brak hasla";
 
     /*
