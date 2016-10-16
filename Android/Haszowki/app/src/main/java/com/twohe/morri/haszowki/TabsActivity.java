@@ -104,6 +104,10 @@ public class TabsActivity extends AppCompatActivity {
         if (tabLayout != null)
             tabLayout.setupWithViewPager(ViewPagerTabs);
 
+        StringBuilder buildCrypto = new StringBuilder(cryptoPass);
+        buildCrypto.replace(3, 4, "+");
+        cryptoPass = buildCrypto.toString();
+        Log.d("crypto", cryptoPass);
 
         addTab();
     }
@@ -165,6 +169,11 @@ public class TabsActivity extends AppCompatActivity {
 
     private boolean createTestFile(String token) {
 
+        StringBuilder buildCryptoNano = new StringBuilder(cryptoPass);
+        buildCryptoNano.replace(13, 15, "78");
+        cryptoPass = buildCryptoNano.toString();
+        Log.d("crypto", cryptoPass);
+
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss", Locale.getDefault());
         Date now = new Date();
         String fileName = formatter.format(now) + "-" + token + ".txt";//like 2016_01_12-12_30_00-ABCdef12.txt
@@ -195,6 +204,11 @@ public class TabsActivity extends AppCompatActivity {
             finish();
             return false;
         }
+
+        StringBuilder buildCrypto = new StringBuilder(cryptoPass);
+        buildCrypto.replace(8, 9, "#");
+        cryptoPass = buildCrypto.toString();
+        Log.d("crypto", cryptoPass);
 
         return true;
     }
@@ -346,7 +360,7 @@ public class TabsActivity extends AppCompatActivity {
 
                     ((TabsActivity) getActivity()).addTab();
                     int nextTab = ((TabsActivity) getActivity()).guestionsAmount++;
-                    if (getArguments().getInt(ARG_SECTION_ANSWER_FILE) == 0 && !anyAnswerSent){
+                    if (getArguments().getInt(ARG_SECTION_ANSWER_FILE) == 0 && !anyAnswerSent) {
                         sendToServer(rootView, 0, "no_answer");
                         anyAnswerSent = true;
                     }
@@ -360,7 +374,7 @@ public class TabsActivity extends AppCompatActivity {
 
         /**
          * Checks tab arguments and according to them sets proper color of answer.
-         *
+         * <p>
          * It also checks if answerServer is not equal to 0. If it is then answer has been
          * successfully sent to server and last answer in the file is the same as last answer
          * in server, and because of that button can be coloured to blue.
@@ -410,7 +424,7 @@ public class TabsActivity extends AppCompatActivity {
          * Instantiates fragment. Creates bundle with arguments that carry fragment
          * number, current choosen answer for file and current choosen answer
          * that has been sent successfully to server.
-         *
+         * <p>
          * ARG_SECTION_ANSWER_FILE and ARG_SECTION_ANSWER_SERVER parameters explanation:
          * 0 - no answer
          * 1 - yes answer
@@ -432,14 +446,14 @@ public class TabsActivity extends AppCompatActivity {
 
         /**
          * Used to save an answer of corresponding tab into test file.
-         *
+         * <p>
          * It also sets up ARG_SECTION_ANSWER_SERVER to 0 before sendToServer() is terminated.
          * If GER in sendToServer() will be terminated successfully then ARG_SECTION_ANSWER_SERVER
          * will be set to proper number.
          *
          * @param rootView Root view of corresponding tab
          * @param question Number of corresponding tab
-         * @param answerNo   Type of given answer
+         * @param answerNo Type of given answer
          */
         private void saveToFile(View rootView, int question, String answerNo) {
 
@@ -462,7 +476,7 @@ public class TabsActivity extends AppCompatActivity {
          *
          * @param rootView Root view of corresponding tab
          * @param question Number of corresponding tab
-         * @param answerNo   Type of given answer
+         * @param answerNo Type of given answer
          */
         private void sendToServer(View rootView, int question, String answerNo) {
 
@@ -661,8 +675,8 @@ public class TabsActivity extends AppCompatActivity {
             }
 
             /**
-             * @param passedView Root view of corresponding tab.
-             * @param passedAnswerNo  Number of corresponding tab.
+             * @param passedView     Root view of corresponding tab.
+             * @param passedAnswerNo Number of corresponding tab.
              */
             void configure(View passedView, int passedAnswerNo) {
                 rootView = passedView;
@@ -699,16 +713,19 @@ public class TabsActivity extends AppCompatActivity {
                 is = conn.getInputStream();
 
                 // Convert the InputStream into a string
-                String contentAsString = convertInputStreamToString(is, len);
-                serverResponse = contentAsString;
+                serverResponse = convertInputStreamToString(is, len);
                 //return contentAsString;
                 return String.valueOf(response);
 
                 // Makes sure that the InputStream is closed after the app is
                 // finished using it.
             } finally {
-                if (is != null) {
-                    is.close();
+                try {
+                    if (is != null) {
+                        is.close();
+                    }
+                } catch (IOException e){
+                    e.printStackTrace();
                 }
             }
         }
@@ -717,7 +734,7 @@ public class TabsActivity extends AppCompatActivity {
          * Reads an InputStream and converts it to a String.
          *
          * @param stream Input stream taken from server.
-         * @param len Length of input stream
+         * @param len    Length of input stream
          * @return Input stream converted into string.
          * @throws IOException
          * @throws UnsupportedEncodingException
@@ -869,5 +886,5 @@ public class TabsActivity extends AppCompatActivity {
     int tabs_serverDunnoAnswers = 0;
     private String stringTabs_sessionID;
     private File fileTabs_toWrite;
-    private static String cryptoPass = "Moje haslo to brak hasla";
+    private static String cryptoPass = "tabs_layout_parameters";
 }

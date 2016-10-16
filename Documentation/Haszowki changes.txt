@@ -12,6 +12,7 @@ ver. 0.6.5
 ~ przeprojektowanie Summary activity layout na czytelniejsze
 + s³uchacz po³¹czeñ przychodz¹cych, który roz³¹cza nadchodz¹ce po³¹czenia
 + weryfikacja kodów QR
+~ zmiana has³a koduj¹cego pliki
 
 ver. 0.6.1
 ~ poprawa b³êdnego odtwarzania siê zak³adek w Tabs Activity
