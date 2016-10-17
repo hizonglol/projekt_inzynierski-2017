@@ -2,7 +2,7 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Haszówki</string>
-    <string name="version_value">0.6.5</string>
+    <string name="version_value">0.6.6</string>
     <string name="zero_value">0</string>
     <string name="six_zeros_value">000000</string>
     <string name="label_null">null</string>
@@ -99,7 +99,7 @@
     <string name="label_yes_answers">TAK:</string>
     <string name="label_no_answers">NIE:</string>
     <string name="label_dunno_answers">NIE WIEM:</string>
-    <string name="label_sum_of_answers">Suma pomyślnie przesłanych odpowiedzi</string>
+    <string name="label_sum_of_answers">Suma zapisanych odpowiedzi w pliku testowym</string>
     <string name="label_stats">Ilość pomyślnie przesłanych odpowiedzi</string>
 
     <!--*** BUTTON strings of SUMMARY ***-->
@@ -109,7 +109,7 @@
 
     <!--*** MESSAGES strings of SUMMARY ***-->
     <string name="message_answers_error_title">Wystąpił błąd przy wysyłaniu odpowiedzi!</string>
-    <string name="message_answers_error">"Do serwera nie dotarły: "</string>
+    <string name="message_answers_error">Do serwera nie dotarły:</string>
     <string name="message_yes_answers_error">odpowiedzi TAK - %1$d</string>
     <string name="message_no_answers_error">odpowiedzi NIE - %1$d</string>
     <string name="message_dunno_answers_error">odpowiedzi NIE WIEM - %1$d</string>

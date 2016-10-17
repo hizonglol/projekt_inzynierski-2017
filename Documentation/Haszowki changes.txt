@@ -1,3 +1,6 @@
+ver. 0.6.6
+~ poprawione stringi na Summary activity
+
 ver. 0.6.5
 ~ przeniesienie zawartoœci projektu do wzorca Android Studio nowszego typu
 ~ uzupe³nienie dokumentacji
@@ -6,12 +9,12 @@ ver. 0.6.5
 + podpis cyfrowy dla aplikacji
 + skonfigurowanie ProGuard
 + przy podsumowaniu iloœæ odpowiedzi wys³ana do serwera jest porównywana z iloœci¹ odpowiedzi pomyœlnie wybranych na pytaniach
-+ przy próbie rozpoczêcia testu sprawdzane jest po³¹czenie sieciowe (ale nie internetowe!)
++ przy próbie rozpoczêcia testu sprawdzane jest po³¹czenie sieciowe (ale nie z serwerem!)
 ~ przycisk "Zakoñcz test" zamieniony na "Podsumuj test"
 + za ka¿dym razem kiedy ktoœ nie wybierze odpowiedzi to serwer przysy³a odpowiedŸ "no_answer" w celu weryfikacji b³êdów
-~ przeprojektowanie Summary activity layout na czytelniejsze
-+ s³uchacz po³¹czeñ przychodz¹cych, który roz³¹cza nadchodz¹ce po³¹czenia
-+ weryfikacja kodów QR
+~ przeprojektowanie Summary activity layout
++ s³uchacz po³¹czeñ przychodz¹cych, który roz³¹cza nadchodz¹ce po³¹czenia (wci¹¿ nieakceptowalne ale jest krok naprzód)
++ weryfikacja kodów QR (tylko nieujemne liczby s¹ akceptowane jako pierwszy parametr)
 ~ zmiana has³a koduj¹cego pliki
 
 ver. 0.6.1
