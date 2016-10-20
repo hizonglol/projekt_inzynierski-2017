@@ -1,10 +1,12 @@
 package com.twohe.morri.haszowki;
 
 import android.content.ComponentCallbacks2;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaScannerConnection;
@@ -68,6 +70,7 @@ public class TabsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("On create", "TabsActivity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabs);
 

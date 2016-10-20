@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -18,6 +18,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/label_app"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize">
@@ -29,14 +30,20 @@
         </activity>
         <activity
             android:name=".TabsActivity"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".InfoActivity" />
-        <activity android:name=".SummaryActivity" />
+        <activity
+            android:name=".SettingsActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".InfoActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".SummaryActivity"
+            android:configChanges="orientation|screenSize" />
 
         <receiver
             android:name=".IncomingCallReceiver"
-            android:enabled="true"
             android:priority="999">
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />

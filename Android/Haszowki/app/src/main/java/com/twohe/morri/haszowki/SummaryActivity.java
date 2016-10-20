@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -58,6 +59,8 @@ public class SummaryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summary);
+
+        Log.d("On create", "SummaryActivity");
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         SummaryActivity.MemoryBoss mMemoryBoss;
