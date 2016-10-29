@@ -1,11 +1,13 @@
 package com.twohe.morri.haszowki;
 
 import android.content.ComponentCallbacks2;
-import android.content.Intent;
+import android.content.ComponentName;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,14 +17,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.twohe.morri.tools.IncomingCallReceiver;
+
 /**
  * Created by morri on 30.07.2016.
  */
 public class SummaryActivity extends AppCompatActivity {
 
-    SharedPreferences sharedPref;
+    SharedPreferences sharedPrefSummary;
 
-    boolean wasInBackground = false;
+    boolean wasInBackgroundSummary = false;
 
     public class MemoryBoss implements ComponentCallbacks2 {
         @Override
@@ -37,10 +41,43 @@ public class SummaryActivity extends AppCompatActivity {
         public void onTrimMemory(final int level) {
             if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
                 // We're in the Background
-                wasInBackground = true;
+
+                wasInBackgroundSummary = true;
+
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        disableIncomingCallReceiver();
+                    }
+                }, 1500);
+
             }
             // you might as well implement some memory cleanup here and be a nice Android dev.
         }
+    }
+
+    /**
+     * Used to enable IncomingCallReceiver that rejects any incoming calls
+     */
+    private void enableIncomingCallReceiver(){
+        PackageManager pm  = SummaryActivity.this.getPackageManager();
+        ComponentName componentName = new ComponentName(SummaryActivity.this, IncomingCallReceiver.class);
+        pm.setComponentEnabledSetting(componentName,PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+        //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń aktywowany", Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * Used to disable IncomingCallReceiver that rejects any incoming calls
+     */
+    private void disableIncomingCallReceiver(){
+        PackageManager pm  = SummaryActivity.this.getPackageManager();
+        ComponentName componentName = new ComponentName(SummaryActivity.this, IncomingCallReceiver.class);
+        pm.setComponentEnabledSetting(componentName,PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+        //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń dezaktywowany", Toast.LENGTH_LONG).show();
     }
 
     Thread thread = new Thread() {
@@ -48,8 +85,10 @@ public class SummaryActivity extends AppCompatActivity {
         public void run() {
             try {
                 Thread.sleep(3500); // As I am using LENGTH_LONG in Toast
+                alertDialog.dismiss();
                 SummaryActivity.this.finish();
             } catch (Exception e) {
+                alertDialog.dismiss();
                 e.printStackTrace();
             }
         }
@@ -62,7 +101,7 @@ public class SummaryActivity extends AppCompatActivity {
 
         Log.d("On create", "SummaryActivity");
 
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPrefSummary = PreferenceManager.getDefaultSharedPreferences(this);
         SummaryActivity.MemoryBoss mMemoryBoss;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -88,7 +127,7 @@ public class SummaryActivity extends AppCompatActivity {
                 startActivity(intentMain);
                 */
                 //now get Editor
-                SharedPreferences.Editor editor = sharedPref.edit();
+                SharedPreferences.Editor editor = sharedPrefSummary.edit();
                 //put your value
                 editor.putBoolean("End test", true);
                 //commits your edits
@@ -144,8 +183,21 @@ public class SummaryActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (wasInBackground) {
-            new AlertDialog.Builder(this)
+        enableIncomingCallReceiver();
+
+        if (wasInBackgroundSummary) {
+
+            if (sharedPrefSummary.getBoolean("Call handled", false)){
+                wasInBackgroundSummary = false;
+
+                SharedPreferences.Editor editor = sharedPrefSummary.edit();
+                editor.putBoolean("Call handled", false);
+                editor.apply();
+                return;
+            }
+
+
+            alertDialog = new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle(getResources().getString(R.string.message_you_quit_test))
                     .setMessage(getResources().getString(R.string.message_test_ended))
@@ -154,7 +206,7 @@ public class SummaryActivity extends AppCompatActivity {
 
 
             //now get Editor
-            SharedPreferences.Editor editor = sharedPref.edit();
+            SharedPreferences.Editor editor = sharedPrefSummary.edit();
             //put your value
             editor.putBoolean("End test", true);
             //commits your edits
@@ -224,4 +276,6 @@ public class SummaryActivity extends AppCompatActivity {
     int serverYesAnswers = -1;
     int serverNoAnswers = -1;
     int serverDunnoAnswers = -1;
+
+    AlertDialog alertDialog;
 }

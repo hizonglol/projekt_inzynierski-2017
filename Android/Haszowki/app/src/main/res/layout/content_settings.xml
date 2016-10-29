@@ -43,7 +43,7 @@
                 android:textSize="15sp" />
 
             <EditText
-                android:id="@+id/name_value"
+                android:id="@+id/editSettings_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -60,7 +60,7 @@
                 android:text="@string/label_surname" />
 
             <EditText
-                android:id="@+id/surname_value"
+                android:id="@+id/editSettings_surname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -77,7 +77,7 @@
                 android:text="@string/label_studentNo" />
 
             <EditText
-                android:id="@+id/index_value"
+                android:id="@+id/editSettings_index"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:digits="0123456789"
@@ -93,8 +93,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/label_course_value" />
 
-            <EditText
-                android:id="@+id/viewMain_course"
+            <com.twohe.morri.tools.InstantAutoComplete
+                android:id="@+id/editSettings_course"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -103,8 +103,27 @@
                 android:selectAllOnFocus="true"
                 android:singleLine="true" />
 
+            <TextView
+                android:id="@+id/label_server_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_server_address"
+                android:textSize="15sp" />
+
+            <EditText
+                android:id="@+id/editSettings_serverAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.:/~"
+                android:ems="10"
+                android:hint="@string/server_address"
+                android:imeOptions="flagNoExtractUi"
+                android:inputType="textNoSuggestions"
+                android:selectAllOnFocus="true"
+                android:singleLine="true" />
+
             <Button
-                android:id="@+id/button_save"
+                android:id="@+id/buttonSettings_save"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/button_save" />

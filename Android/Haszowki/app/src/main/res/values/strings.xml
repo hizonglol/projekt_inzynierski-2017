@@ -3,13 +3,13 @@
     <string name="button_dunno">Dunno</string>
     <string name="button_add_question">Add question</string>
     <string name="button_back_to_test">Back to test</string>
-    <string name="button_compute">Compute</string>
+    <string name="button_compute">Compute group</string>
     <string name="button_summarise_test">Summarise test</string>
     <string name="button_exit">Exit</string>
     <string name="button_no">No</string>
     <string name="button_qr_code">Scan QR code</string>
     <string name="button_save">Save</string>
-    <string name="button_start_test">Begin test</string>
+    <string name="button_start_test">Go to test</string>
     <string name="button_yes">Yes</string>
     <string name="label_app">Haszowki</string>
     <string name="label_dunno_answers">DUNNO:</string>
@@ -24,7 +24,7 @@
     <string name="label_null">null</string>
     <string name="label_question_number">Question nr:</string>
     <string name="label_result">Result:</string>
-    <string name="label_result_modulo">Modulo 16:</string>
+    <string name="label_result_modulo">Group:</string>
     <string name="label_section">Question nr %1$d</string>
     <string name="label_session_token">Session identificator:</string>
     <string name="label_settings_activity">Settings</string>
@@ -36,14 +36,14 @@
     <string name="label_weight">Weights vector:</string>
     <string name="label_yes_answers">YES:</string>
     <string name="six_zeros_value">000000</string>
-    <string name="version_value">0.6.8</string>
+    <string name="version_value">0.7.1</string>
     <string name="zero_value">0</string>
     <string name="message_your_test_file_was_created">Your test file has been created</string>
     <string name="message_you_quit_test">You have left application</string>
     <string name="message_unable_to_send_answer">Unable to send answer!</string>
     <string name="message_type_course_name">Type course name!</string>
-    <string name="message_type_row_higher_than_0">Type row higher than 0!</string>
-    <string name="message_type_seat_higher_than_0">Type seat higher than 0!</string>
+    <string name="message_type_row">Type row!</string>
+    <string name="message_type_seat">Type seat!</string>
     <string name="message_type_ID_name">Type test ID!</string>
     <string name="message_test_ended">Test finished</string>
     <string name="message_scan_qr_code">Scan QR code</string>
@@ -70,4 +70,11 @@
     <string name="label_stats">Amount of successfully sent answers</string>
     <string name="message_wrong_qr_button">Wrong QR code!</string>
     <string name="button_finish_test">Finish test</string>
+    <string name="message_vector_cant_be_zero">Vector cannot be equal to 0!</string>
+    <string name="message_invalid_row">Invalid row!</string>
+    <string name="message_invalid_seat">Invalid seat!</string>
+    <string name="message_invalid_row_and_seat">Invalid row and seat!</string>
+    <string name="message_going_to_test_without_position">You\'re going to test without giving row and seat!</string>
+    <string name="label_server_address">Server address:</string>
+    <string name="server_address">http://sequoia.ict.pwr.wroc.pl/~witold/</string>
 </resources>

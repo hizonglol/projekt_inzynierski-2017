@@ -2,10 +2,11 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Haszówki</string>
-    <string name="version_value">0.6.8</string>
+    <string name="version_value">0.7.1</string>
     <string name="zero_value">0</string>
     <string name="six_zeros_value">000000</string>
     <string name="label_null">null</string>
+    <string name="server_address">http://sequoia.ict.pwr.wroc.pl/~witold/</string>
 
 
     <!--*** LABEL strings of MAIN ***-->
@@ -14,7 +15,7 @@
     <string name="label_hall_seat">Miejsce</string>
     <string name="label_weight">Wektor wag:</string>
     <string name="label_result">Wynik:</string>
-    <string name="label_result_modulo">Modulo 16:</string>
+    <string name="label_result_modulo">Grupa:</string>
     <string name="label_course_value">Nazwa przedmiotu:</string>
     <string name="label_exam_id_value">ID testu:</string>
 
@@ -22,8 +23,8 @@
     <!--*** BUTTON strings of MAIN ***-->
     <string name="button_qr_code">Skanuj kod QR</string>
     <string name="button_exit">Wyjdź</string>
-    <string name="button_start_test">Rozpocznij test</string>
-    <string name="button_compute">Wylicz</string>
+    <string name="button_start_test">Przejdź do testu</string>
+    <string name="button_compute">Wylicz grupę</string>
 
     <!--*** MESSAGES strings of MAIN ***-->
     <string name="message_i_quit_app">Wychodzę z aplikacji</string>
@@ -31,13 +32,18 @@
     <string name="message_scan_qr_code">Zeskanuj kod QR</string>
     <string name="message_type_course_name">Wprowadź nazwę przedmiotu!</string>
     <string name="message_type_ID_name">Wprowadź ID testu!</string>
-    <string name="message_type_seat_higher_than_0">Podaj miejsce więsze od 0!</string>
-    <string name="message_type_row_higher_than_0">Podaj rząd więszy od 0!</string>
+    <string name="message_type_seat">Podaj miejsce!</string>
+    <string name="message_type_row">Podaj rząd!</string>
+    <string name="message_invalid_seat">Nieprawidłowe miejsce!</string>
+    <string name="message_invalid_row">Nieprawidłowy rząd!</string>
+    <string name="message_invalid_row_and_seat">Nieprawidłowy rząd i miejsce!</string>
+    <string name="message_going_to_test_without_position">Przechodzisz do testu bez podawania rzędu i miejsca!</string>
     <string name="message_compute_group">Wylicz grupę!</string>
     <string name="message_give_writing_permission">Daj uprawnienia do zapisu!</string>
     <string name="message_give_proper_student_number">Podaj poprawny indeks!</string>
-    <string name="message_give_proper_vector_number">Podaj poprawne wagi!</string>
+    <string name="message_give_proper_vector_number">Podaj poprawny wektor wag!</string>
     <string name="message_wrong_qr_button">Niepoprawny kod QR!</string>
+    <string name="message_vector_cant_be_zero">Wektor wag nie może być równy 0!</string>
 
 
     <!--*** LABEL strings of INFO ***-->
@@ -52,6 +58,7 @@
     <string name="label_settings_activity">Ustawienia</string>
     <string name="label_name">Imię:</string>
     <string name="label_surname">Nazwisko:</string>
+    <string name="label_server_address">Adres serwera:</string>
     <!--
     @string/title_studentNo
     @string/title_course_name

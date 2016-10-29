@@ -4,15 +4,19 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.twohe.morri.tools.InstantAutoComplete;
+import com.twohe.morri.tools.SettingsDataSource;
 
 
 /**
@@ -27,9 +31,6 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-
-        Log.d("On create", "SummaryActivity");
-
         db.open();
 
         /* obsluga toolbar w Settings */
@@ -37,45 +38,50 @@ public class SettingsActivity extends AppCompatActivity {
         if (settingsToolbar != null)
             settingsToolbar.setTitle(R.string.label_settings_activity);
 
-        Button saveButton = (Button) findViewById(R.id.button_save);
+        editSettings_name = (EditText) findViewById(R.id.editSettings_name);
+        editSettings_surname = (EditText) findViewById(R.id.editSettings_surname);
+        editSettings_index = (EditText) findViewById(R.id.editSettings_index);
+        editSettings_course = (InstantAutoComplete) findViewById(R.id.editSettings_course);
+        editSettings_serverAddress = (EditText) findViewById(R.id.editSettings_serverAddress);
+        buttonSettings_save = (Button) findViewById(R.id.buttonSettings_save);
+
         View.OnClickListener saveButtonHandler = new View.OnClickListener() {
             public void onClick(View v) throws NumberFormatException {
 
-                EditText name = (EditText) findViewById(R.id.name_value);
-                EditText surname = (EditText) findViewById(R.id.surname_value);
-                EditText studentNo = (EditText) findViewById(R.id.index_value);
-                EditText course = (EditText) findViewById(R.id.viewMain_course);
-
-                if (name != null) {
-                    if (name.getText().toString().equals("")) {
+                if (editSettings_name != null) {
+                    if (editSettings_name.getText().toString().equals("")) {
                         Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_name), Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    db.createSetting("setting_name", name.getText().toString());
+                    db.createSetting("setting_name", editSettings_name.getText().toString());
                 }
 
-                if (surname != null) {
-                    if (surname.getText().toString().equals("")) {
+                if (editSettings_surname != null) {
+                    if (editSettings_surname.getText().toString().equals("")) {
                         Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_surname), Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    db.createSetting("setting_surname", surname.getText().toString());
+                    db.createSetting("setting_surname", editSettings_surname.getText().toString());
                 }
 
-                if (studentNo != null) {
-                    if (studentNo.getText().toString().length() != 6) {
+                if (editSettings_index != null) {
+                    if (editSettings_index.getText().toString().length() != 6) {
                         Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_student_number), Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    db.createSetting("setting_studentNo", studentNo.getText().toString());
+                    db.createSetting("setting_studentNo", editSettings_index.getText().toString());
                 }
 
-                if (course != null) {
-                    if (course.getText().toString().equals("")) {
+                if (editSettings_course != null) {
+                    if (editSettings_course.getText().toString().equals("")) {
                         Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_course), Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    db.createSetting("setting_course", course.getText().toString());
+                    db.createSetting("setting_course", editSettings_course.getText().toString());
+                }
+
+                if (editSettings_serverAddress != null) {
+                    db.createSetting("setting_serverAddress", editSettings_serverAddress.getText().toString());
                 }
 
                 //Log.d("saveButtonHandler", "Dane zapisane");
@@ -83,26 +89,43 @@ public class SettingsActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(), getResources().getString(R.string.message_data_saved), Toast.LENGTH_SHORT).show();
             }
         };
-        if (saveButton != null)
-            saveButton.setOnClickListener(saveButtonHandler);
+        if (buttonSettings_save != null)
+            buttonSettings_save.setOnClickListener(saveButtonHandler);
 
-        EditText editTestId = (EditText) findViewById(R.id.viewMain_course);
         EditText.OnEditorActionListener doneKeyboardButton = new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                     return true;
                 }
                 return false;
             }
         };
-        if (editTestId != null)
-            editTestId.setOnEditorActionListener(doneKeyboardButton);
+        if (editSettings_serverAddress != null)
+            editSettings_serverAddress.setOnEditorActionListener(doneKeyboardButton);
+
+        if (editSettings_course != null) {
+            ArrayAdapter<String> adapter =
+                    new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
+            editSettings_course.setAdapter(adapter);
+            editSettings_course.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
+
+            View.OnFocusChangeListener focusListener = new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(hasFocus){
+                        editSettings_course.showDropDown();
+                    }else {
+                        editSettings_course.dismissDropDown();
+                    }
+                }
+            };
+            editSettings_course.setOnFocusChangeListener(focusListener);
+        }
 
     }
-
 
     @Override
     public void onDestroy() {
@@ -111,34 +134,32 @@ public class SettingsActivity extends AppCompatActivity {
         db.close();
     }
 
-
     void resumeState() {
 
         SettingsDataSource resume_db = new SettingsDataSource(this);
         resume_db.open();
 
-        EditText editName = (EditText) findViewById(R.id.name_value);
-        EditText editSurname = (EditText) findViewById(R.id.surname_value);
-        EditText editStudentNo = (EditText) findViewById(R.id.index_value);
-        EditText editCourse = (EditText) findViewById(R.id.viewMain_course);
-
         String stringName = resume_db.getSetting("setting_name");
         String stringSurname = resume_db.getSetting("setting_surname");
         String stringStudentNo = resume_db.getSetting("setting_studentNo");
         String stringCourse = resume_db.getSetting("setting_course");
+        String stringServerAddress = resume_db.getSetting("setting_serverAddress");
 
 
-        if (editName != null)
-            editName.setText(stringName);
+        if (editSettings_name != null)
+            editSettings_name.setText(stringName);
 
-        if (editSurname != null)
-            editSurname.setText(stringSurname);
+        if (editSettings_surname != null)
+            editSettings_surname.setText(stringSurname);
 
-        if (editStudentNo != null)
-            editStudentNo.setText(stringStudentNo);
+        if (editSettings_index != null)
+            editSettings_index.setText(stringStudentNo);
 
-        if (editCourse != null)
-            editCourse.setText(stringCourse);
+        if (editSettings_course != null)
+            editSettings_course.setText(stringCourse);
+
+        if (editSettings_serverAddress != null)
+            editSettings_serverAddress.setText(stringServerAddress);
 
         resume_db.close();
 
@@ -158,4 +179,15 @@ public class SettingsActivity extends AppCompatActivity {
         resumeState();
     }
 
+
+    EditText editSettings_name;
+    EditText editSettings_surname;
+    EditText editSettings_index;
+    InstantAutoComplete editSettings_course;
+    EditText editSettings_serverAddress;
+    Button buttonSettings_save;
+
+    private static final String[] courses = new String[] {
+            "SCRSK", "OpSys", "SICR", "UnixEZI"
+    };
 }

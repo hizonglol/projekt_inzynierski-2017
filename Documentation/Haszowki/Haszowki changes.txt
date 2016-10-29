@@ -1,0 +1,198 @@
+## 0.7.1 - 2016-10-29
+### Added
++ nowe activity Security Check
++ sprawdzanie dostêpnoœci serwera, do którego przychodz¹ odpowiedzi na pytania (ten który jest ustawiony w Settings Activity)
++ ³adne krêc¹ce siê zielono/niebiesko/czerwone pola do informowania u¿ytkownika o rezultatach metod wykonywanych asynchronicznie w innych w¹tkach
+  niebieski to jest dezaktywowany
+  zielony to jest sukces
+  czerwony to jest pora¿ka
+  krêc¹ce siê kó³eczko to oczekiwanie na wynik
+
+### Changed
+~ aby kontynuowaæ test tym razem nale¿y przejœæ pomyœlnie testy wykonywane w Security Check
+~ czêœciowy kod do walidacji aplikacji z SafetyNet
+~ zeskanowanie kodu QR automatycznie wylicza now¹ grupê
+
+## 0.7.0 - 2016-10-25
+### Added
++ w przypadku braku miejsca lub rzêdu pojawia siê Toast "wpisz rz¹d" lub "wpisz miejsce"
++ menu wyboru nazwy kursu
++ edytowalny adres serwera, domyœlnie ma byæ "http://sequoia.ict.pwr.wroc.pl/~witold/"
+
+### Changed
+~ akceptowalne -1 jako rz¹d i miejsce. Jeœli -1 wybrane to po rozpoczêciu testu wyœwietla siê toast, ¿e piszemy test bez sprecyzowanego miejsca
+~ "Modulo 16" -> "Grupa" w Main Activity
+~ "Wylicz" -> "Wylicz grupê" w Main Activity
+~ "Rozpocznij test" -> "PrzejdŸ do testu" w Main Activity
+~ "szare podœwietlenie ma byæ jaœniejsze" wykonane jako przyciemnione szare podœwietlenie a napis na przycisku zmienia kolor na bia³y
+~ menu wyboru nazwy kursu oraz menu wyboru nazwy testu nie wymaga ju¿ podania przynajmniej dwóch liter. Teraz pojawia siê od razu ca³e menu.
+
+### Removed
+- zero jako wartoœæ domyœlna w Modulo 16 w Main Activity
+- zera jako wartoœæ domyœlna w rzêdzie oraz miejscu w Main Activity
+
+## 0.6.10 - 2016-10-24
+### Changed
+~ ponownie uruchomiony odrzucacz po³¹czeñ przychodz¹cych w trakcie testu. Teraz uruchamia siê tylko po przejœciu do testu. Po wyjœciu siê wy³¹cza.
+
+## 0.6.9 - 2016-10-22
+### Added
++ menu wyboru nazwy testu po wpisaniu dwóch pierwszych liter nazwy kursu
+
+### Changed
+~ poprawiony b³¹d przy wyœwietlaniu siê podpowiedzi klawiaturowych przy wprowadzaniu IDTestu. Teraz wyœwietla siê menu tylko
+  wtedy kiedy wpisze siê dwie pierwsze litery nazwy przedmiotu
+
+## [0.6.8] - 2016-10-20
+### Added
++ sprawdzanie czy wektor wag zosta³ wprowadzony oraz czy jest równy 0. Jeœli tak to nie da siê wyliczyæ grupy.
+
+### Changed
+~ poprawiony b³¹d przy wywo³ywaniu siê onCreate w trakcie zmiany trybu (landscape/portait)
+~ poprawiony b³¹d przy wycieku pamiêci po nieuprawionym wyjœciu z aplikacji (monit nie by³ zamykany przed zakoñczeniem testu)
+~ zmieniony background przycisków w TabsActivity na bardziej czytelny
+
+## [0.6.6] - 2016-10-17
+### Changed
+~ poprawione stringi na Summary activity
+
+## 0.6.5 - Date according to GitHub
+### Added
++ podpisywanie cyfrowe aplikacji
++ skonfigurowanie ProGuard
++ iloœæ odpowiedzi wys³ana do serwera jest porównywana z iloœci¹ odpowiedzi
+  pomyœlnie wybranych na pytaniach w Summary Activity
++ mechanizm sprawdzania istnienia po³¹czenia sieciowego (ale nie z serwerem!) przy próbie rozpoczêcia testu
++ przysy³anie do serwera odpowiedzi "no_answer" za ka¿dym razem kiedy ktoœ nie wybierze odpowiedzi
+  i przejdzie do nastêpnej zak³adki w celu weryfikacji b³êdów
++ s³uchacz po³¹czeñ przychodz¹cych, który roz³¹cza nadchodz¹ce po³¹czenia
+  (wci¹¿ zbugowane ale jest krok naprzód)
++ weryfikacja kodów QR (tylko nieujemne liczby s¹ akceptowane jako pierwszy parametr)
+
+### Changed
+~ przeniesienie zawartoœci projektu do wzorca Android Studio nowszego typu
+~ uzupe³nienie dokumentacji
+~ uporz¹dkowanie kodu
+~ zmiana formatu URL z odpowiedziami
+~ przycisk "Zakoñcz test" zamieniony na "Podsumuj test"
+~ przeprojektowanie Summary activity layout
+~ zmiana has³a koduj¹cego pliki
+
+## 0.6.1 - Date according to GitHub
+### Added
++ pe³ne angielskie t³umaczenie i zmieniony na domyœlny jêzyk angielski
++ numer wersji programu do nag³ówków plików z odpowiedziami
+
+### Changed
+~ poprawa b³êdnego odtwarzania siê zak³adek w Tabs Activity
+~ poprawa koñczenia testu w przypadku wyrzucenia aplikacji w background. Teraz wyœwietla siê monit
+  i aplikacja wychodzi z testu po 3.5 sekundy
+~ poprawa plików XML layoutów do wspierania starszych wersji systemu Android
+~ zak³adki w Tabs Activity przesuwaj¹ siê teraz poprawnie po chwytaniu tekstu
+~ zamiana sta³ych stringów na stringi pobierane z zasobów (wsparcie do t³umaczenia)
+~ poprawa krytycznego b³êdu nie pojawiania siê pliku z odpowiedziami w pamiêci telefonu
+~ poprawa krytycznego b³êdu z wysy³aniem do serwera wadliwych odpowiedzi
+
+## 0.6.0 - Date according to GitHub
+### Added
++ w Android Marshmallow i wy¿ej pojawia siê zapytanie o dostêp do kamery i pamiêci masowej
++ zapisywanie odpowiedzi do pliku w folderze Haszowki w pamiêci zewnêtrznej
++ w razie braku internetu odpowiedzi zapisz¹ siê do pliku, a odpowiedŸ zaznaczy siê wyszarzonym kolorem
++ sprawdzanie czy u¿ytkownik na pewno chcia³ wcisn¹æ przycisk back
++ w razie wciœniêcia przycisków home lub czegoœ innego, co przeniesie aplikacjê w t³o aplikacja koñczy test
+  (potrzebne ³adniejsze rozwi¹zanie jakimœ promptem i zakoñczeniem aplikacji po delay)
+
+### Changed
+~ poprawki w gradle scripts i obni¿enie minimalnego API do 14 (Ice Cream Sandwich)
+~ poprawki w czytelnoœci kodu
+
+## 0.5.1 - Date according to GitHub
+### Changed
+~ niezbyt ³adne obejœcie b³êdu z niepoprawn¹ zmian¹ background przycisków w Tabs Activity
+
+## 0.5.0 - Date according to GitHub
+### Added
++ ³¹czenie siê z serwerem i wysy³anie zapytania z danymi testu
+
+### Changed
+~ poprawiony focus w MainActivity
+~ test jest zaznaczany w ca³oœci po klikniêciu w dane pole do edytowania
+~ dzia³a odczytywanie kodu QR w formacie "wektor_wag id_testu"
+~ po dodaniu nowego pytania automatycznie siê do niego przechodzi
+
+## 0.4.0 - Date according to GitHub
+### Added
++ przy wciskaniu przycisku Rozpocznij Test sprawdzane jest istnienie ID testu oraz nazwy przedmiotu
++ uzupe³nianie wektora wag o zera od lewej strony w razie wpisania wektora krótszego ni¿ 6 cyfr
++ dodane skanowanie kodów QR i ³adowanie odczytanej wartoœci jako ID testu
+
+## 0.3.2 - Date according to GitHub
+### Added
++ iloœæ wciœniêtych przycisków jest zliczana i wyœwietlana w podsumowaniu
+
+### Changed
+~ poprawiono zapamiêtywanie stanu wciœniêtych przycisków w Tabs Activity
+~ poprawiono wyœwietlanie siê sumy pytañ: teraz wyœwietlana jest ich poprawna iloœæ
+~ poprawiono b³¹d przy próbie wyliczenia grupy bez skonfigurowania numeru indeksu
+~ poprawiono wyciek bazy danych w Main Activity przy nieprawid³owym zamykaniu bazy
+
+## 0.3.1 - Date according to GitHub
+### Added:
++ dynamicznie dodawane zak³adki w Tabs Activity
++ kolorowanie przycisków po wybraniu odpowiedzi w Tabs Activity
+
+### Changed
+~ poprawiono dzia³anie przycisku "Wróæ do testu" w Summary Activity
+
+## [0.3.0] - Date according to GitHub
+### Added
++ nowa metoda wyliczania grupy testu
++ ustawione docelowe dzia³anie niektórych przycisków w Tabs, Settings, Summary Activity
++ mechanizm zapamiêtywania zawartoœci Settings Activity i odtwarzania po ponownym uruchomieiu aplikacji
+
+### Changed
+~ baza danych zapisuje informacje otrzymane z Settings Activity
+~ Activity Main, Tabs, Summary korzysta z informacji zawartych w bazie danych
+~ przycisk Rozpocznij Test w Activity Main dzia³a tylko wtedy, gdy poprawnie wyliczono maskê
+
+### Removed
+- przycisk Summary Activity z menu z górnej belki
+
+## [0.2.2] - 2016-08-26
+### Changed
+~ baza danych dzia³a i jest w stanie przekazywaæ informacje pomiêdzy aktywnoœciami
+
+## [0.2.1] - 2016-08-25
+### Added
++ wstêpna niedzia³aj¹ca wersja bazy danych
+
+## 0.2.0 - 2016-08-22
+### Added
++ wyœwietlanie informacji po naciœniêciu przycisku w zak³adkach w TabsActivity
+
+## [0.1.2] - 2016-08-18
+### Added
++ Summary Activity
++ tekst na drugim pasku na górze aplikacji w Settings, Info, Summary Activity
++ przesuwny layout po pokazaniu siê soft keyboard input w Main, Settings
++ przesuwny layout po przejœciu w tryb landscape w Main, Tabs, Settings, Summary Activity
+
+### Changed
+~ przeprojektowany layout w Main, Tabs, Settings Activity
+~ w Main, Info, Summary Activity ustawione linie rozgraniczaj¹ce rzêdy
+~ ustawione domyœlne wartoœci pól w ka¿dym activity dla lepszego rozeznania rozmieszczenia elementów
+
+### Removed
+- wyliczanie grupy z racji przeprojektowania Main Activity
+
+# Known bugs:
+* z³e granice przesuwania w trybie landscape w Tabs Activity
+* nie da siê przechwyciæ przycisków home i list applications (nierozwi¹zywalne)
+
+[0.6.8] https://github.com/hizonglol/projekt_inzynierski-2017/commit/4b99fca28efe7c06ffcc91c25fd9366dcf1c65d5
+[0.6.6] https://github.com/hizonglol/projekt_inzynierski-2017/commit/079f98de465de66ac0df05cec0c726c7712f42b7
+...
+[0.3.0] https://github.com/hizonglol/projekt_inzynierski-2017/commit/d773c7c2fc803a043e5de95de8e7dbde13466a30
+[0.2.2] https://github.com/hizonglol/projekt_inzynierski-2017/commit/76ed41ffd8128debcf7caa79238e406f849418c4
+[0.2.0] https://github.com/hizonglol/projekt_inzynierski-2017/commit/202ddb1ff774b60eb4fbef3bf712f0ac69195547
+[0.1.2] https://github.com/hizonglol/projekt_inzynierski-2017/commit/1a1438152fd8f32d94f678aa21d339d327116e8e

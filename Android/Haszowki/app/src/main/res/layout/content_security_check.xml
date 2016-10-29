@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:showIn="@layout/activity_security_check">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <com.dd.CircularProgressButton
+                android:id="@+id/progressButtonSecurityCheck_serverConnection"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:textColor="@color/cpb_white"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:textSize="18sp"
+                app:cpb_iconComplete="@drawable/ic_action_accept"
+                app:cpb_iconError="@drawable/ic_action_cancel" />
+
+            <com.twohe.morri.tools.AutoResizeTextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center|start"
+                android:maxLines="1"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/progressButtonSecurityCheck_serverConnection"
+                android:layout_toLeftOf="@id/progressButtonSecurityCheck_serverConnection"
+                android:paddingRight="@dimen/activity_vertical_margin"
+                android:paddingEnd="@dimen/activity_vertical_margin"
+                android:layout_centerVertical="true"
+                android:text="Test jakości połączenia"
+                android:textColor="#000000"
+                android:textSize="25sp" /> <!-- maximum size -->
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/row_dunno_infos"
+            android:layout_marginBottom="10sp"
+            android:layout_marginTop="10sp"
+            android:background="@android:color/darker_gray" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <com.dd.CircularProgressButton
+                android:id="@+id/progressButtonSecurityCheck_validation"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:textColor="@color/cpb_white"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:textSize="18sp"
+                app:cpb_iconComplete="@drawable/ic_action_accept"
+                app:cpb_iconError="@drawable/ic_action_cancel" />
+
+            <com.twohe.morri.tools.AutoResizeTextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center|start"
+                android:maxLines="1"
+                android:layout_alignParentLeft="true"
+                android:paddingRight="@dimen/activity_vertical_margin"
+                android:paddingEnd="@dimen/activity_vertical_margin"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/progressButtonSecurityCheck_validation"
+                android:layout_toLeftOf="@id/progressButtonSecurityCheck_validation"
+                android:layout_centerVertical="true"
+                android:text="Walidacja aplikacji"
+                android:textColor="#000000"
+                android:textSize="25sp" /> <!-- maximum size -->
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="10sp"
+            android:layout_marginTop="10sp"
+            android:background="@android:color/darker_gray" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <com.dd.CircularProgressButton
+                android:id="@+id/progressButtonSecurityCheck_appConfiguration"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:textColor="@color/cpb_white"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:textSize="18sp"
+                app:cpb_iconComplete="@drawable/ic_action_accept"
+                app:cpb_iconError="@drawable/ic_action_cancel" />
+
+            <com.twohe.morri.tools.AutoResizeTextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center|start"
+                android:maxLines="1"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:paddingRight="@dimen/activity_vertical_margin"
+                android:paddingEnd="@dimen/activity_vertical_margin"
+                android:layout_toStartOf="@id/progressButtonSecurityCheck_appConfiguration"
+                android:layout_toLeftOf="@id/progressButtonSecurityCheck_appConfiguration"
+                android:layout_centerVertical="true"
+                android:text="Skonfigurowanie aplikacji"
+                android:textColor="#000000"
+                android:textSize="25sp" /> <!-- maximum size -->
+
+        </RelativeLayout>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10sp">
+
+            <Button
+                android:id="@+id/buttonSecurityCheck_abort"
+                android:layout_width="0sp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:ems="10"
+                android:text="przerwij" />
+
+            <Button
+                android:id="@+id/buttonSecurityCheck_continue"
+                android:layout_width="0sp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:ems="10"
+                android:text="kontynnuj" />
+        </TableRow>
+
+    </LinearLayout>
+
+</ScrollView>

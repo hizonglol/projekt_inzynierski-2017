@@ -1,6 +1,7 @@
 package com.twohe.morri.haszowki;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -23,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -30,6 +33,9 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.twohe.morri.tools.IncomingCallReceiver;
+import com.twohe.morri.tools.InstantAutoComplete;
+import com.twohe.morri.tools.SettingsDataSource;
 
 import java.io.File;
 
@@ -46,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        disableIncomingCallReceiver();
 
         Log.d("On create", "MainActivity");
 
@@ -64,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         editMain_vector = (EditText) findViewById(R.id.editMain_vector);
         viewMain_result = (TextView) findViewById(R.id.viewMain_result);
         buttonMain_compute = (Button) findViewById(R.id.buttonMain_compute);
-        editMain_testID = (EditText) findViewById(R.id.editMain_testID);
+        editMain_testID = (InstantAutoComplete) findViewById(R.id.editMain_testID);
         viewMain_moduloResult = (TextView) findViewById(R.id.editMain_moduloResult);
         editMain_hallRow = (EditText) findViewById(R.id.editMain_hallRow);
         editMain_hallSeat = (EditText) findViewById(R.id.editMain_hallSeat);
@@ -209,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
      * <p>
      * Checks if scanResult is valid. Weights vector cannot be negative.
      * Updates editMain_vector and editMain_testID with received data.
+     * Performs computing if reading successful.
      *
      * @param requestCode The integer request code originally supplied to startActivityForResult(), allowing you to identify who this result came from.
      * @param resultCode  The integer result code returned by the child activity through its setResult().
@@ -235,10 +244,12 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
+                canBeginTestFlag = false;
                 if (editMain_vector != null)
                     editMain_vector.setText(contentsTable[0]);
                 if (editMain_testID != null)
                     editMain_testID.setText(contentsTable[1]);
+                buttonMain_compute.performClick();
             }
         }
     }
@@ -297,6 +308,8 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
+        disableIncomingCallReceiver();
+
         /*
         Reset sharedPrefMain to prevent closing TabsActivity itself
          */
@@ -308,8 +321,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Used to disable IncomingCallReceiver that rejects any incoming calls
+     */
+    private void disableIncomingCallReceiver() {
+        PackageManager pm = MainActivity.this.getPackageManager();
+        ComponentName componentName = new ComponentName(MainActivity.this, IncomingCallReceiver.class);
+        pm.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+        //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń dezaktywowany", Toast.LENGTH_LONG).show();
+    }
+
+    /**
      * Is being used to restore two significant fields in this activity:
      * student number and course name.
+     * <p>
+     * It also creates suggestions for test id by concatenating lowered course name
+     * with numbers from 0 to 10.
+     * TYPE_TEXT_FLAG_AUTO_COMPLETE is used to get rid of autocomplete suggestions
      * <p>
      * To avoid database leakage this method uses it's own SettingsDataSource.
      */
@@ -330,6 +358,35 @@ public class MainActivity extends AppCompatActivity {
 
         if (viewCourse != null)
             viewCourse.setText(stringCourse);
+
+        if (editMain_testID != null && stringCourse.length() > 0) {
+
+            String possibleTests[] = new String[10];
+            String stringCourseFormatted = stringCourse.toLowerCase();
+            stringCourseFormatted = stringCourseFormatted.replace(" ", "");
+
+            for (Integer i = 0; i < 10; ++i) {
+                String onePossibleTestName = stringCourseFormatted.concat(i.toString());
+                possibleTests[i] = onePossibleTestName;
+            }
+
+            ArrayAdapter<String> adapter =
+                    new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, possibleTests);
+            editMain_testID.setAdapter(adapter);
+            editMain_testID.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
+
+            View.OnFocusChangeListener focusListener = new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(hasFocus){
+                        editMain_testID.showDropDown();
+                    }else {
+                        editMain_testID.dismissDropDown();
+                    }
+                }
+            };
+            editMain_testID.setOnFocusChangeListener(focusListener);
+        }
 
         db.close();
     }
@@ -390,7 +447,14 @@ public class MainActivity extends AppCompatActivity {
             int digitsResult[] = new int[6];
 
             String stringStudentNo = databaseMain.getSetting("setting_studentNo");
-            String stringVector = checkTestVector();
+            String stringVector;
+
+            try {
+                stringVector = checkTestVector();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                return;
+            }
 
             if (parseStudentNo(stringStudentNo, digitsStudentNo)) return;
 
@@ -407,16 +471,31 @@ public class MainActivity extends AppCompatActivity {
     };
 
     /**
+     * Checks if test vector is longer than zero.
+     * Checks if test vector is not equal to 0.
+     * If any of upper conditions are true then throws exception and resets fields.
+     * <p>
      * Checks test vector taken from editMain_vector for too short length and fills front of it
      * with zeros until there are 6 digits total.
      * Updates editMain_vector with checked vector if needed.
      *
      * @return string with test vector
      */
-    private String checkTestVector() {
+    private String checkTestVector() throws IllegalArgumentException {
         StringBuilder builderStringVector = new StringBuilder("");
 
         if (editMain_vector != null) {
+            if (editMain_vector.getText().toString().length() == 0) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_vector_number), Toast.LENGTH_SHORT).show();
+                resetResults();
+                throw new IllegalArgumentException(getResources().getString(R.string.message_give_proper_vector_number));
+            }
+            if (Integer.parseInt(editMain_vector.getText().toString()) == 0) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_vector_cant_be_zero), Toast.LENGTH_SHORT).show();
+                resetResults();
+                throw new IllegalArgumentException(getResources().getString(R.string.message_vector_cant_be_zero));
+            }
+
             builderStringVector.append(editMain_vector.getText().toString());
 
             if (builderStringVector.length() != 6) {
@@ -563,6 +642,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Used to reset fields:
+     * viewMain_result
+     * viewMain_moduloResult
+     */
+    private void resetResults() {
+        viewMain_result.setText("");
+        viewMain_moduloResult.setText("");
+    }
+
+    /**
      * Callback for clicking buttonMain_startTest.
      * <p>
      * Checks if app has been granted permission to write to external storage.
@@ -595,8 +684,8 @@ public class MainActivity extends AppCompatActivity {
             if (!isTelephonyPermissionGranted())
                 return;
 
-            Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
-            startActivity(intentTabs);
+            Intent intentSecurityCheck = new Intent(getApplicationContext(), SecurityCheckActivity.class);
+            startActivity(intentSecurityCheck);
         }
     };
 
@@ -614,27 +703,72 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Checks if row and seat is higher than 0.
+     * If it is then it proceeds.
+     *
+     * Checks if row and seat equal 0 or <-1.
+     * If it is then it stops operation.
+     *
+     * Checks if row and seat is equal -1.
+     * If it is then it informs that student is beggining test without
+     * giving row and seat.
+     *
+     * Checks if row == -1 with seat != -1 or row != -1 with seat == -1.
+     * If it is true then stops operation.
+     *
      * Checks if testId contains at least one character.
      * Checks if course name contains at least two characters.
      *
      * @return false if checks are passed, true if any check has been failed
      */
     private boolean checkEditableValues() {
+        int hallRow = 0;
+        int hallSeat = 0;
 
         if (editMain_hallRow != null) {
-            if (Integer.parseInt(editMain_hallRow.getText().toString()) < 1) {
-                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_row_higher_than_0), Toast.LENGTH_SHORT).show();
+            try {
+                hallRow = Integer.parseInt(editMain_hallRow.getText().toString());
+                if (hallRow > 0) {
+                    databaseMain.createSetting("setting_hall_row", editMain_hallRow.getText().toString());
+                } else if (hallRow == 0) {
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_invalid_row), Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (hallRow < -1) {
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_invalid_row), Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_row), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
                 return true;
             }
-            databaseMain.createSetting("setting_hall_row", editMain_hallRow.getText().toString());
         }
 
         if (editMain_hallSeat != null) {
-            if (Integer.parseInt(editMain_hallSeat.getText().toString()) < 1) {
-                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_seat_higher_than_0), Toast.LENGTH_SHORT).show();
+            try {
+                hallSeat = Integer.parseInt(editMain_hallSeat.getText().toString());
+                if (hallSeat > 0) {
+                    databaseMain.createSetting("setting_hall_seat", editMain_hallSeat.getText().toString());
+                } else if (hallSeat == 0) {
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_invalid_seat), Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (hallSeat < -1) {
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_invalid_seat), Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_seat), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
                 return true;
             }
+        }
+
+        if (hallRow == -1 && hallSeat == -1) {
+            Toast.makeText(getBaseContext(), getResources().getString(R.string.message_going_to_test_without_position), Toast.LENGTH_SHORT).show();
+            databaseMain.createSetting("setting_hall_row", editMain_hallRow.getText().toString());
             databaseMain.createSetting("setting_hall_seat", editMain_hallSeat.getText().toString());
+        } else if (hallRow == -1 && hallSeat != -1 || hallRow != -1 && hallSeat == -1) {
+            Toast.makeText(getBaseContext(), getResources().getString(R.string.message_invalid_row_and_seat), Toast.LENGTH_SHORT).show();
+            return true;
         }
 
         if (editMain_testID != null) {
@@ -719,7 +853,7 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonMain_startTest;
     private Button buttonMain_exitApp;
     private Button buttonMain_scanQR;
-    private EditText editMain_testID;
+    private InstantAutoComplete editMain_testID;
     private EditText editMain_vector;
     private TextView viewMain_result;
     private Button buttonMain_compute;

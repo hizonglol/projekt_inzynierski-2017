@@ -1,9 +1,11 @@
-package com.twohe.morri.haszowki;
+package com.twohe.morri.tools;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 
 import com.android.internal.telephony.ITelephony;
@@ -17,10 +19,10 @@ import java.lang.reflect.Method;
  */
 
 public class IncomingCallReceiver extends BroadcastReceiver {
-    private ITelephony ITelephonyICR;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        SharedPreferences sharedPrefICR = PreferenceManager.getDefaultSharedPreferences(context);
 
         TelephonyManager telephonyManagerICR = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         try {
@@ -35,6 +37,13 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                 telephonyService.silenceRinger();
                 telephonyService.endCall();
                 //Log.e("HANG UP", phoneNumber);
+
+                /*
+                SharedPreferences.Editor editor = sharedPrefICR.edit();
+                editor.putBoolean("Call handled", true);
+                editor.putBoolean("Call handle changed", true);
+                editor.apply();
+                */
             }
 
         } catch (Exception e) {

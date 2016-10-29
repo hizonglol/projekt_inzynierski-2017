@@ -1,4 +1,4 @@
-package com.twohe.morri.haszowki;
+package com.twohe.morri.tools;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,7 +6,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
+
+import com.twohe.morri.tools.DBHelper;
 
 /**
  * Created by morri on 23.08.2016.

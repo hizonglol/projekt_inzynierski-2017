@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -33,6 +34,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.twohe.morri.tools.IncomingCallReceiver;
+import com.twohe.morri.tools.SettingsDataSource;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -110,23 +114,46 @@ public class TabsActivity extends AppCompatActivity {
         StringBuilder buildCrypto = new StringBuilder(cryptoPass);
         buildCrypto.replace(3, 4, "+");
         cryptoPass = buildCrypto.toString();
-        Log.d("crypto", cryptoPass);
 
         addTab();
+
+        //enableIncomingCallReceiver();
+    }
+
+    /**
+     * Used to enable IncomingCallReceiver that rejects any incoming calls
+     */
+    private void enableIncomingCallReceiver(){
+        PackageManager pm  = TabsActivity.this.getPackageManager();
+        ComponentName componentName = new ComponentName(TabsActivity.this, IncomingCallReceiver.class);
+        pm.setComponentEnabledSetting(componentName,PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+        //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń aktywowany", Toast.LENGTH_LONG).show();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
+        enableIncomingCallReceiver();
+
         Boolean endTest = sharedPrefTabs.getBoolean("End test", false);
 
         if (endTest)
             TabsActivity.this.finish();
+        else if (wasInBackgroundTabs) {
 
+            if (sharedPrefTabs.getBoolean("Call handled", false) || sharedPrefTabs.getBoolean("Call handle changed", false)) {
+                wasInBackgroundTabs = false;
 
-        if (wasInBackgroundTabs) {
-            new AlertDialog.Builder(this)
+                SharedPreferences.Editor editor = sharedPrefTabs.edit();
+                editor.putBoolean("Call handled", false);
+                editor.putBoolean("Call handle changed", false);
+                editor.apply();
+                return;
+            }
+
+            alertDialog = new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle(getResources().getString(R.string.message_you_quit_test))
                     .setMessage(getResources().getString(R.string.message_test_ended))
@@ -155,6 +182,24 @@ public class TabsActivity extends AppCompatActivity {
                 .show();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        disableIncomingCallReceiver();
+    }
+
+    /**
+     * Used to disable IncomingCallReceiver that rejects any incoming calls
+     */
+    private void disableIncomingCallReceiver() {
+        PackageManager pm = TabsActivity.this.getPackageManager();
+        ComponentName componentName = new ComponentName(TabsActivity.this, IncomingCallReceiver.class);
+        pm.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+        //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń dezaktywowany", Toast.LENGTH_LONG).show();
+    }
+
     public void addTab() {
         SectionsPagerAdapterTabs.addFragment();
     }
@@ -175,7 +220,6 @@ public class TabsActivity extends AppCompatActivity {
         StringBuilder buildCryptoNano = new StringBuilder(cryptoPass);
         buildCryptoNano.replace(13, 15, "78");
         cryptoPass = buildCryptoNano.toString();
-        Log.d("crypto", cryptoPass);
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss", Locale.getDefault());
         Date now = new Date();
@@ -211,7 +255,6 @@ public class TabsActivity extends AppCompatActivity {
         StringBuilder buildCrypto = new StringBuilder(cryptoPass);
         buildCrypto.replace(8, 9, "#");
         cryptoPass = buildCrypto.toString();
-        Log.d("crypto", cryptoPass);
 
         return true;
     }
@@ -502,8 +545,8 @@ public class TabsActivity extends AppCompatActivity {
          */
         private String createDataURL(String mode, String answer) {
 
-            SettingsDataSource db = new SettingsDataSource(getActivity());
-            db.open();
+            SettingsDataSource databaseCreateDataURL = new SettingsDataSource(getActivity());
+            databaseCreateDataURL.open();
 
             StringBuilder sbServerQuery = new StringBuilder();
             String divider = "&";
@@ -514,21 +557,26 @@ public class TabsActivity extends AppCompatActivity {
             String stringTimestamp = formatter.format(timestamp);
 
             if (mode.equals("to_server")) {
-                String stringServerUrl = "http://www.zpcir.ict.pwr.wroc.pl/~witold/empty.html";
+                String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
+                String stringServerUrl = getResources().getString(R.string.server_address);
+                if (stringDbServerUrl.length() > 1){
+                    stringServerUrl = stringDbServerUrl;
+                }
+                stringServerUrl = stringServerUrl.concat("empty.html");
                 sbServerQuery.append(stringServerUrl).append("?");
             }
 
-            String studentNo = db.getSetting("setting_studentNo");
-            String course = db.getSetting("setting_course");
-            String testId = db.getSetting("setting_test_id");
-            String hall_row = db.getSetting("setting_hall_row");
-            String hall_seat = db.getSetting("setting_hall_seat");
-            String name = db.getSetting("setting_name");
-            String surname = db.getSetting("setting_surname");
-            String vector = db.getSetting("setting_vector");
-            String group = db.getSetting("setting_group");
+            String studentNo = databaseCreateDataURL.getSetting("setting_studentNo");
+            String course = databaseCreateDataURL.getSetting("setting_course");
+            String testId = databaseCreateDataURL.getSetting("setting_test_id");
+            String hall_row = databaseCreateDataURL.getSetting("setting_hall_row");
+            String hall_seat = databaseCreateDataURL.getSetting("setting_hall_seat");
+            String name = databaseCreateDataURL.getSetting("setting_name");
+            String surname = databaseCreateDataURL.getSetting("setting_surname");
+            String vector = databaseCreateDataURL.getSetting("setting_vector");
+            String group = databaseCreateDataURL.getSetting("setting_group");
             String question_no = String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER));
-            String sessionID = db.getSetting("setting_sessionID");
+            String sessionID = databaseCreateDataURL.getSetting("setting_sessionID");
 
             sbServerQuery.append("student_no=").append(studentNo).append(divider);
             sbServerQuery.append("course=").append(course).append(divider);
@@ -550,13 +598,15 @@ public class TabsActivity extends AppCompatActivity {
 
             Log.d("Sent uri", sentUrl);
 
-            db.close();
+            databaseCreateDataURL.close();
 
             return sentUrl;
         }
 
         /**
-         * Sets choosen button's background from corresponding view to gray.
+         * Sets choosen button's background from corresponding view to gray
+         * and makes letters on gray button white.
+         * Resets other button's texts to black.
          *
          * @param rootView Root view of corresponding tab.
          * @param arg      Choosen answer
@@ -574,20 +624,29 @@ public class TabsActivity extends AppCompatActivity {
 
             if (arg == 1) {
                 buttonYes.setBackgroundColor(Color.DKGRAY);
+                buttonYes.setTextColor(Color.WHITE);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setTextColor(Color.BLACK);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setTextColor(Color.BLACK);
                 getArguments().putInt(ARG_SECTION_ANSWER_FILE, 1);
                 ((TabsActivity) getActivity()).tabs_fileYesAnswers++;
             } else if (arg == 2) {
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonYes.setTextColor(Color.BLACK);
                 buttonNo.setBackgroundColor(Color.DKGRAY);
+                buttonNo.setTextColor(Color.WHITE);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
+                buttonDunno.setTextColor(Color.BLACK);
                 getArguments().putInt(ARG_SECTION_ANSWER_FILE, 2);
                 ((TabsActivity) getActivity()).tabs_fileNoAnswers++;
             } else if (arg == 3) {
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
+                buttonYes.setTextColor(Color.BLACK);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
+                buttonNo.setTextColor(Color.BLACK);
                 buttonDunno.setBackgroundColor(Color.DKGRAY);
+                buttonDunno.setTextColor(Color.WHITE);
                 getArguments().putInt(ARG_SECTION_ANSWER_FILE, 3);
                 ((TabsActivity) getActivity()).tabs_fileDunnoAnswers++;
             } else if (arg == 0) {
@@ -599,7 +658,8 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         /**
-         * Sets choosen button's background from corresponding view to blue.
+         * Sets choosen button's background from corresponding view to blue
+         * and sets button's text to black.
          *
          * @param rootView Root view of corresponding tab.
          * @param arg      Choosen answer
@@ -615,21 +675,24 @@ public class TabsActivity extends AppCompatActivity {
             else if (last_answer == 3) ((TabsActivity) getActivity()).tabs_serverDunnoAnswers--;
 
             if (arg == 1) {
-                buttonYes.setBackgroundColor(Color.BLUE);
+                buttonYes.setBackgroundColor(Color.parseColor("#819FF7"));
+                buttonYes.setTextColor(Color.BLACK);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
                 getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 1);
                 ((TabsActivity) getActivity()).tabs_serverYesAnswers++;
             } else if (arg == 2) {
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
-                buttonNo.setBackgroundColor(Color.BLUE);
+                buttonNo.setBackgroundColor(Color.parseColor("#819FF7"));
+                buttonNo.setTextColor(Color.BLACK);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
                 getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 2);
                 ((TabsActivity) getActivity()).tabs_serverNoAnswers++;
             } else if (arg == 3) {
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
-                buttonDunno.setBackgroundColor(Color.BLUE);
+                buttonDunno.setBackgroundColor(Color.parseColor("#819FF7"));
+                buttonDunno.setTextColor(Color.BLACK);
                 getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 3);
                 ((TabsActivity) getActivity()).tabs_serverDunnoAnswers++;
             } else if (arg == 0) {
@@ -669,6 +732,7 @@ public class TabsActivity extends AppCompatActivity {
              */
             @Override
             protected void onPostExecute(String result) {
+                Log.d(serverResponseCode.toString(), serverResponse);
                 if (result.equals("200")) {
                     setGivenAnswerBlue(rootView, answerNo);
                     getArguments().putInt(ARG_SECTION_ANSWER_SERVER, answerNo);
@@ -727,7 +791,7 @@ public class TabsActivity extends AppCompatActivity {
                     if (is != null) {
                         is.close();
                     }
-                } catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -843,8 +907,10 @@ public class TabsActivity extends AppCompatActivity {
         public void run() {
             try {
                 Thread.sleep(3500);
+                alertDialog.dismiss();
                 TabsActivity.this.finish();
             } catch (Exception e) {
+                alertDialog.dismiss();
                 e.printStackTrace();
             }
         }
@@ -868,6 +934,14 @@ public class TabsActivity extends AppCompatActivity {
             if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
 
                 wasInBackgroundTabs = true;
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        disableIncomingCallReceiver();
+                    }
+                }, 1500);
             }
             // you might as well implement some memory cleanup here and be a nice Android dev.
         }
@@ -879,6 +953,7 @@ public class TabsActivity extends AppCompatActivity {
     private SharedPreferences sharedPrefTabs;
     private SectionsPagerAdapter SectionsPagerAdapterTabs;
     private ViewPager ViewPagerTabs;
+    private AlertDialog alertDialog;
 
     int guestionsAmount = 1;
     int tabs_fileYesAnswers = 0;

@@ -1,4 +1,4 @@
-package com.twohe.morri.haszowki;
+package com.twohe.morri.tools;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
