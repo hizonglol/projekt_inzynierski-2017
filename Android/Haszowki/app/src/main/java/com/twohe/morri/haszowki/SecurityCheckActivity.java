@@ -17,9 +17,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.safetynet.SafetyNet;
 import com.twohe.morri.tools.SettingsDataSource;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * This activity is being used to check application
@@ -29,7 +33,6 @@ public class SecurityCheckActivity extends AppCompatActivity
         GoogleApiClient.OnConnectionFailedListener {
 
     /**
-     *
      * @param savedInstanceState
      */
     @Override
@@ -50,8 +53,8 @@ public class SecurityCheckActivity extends AppCompatActivity
 
         initializeSpinning();
 
-        serverCheckTaskSecurityCheck = new serverCheckTask();
-        serverCheckTaskSecurityCheck.execute();
+        serverCheckTask = new serverConnectionCheckTask();
+        serverCheckTask.execute();
 
         progressButtonSecurityCheck_validation.setProgress(0);
         progressButtonSecurityCheck_appConfiguration.setProgress(0);
@@ -63,8 +66,7 @@ public class SecurityCheckActivity extends AppCompatActivity
                     Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
                     startActivity(intentTabs);
                     finish();
-                }
-                else
+                } else
                     retryChecks();
 
             }
@@ -79,11 +81,11 @@ public class SecurityCheckActivity extends AppCompatActivity
 
     }
 
-    private void retryChecks(){
-        if (!serverConnectionSuccessful){
+    private void retryChecks() {
+        if (!serverConnectionSuccessful) {
             restartSpinning(progressButtonSecurityCheck_serverConnection);
-            serverCheckTaskSecurityCheck = new serverCheckTask();
-            serverCheckTaskSecurityCheck.execute();
+            serverCheckTask = new serverConnectionCheckTask();
+            serverCheckTask.execute();
         }
     }
 
@@ -97,7 +99,6 @@ public class SecurityCheckActivity extends AppCompatActivity
     }
 
     /**
-     *
      * @param result
      */
     @Override
@@ -177,7 +178,7 @@ public class SecurityCheckActivity extends AppCompatActivity
     /**
      * Being used to run server reachability check.
      */
-    private class serverCheckTask extends AsyncTask<String, String, String> {
+    private class serverConnectionCheckTask extends AsyncTask<String, String, String> {
 
         /**
          * Used to launch server reachability.
@@ -190,7 +191,7 @@ public class SecurityCheckActivity extends AppCompatActivity
 
             String stringDbServerUrl = databaseSecurityCheck.getSetting("setting_serverAddress");
             String stringServerUrl = getResources().getString(R.string.server_address);
-            if (stringDbServerUrl.length() > 1){
+            if (stringDbServerUrl.length() > 1) {
                 stringServerUrl = stringDbServerUrl;
             }
 
@@ -207,12 +208,11 @@ public class SecurityCheckActivity extends AppCompatActivity
          */
         @Override
         protected void onPostExecute(String result) {
-            if(result.equals("success")) {
+            if (result.equals("success")) {
                 spinnerSuccessful(progressButtonSecurityCheck_serverConnection);
                 buttonSecurityCheck_continue.setText("Kontynuuj");
                 serverConnectionSuccessful = true;
-            }
-            else if (result.equals("failure")) {
+            } else if (result.equals("failure")) {
                 spinnerUnsuccessful(progressButtonSecurityCheck_serverConnection);
                 buttonSecurityCheck_continue.setText("Spróbuj ponownie");
                 serverConnectionSuccessful = false;
@@ -223,7 +223,7 @@ public class SecurityCheckActivity extends AppCompatActivity
     /**
      * Checks if server with given serverAddress is reachable
      *
-     * @param context of application
+     * @param context       of application
      * @param serverAddress address of checked server
      * @return
      */
@@ -251,12 +251,112 @@ public class SecurityCheckActivity extends AppCompatActivity
         return isReachable;
     }
 
+    private class appConfigurationTask extends AsyncTask<String, String, String> {
+
+        /**
+         * Used to download configuration data from server.
+         *
+         * @param urls execution parameters
+         * @return success if successful, failure if unsuccessful
+         */
+        @Override
+        protected String doInBackground(String... urls) {
+
+            String stringDbServerUrl = databaseSecurityCheck.getSetting("setting_serverAddress");
+            String stringServerUrl = getResources().getString(R.string.server_address);
+            if (stringDbServerUrl.length() > 1) {
+                stringServerUrl = stringDbServerUrl;
+            }
+            stringServerUrl = stringServerUrl
+                    .concat(databaseSecurityCheck.getSetting("setting_course"))
+                    .concat("/")
+                    .concat(databaseSecurityCheck.getSetting("setting_test_id"))
+                    .concat(".xml");
+
+            if (downloadedConfiguration(getApplicationContext(), stringServerUrl))
+                return "success";
+            else
+                return "failure";
+        }
+
+        /**
+         * Handles result of doInBackground
+         *
+         * @param result of check
+         */
+        @Override
+        protected void onPostExecute(String result) {
+            if (result.equals("success")) {
+                spinnerSuccessful(progressButtonSecurityCheck_appConfiguration);
+                buttonSecurityCheck_continue.setText("Kontynuuj");
+                appConfigurationSuccessful = true;
+            } else if (result.equals("failure")) {
+                spinnerUnsuccessful(progressButtonSecurityCheck_appConfiguration);
+                buttonSecurityCheck_continue.setText("Spróbuj ponownie");
+                appConfigurationSuccessful = false;
+            }
+        }
+    }
+
+    /**
+     * Downloads configuration file from server
+     *
+     * @param context               of application
+     * @param serverDocumentAddress address of configuration file
+     * @return
+     */
+    public static boolean downloadedConfiguration(Context context, String serverDocumentAddress) {
+        // First, check we have any sort of connectivity
+        final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
+        boolean downloadedConfiguration = false;
+
+        if (netInfo != null && netInfo.isConnected()) {
+            // Some sort of connection is open, check if server is reachable
+            try {
+                URL url = new URL(serverDocumentAddress);
+                URLConnection conn = url.openConnection();
+
+                XmlPullParserFactory xmlFactoryObject = XmlPullParserFactory.newInstance();
+                XmlPullParser configurationParser = xmlFactoryObject.newPullParser();
+                configurationParser.setInput(conn.getInputStream(), null);
+
+                int event = configurationParser.getEventType();
+                while (event != XmlPullParser.END_DOCUMENT)
+                {
+                    String name=configurationParser.getName();
+                    switch (event){
+                        case XmlPullParser.START_TAG:
+                            break;
+
+                        case XmlPullParser.END_TAG:
+                            if(name.equals("version")){
+                                minAppVersion = configurationParser.getAttributeValue(null,"min");
+                                maxAppVersion = configurationParser.getAttributeValue(null,"max");
+                            }
+                            else if(name.equals("key")){
+                                cipheringKey = configurationParser.getAttributeValue(null,"aes");
+                            }
+                            break;
+                    }
+                    event = configurationParser.next();
+                }
+
+                downloadedConfiguration = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return downloadedConfiguration;
+    }
+
     private CircularProgressButton progressButtonSecurityCheck_validation;
     private CircularProgressButton progressButtonSecurityCheck_serverConnection;
     private CircularProgressButton progressButtonSecurityCheck_appConfiguration;
     private Button buttonSecurityCheck_continue;
     private Button buttonSecurityCheck_abort;
-    private serverCheckTask serverCheckTaskSecurityCheck;
+    private serverConnectionCheckTask serverCheckTask;
     private SettingsDataSource databaseSecurityCheck;
 
     /*
@@ -280,4 +380,10 @@ public class SecurityCheckActivity extends AppCompatActivity
     private static final int RC_SIGN_IN = 0;
     /* Client used to interact with Google APIs. */
     private GoogleApiClient mGoogleApiClient;
+
+    static String minAppVersion;
+
+    static String maxAppVersion;
+
+    static String cipheringKey;
 }
