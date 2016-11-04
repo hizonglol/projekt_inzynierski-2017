@@ -378,9 +378,9 @@ public class MainActivity extends AppCompatActivity {
             View.OnFocusChangeListener focusListener = new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
-                    if(hasFocus){
+                    if (hasFocus) {
                         editMain_testID.showDropDown();
-                    }else {
+                    } else {
                         editMain_testID.dismissDropDown();
                     }
                 }
@@ -704,17 +704,17 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Checks if row and seat is higher than 0.
      * If it is then it proceeds.
-     *
+     * <p>
      * Checks if row and seat equal 0 or <-1.
      * If it is then it stops operation.
-     *
+     * <p>
      * Checks if row and seat is equal -1.
      * If it is then it informs that student is beggining test without
      * giving row and seat.
-     *
+     * <p>
      * Checks if row == -1 with seat != -1 or row != -1 with seat == -1.
      * If it is true then stops operation.
-     *
+     * <p>
      * Checks if testId contains at least one character.
      * Checks if course name contains at least two characters.
      *
@@ -784,6 +784,19 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(), getResources().getString(R.string.message_type_course_name), Toast.LENGTH_SHORT).show();
                 return true;
             }
+        }
+
+        try {
+            if (editMain_vector != null) {
+                if (Integer.parseInt(editMain_vector.getText().toString()) == 0) {
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.message_vector_cant_be_zero), Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            Toast.makeText(getBaseContext(), getResources().getString(R.string.message_give_proper_vector_number), Toast.LENGTH_SHORT).show();
+            return true;
         }
 
         return false;

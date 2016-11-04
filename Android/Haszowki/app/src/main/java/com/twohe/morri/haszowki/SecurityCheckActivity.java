@@ -1,6 +1,7 @@
 package com.twohe.morri.haszowki;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -9,11 +10,12 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
 import com.google.android.gms.common.ConnectionResult;
@@ -69,13 +71,6 @@ public class SecurityCheckActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 if (serverConnectionSuccessful && appConfigurationSuccessful) {
-
-                    //przerzucić to do spinnera. Zanegować go jeśli wersja nie zadziała
-                    if (!minAppVersion.equals(getResources().getString(R.string.version_value)) &&
-                            !maxAppVersion.equals(getResources().getString(R.string.version_value))) {
-                        Toast.makeText(getApplicationContext(), "Niewłaściwa wersja aplikacji!", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
 
                     SharedPreferences.Editor editor = sharedPrefSecurity.edit();
                     Log.d("Przekazany klucz", cipheringKey);
@@ -319,9 +314,28 @@ public class SecurityCheckActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(String result) {
             if (result.equals("success")) {
-                spinnerSuccessful(progressButtonSecurityCheck_appConfiguration);
-                buttonSecurityCheck_continue.setText("Kontynuuj");
-                appConfigurationSuccessful = true;
+                if (isAppVersionAcceptable(minAppVersion, maxAppVersion)) {
+                    spinnerSuccessful(progressButtonSecurityCheck_appConfiguration);
+                    buttonSecurityCheck_continue.setText("Kontynuuj");
+                    appConfigurationSuccessful = true;
+                } else {
+                    spinnerUnsuccessful(progressButtonSecurityCheck_appConfiguration);
+                    buttonSecurityCheck_continue.setText("Spróbuj ponownie");
+                    appConfigurationSuccessful = false;
+
+                    String announcement = "Nieprawidłowa wersja!";
+                    announcement = announcement.concat(" Twoja wersja aplikacji to: ")
+                            .concat(getResources().getString(R.string.version_value)).concat("!")
+                            .concat(" Wymagana wersja wyższa od ").concat(minAppVersion)
+                            .concat(" oraz niższa od ").concat(maxAppVersion).concat("!");
+
+                    new AlertDialog.Builder(SecurityCheckActivity.this)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("Uwaga")
+                            .setMessage(announcement)
+                            .setPositiveButton("Ok", null)
+                            .show();
+                }
             } else if (result.equals("failure")) {
                 spinnerUnsuccessful(progressButtonSecurityCheck_appConfiguration);
                 buttonSecurityCheck_continue.setText("Spróbuj ponownie");
@@ -379,6 +393,65 @@ public class SecurityCheckActivity extends AppCompatActivity
         }
 
         return downloadedConfiguration;
+    }
+
+
+    private boolean isAppVersionAcceptable(String minVersion, String maxVersion) {
+
+        String appVersion = getResources().getString(R.string.version_value);
+
+        int[] minIntVersion = new int[3];
+        int[] maxIntVersion = new int[3];
+        int[] intAppVersion = new int[3];
+
+        for (int i = 0; i < 3; ++i) {
+            minIntVersion[i] = Integer.valueOf(minVersion.split("\\.")[i]);
+            maxIntVersion[i] = Integer.valueOf(maxVersion.split("\\.")[i]);
+            intAppVersion[i] = Integer.valueOf(appVersion.split("\\.")[i]);
+        }
+
+
+        if (intAppVersion[0] < minIntVersion[0] || intAppVersion[0] > maxIntVersion[0])
+            return false;
+
+        else if (intAppVersion[0] > minIntVersion[0] && intAppVersion[0] < maxIntVersion[0])
+            return true;
+
+        else if (intAppVersion[0] == minIntVersion[0] && intAppVersion[0] < maxIntVersion[0]) {
+            if (intAppVersion[1] < minIntVersion[1])
+                return false;
+            else if (intAppVersion[1] > minIntVersion[1])
+                return true;
+            else if (intAppVersion[1] == minIntVersion[1]) {
+                if (intAppVersion[2] < minIntVersion[2])
+                    return false;
+                else if (intAppVersion[2] >= minIntVersion[2])
+                    return true;
+            }
+        } else if (intAppVersion[0] == minIntVersion[0] && intAppVersion[0] == maxIntVersion[0]) {
+
+            if (intAppVersion[1] < minIntVersion[1] || intAppVersion[1] > maxIntVersion[1])
+                return false;
+
+            else if (intAppVersion[1] > minIntVersion[1] && intAppVersion[1] < maxIntVersion[1])
+                return true;
+
+            else if (intAppVersion[1] == minIntVersion[1] && intAppVersion[1] < maxIntVersion[1]) {
+                if (intAppVersion[2] < minIntVersion[2])
+                    return false;
+                else if (intAppVersion[2] >= minIntVersion[2])
+                    return true;
+            } else if (intAppVersion[1] == minIntVersion[1] && intAppVersion[1] == maxIntVersion[1]) {
+
+                if (intAppVersion[2] < minIntVersion[2] || intAppVersion[2] > maxIntVersion[2])
+                    return false;
+
+                else if (intAppVersion[2] >= minIntVersion[2] && intAppVersion[2] <= maxIntVersion[2])
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     private CircularProgressButton progressButtonSecurityCheck_validation;
