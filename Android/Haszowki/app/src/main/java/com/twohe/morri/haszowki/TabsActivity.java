@@ -79,6 +79,9 @@ public class TabsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tabs);
 
         sharedPrefTabs = PreferenceManager.getDefaultSharedPreferences(this);
+        cipheringKey = sharedPrefTabs.getString("Key", "");
+        Log.d("Otrzymany klucz", cipheringKey);
+
         threadKillerTabs = new threadKiller();
 
         MemoryBoss mMemoryBoss;
@@ -965,4 +968,5 @@ public class TabsActivity extends AppCompatActivity {
     private String stringTabs_sessionID;
     private File fileTabs_toWrite;
     private static String cryptoPass = "tabs_layout_parameters";
+    private static String cipheringKey;
 }

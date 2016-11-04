@@ -3,13 +3,17 @@ package com.twohe.morri.haszowki;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
 import com.google.android.gms.common.ConnectionResult;
@@ -40,6 +44,7 @@ public class SecurityCheckActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_security_check);
 
+        sharedPrefSecurity = PreferenceManager.getDefaultSharedPreferences(this);
         databaseSecurityCheck = new SettingsDataSource(this);
         databaseSecurityCheck.open();
 
@@ -55,14 +60,28 @@ public class SecurityCheckActivity extends AppCompatActivity
 
         serverCheckTask = new serverConnectionCheckTask();
         serverCheckTask.execute();
+        configurationTask = new appConfigurationTask();
+        configurationTask.execute();
 
         progressButtonSecurityCheck_validation.setProgress(0);
-        progressButtonSecurityCheck_appConfiguration.setProgress(0);
 
         buttonSecurityCheck_continue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (serverConnectionSuccessful) {
+                if (serverConnectionSuccessful && appConfigurationSuccessful) {
+
+                    //przerzucić to do spinnera. Zanegować go jeśli wersja nie zadziała
+                    if (!minAppVersion.equals(getResources().getString(R.string.version_value)) &&
+                            !maxAppVersion.equals(getResources().getString(R.string.version_value))) {
+                        Toast.makeText(getApplicationContext(), "Niewłaściwa wersja aplikacji!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    SharedPreferences.Editor editor = sharedPrefSecurity.edit();
+                    Log.d("Przekazany klucz", cipheringKey);
+                    editor.putString("Key", cipheringKey);
+                    editor.apply();
+
                     Intent intentTabs = new Intent(getApplicationContext(), TabsActivity.class);
                     startActivity(intentTabs);
                     finish();
@@ -86,6 +105,12 @@ public class SecurityCheckActivity extends AppCompatActivity
             restartSpinning(progressButtonSecurityCheck_serverConnection);
             serverCheckTask = new serverConnectionCheckTask();
             serverCheckTask.execute();
+        }
+
+        if (!appConfigurationSuccessful) {
+            restartSpinning(progressButtonSecurityCheck_appConfiguration);
+            configurationTask = new appConfigurationTask();
+            configurationTask.execute();
         }
     }
 
@@ -271,7 +296,10 @@ public class SecurityCheckActivity extends AppCompatActivity
                     .concat(databaseSecurityCheck.getSetting("setting_course"))
                     .concat("/")
                     .concat(databaseSecurityCheck.getSetting("setting_test_id"))
-                    .concat(".xml");
+                    .concat(".xml").toLowerCase();
+            stringServerUrl = stringServerUrl.replace(" ", "");
+
+            Log.d("Adres z xml", stringDbServerUrl);
 
             if (downloadedConfiguration(getApplicationContext(), stringServerUrl))
                 return "success";
@@ -280,7 +308,11 @@ public class SecurityCheckActivity extends AppCompatActivity
         }
 
         /**
-         * Handles result of doInBackground
+         * Handles result of doInBackground.
+         * Checks what was the result of configuration.
+         * If it was successful then notifies about it and changes buttonSecurityCheck_continue
+         * text to appropriate one.
+         * If it was unsuccessful then
          *
          * @param result of check
          */
@@ -322,20 +354,18 @@ public class SecurityCheckActivity extends AppCompatActivity
                 configurationParser.setInput(conn.getInputStream(), null);
 
                 int event = configurationParser.getEventType();
-                while (event != XmlPullParser.END_DOCUMENT)
-                {
-                    String name=configurationParser.getName();
-                    switch (event){
+                while (event != XmlPullParser.END_DOCUMENT) {
+                    String name = configurationParser.getName();
+                    switch (event) {
                         case XmlPullParser.START_TAG:
                             break;
 
                         case XmlPullParser.END_TAG:
-                            if(name.equals("version")){
-                                minAppVersion = configurationParser.getAttributeValue(null,"min");
-                                maxAppVersion = configurationParser.getAttributeValue(null,"max");
-                            }
-                            else if(name.equals("key")){
-                                cipheringKey = configurationParser.getAttributeValue(null,"aes");
+                            if (name.equals("version")) {
+                                minAppVersion = configurationParser.getAttributeValue(null, "min");
+                                maxAppVersion = configurationParser.getAttributeValue(null, "max");
+                            } else if (name.equals("key")) {
+                                cipheringKey = configurationParser.getAttributeValue(null, "aes");
                             }
                             break;
                     }
@@ -357,6 +387,7 @@ public class SecurityCheckActivity extends AppCompatActivity
     private Button buttonSecurityCheck_continue;
     private Button buttonSecurityCheck_abort;
     private serverConnectionCheckTask serverCheckTask;
+    private appConfigurationTask configurationTask;
     private SettingsDataSource databaseSecurityCheck;
 
     /*
@@ -386,4 +417,6 @@ public class SecurityCheckActivity extends AppCompatActivity
     static String maxAppVersion;
 
     static String cipheringKey;
+
+    private SharedPreferences sharedPrefSecurity;
 }

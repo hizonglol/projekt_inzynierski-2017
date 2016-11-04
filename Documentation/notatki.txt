@@ -1,0 +1,10 @@
+- zawrzeæ w changes zawieszanie rozmów
+- przerzuciæ siê na lepsze szyfrowanie
+- 10 razy sprawdziæ po³¹czenie z serwerem i je¿eli jest s³abo to nie kontynuujemy
+- kompresja odpowiedzi
+- 0 w wektorze wag przed wciœnieciem "wylicz grupê". Nie mo¿e pozwoliæ przejœæ do testu. Wymusiæ wyliczenie grupy
+
+Serwer:
+Jak pisaæ, ¿eby zapisy by³y bezpieczne i bez ci¹g³ego otwierania i zamykania.
+
+Przes³aæ do promotora skompilowan¹ aplikacjê.
