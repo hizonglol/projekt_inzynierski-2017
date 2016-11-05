@@ -16,9 +16,9 @@ import java.util.List;
 
 public class Decrypter {
 
-    private static String VERSION_NUMBER = "0.6.5";
-    private static String cryptoPass = "tab+_lay#ut_p78ameters";
-
+    private static String VERSION_NUMBER = "0.7.3";
+    private static String cryptoPass = "my simple aes key";
+	
     /*
     private static List<String> argsList = new ArrayList<>();
     private static List<Option> optsList = new ArrayList<>();
@@ -32,9 +32,15 @@ public class Decrypter {
     private static String outputFileName = "";
 
     private static String decryptIt(String text) {
+		
+		StringBuilder buildCrypto = new StringBuilder(cryptoPass);
+		buildCrypto.replace(8, 9, "#");
+		buildCryptoNano.replace(13, 15, "78");
+		buildCrypto.replace(3, 4, "+");
+		enrichedCryptoPass = buildCrypto.toString();
 
         try {
-            DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
+            DESKeySpec keySpec = new DESKeySpec(enrichedCryptoPass.getBytes("UTF8"));
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
             SecretKey key = keyFactory.generateSecret(keySpec);
 

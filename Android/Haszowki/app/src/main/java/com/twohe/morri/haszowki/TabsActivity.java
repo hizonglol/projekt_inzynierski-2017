@@ -79,8 +79,7 @@ public class TabsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tabs);
 
         sharedPrefTabs = PreferenceManager.getDefaultSharedPreferences(this);
-        cipheringKey = sharedPrefTabs.getString("Key", "");
-        Log.d("Otrzymany klucz", cipheringKey);
+        cryptoPass = sharedPrefTabs.getString("Key", "");
 
         threadKillerTabs = new threadKiller();
 
@@ -220,6 +219,9 @@ public class TabsActivity extends AppCompatActivity {
 
     private boolean createTestFile(String token) {
 
+        SettingsDataSource databaseTabsTestFile = new SettingsDataSource(this);
+        databaseTabsTestFile.open();
+
         StringBuilder buildCryptoNano = new StringBuilder(cryptoPass);
         buildCryptoNano.replace(13, 15, "78");
         cryptoPass = buildCryptoNano.toString();
@@ -241,9 +243,16 @@ public class TabsActivity extends AppCompatActivity {
             MediaScannerConnection.scanFile(this, new String[]{fileTabs_toWrite.getAbsolutePath()}, null, null);
 
             FileWriter writer = new FileWriter(fileTabs_toWrite, true);
+            //naglowek pliku testu to: nazwa przedmiotu, kod testu, kod sesji, wersja aplikacji, stempel czasowy
+            writer.append(databaseTabsTestFile.getSetting("setting_course"));
+            writer.append("\t");
+            writer.append(databaseTabsTestFile.getSetting("setting_test_id"));
+            writer.append("\t");
             writer.append(token);
             writer.append("\t");
             writer.append(getResources().getString(R.string.version_value));
+            writer.append("\t");
+            writer.append(formatter.format(now));
             writer.append("\n\n");
             writer.flush();
             writer.close();
@@ -258,6 +267,7 @@ public class TabsActivity extends AppCompatActivity {
         StringBuilder buildCrypto = new StringBuilder(cryptoPass);
         buildCrypto.replace(8, 9, "#");
         cryptoPass = buildCrypto.toString();
+        databaseTabsTestFile.close();
 
         return true;
     }
@@ -287,6 +297,7 @@ public class TabsActivity extends AppCompatActivity {
     private String encryptIt(String text) {
 
         try {
+            Log.d("moje crypto", cryptoPass);
             DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
             SecretKey key = keyFactory.generateSecret(keySpec);
@@ -967,6 +978,5 @@ public class TabsActivity extends AppCompatActivity {
     int tabs_serverDunnoAnswers = 0;
     private String stringTabs_sessionID;
     private File fileTabs_toWrite;
-    private static String cryptoPass = "tabs_layout_parameters";
-    private static String cipheringKey;
+    private static String cryptoPass;
 }

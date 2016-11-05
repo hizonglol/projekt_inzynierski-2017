@@ -1,4 +1,10 @@
-## 0.7.2 - 2016-11-04
+## 0.7.3 - 2016-11-05
+### Changed
+~ zmieniony klucz szyfrowania testu. Tym razem klucz pochodzi z serwera
+~ napis w SecurityCheckActivity "Skonfigurowanie aplikacji" zmieniony na "Inicjalizacja testu"
+~ nag³ówek pliku testu to: nazwa przedmiotu, kod testu, kod sesji, wersja aplikacji, stempel czasowy
+
+## [0.7.2] - 2016-11-04
 ### Added
 + pobieranie pliku konfiguracyjnego
 + sprawdzanie wersji aplikacji na podstawie pliku konfiguracyjnego
@@ -8,7 +14,7 @@
 ### Changed
 ~ Odrzucanie po³¹czeñ telefonicznych aktywne
 
-## 0.7.1 - 2016-10-29
+## [0.7.1] - 2016-10-29
 ### Added
 + nowe activity Security Check
 + sprawdzanie dostêpnoœci serwera, do którego przychodz¹ odpowiedzi na pytania (ten który jest ustawiony w Settings Activity)
@@ -199,6 +205,8 @@
 * z³e granice przesuwania w trybie landscape w Tabs Activity
 * nie da siê przechwyciæ przycisków home i list applications (nierozwi¹zywalne)
 
+[0.7.2] https://github.com/hizonglol/projekt_inzynierski-2017/commit/3d0f934da13910860b7c462a79f849a01764f192
+[0.7.1] https://github.com/hizonglol/projekt_inzynierski-2017/commit/c3a84814fd927db8b216aeb7e8c6ca7473a29a25
 [0.6.8] https://github.com/hizonglol/projekt_inzynierski-2017/commit/4b99fca28efe7c06ffcc91c25fd9366dcf1c65d5
 [0.6.6] https://github.com/hizonglol/projekt_inzynierski-2017/commit/079f98de465de66ac0df05cec0c726c7712f42b7
 ...
