@@ -323,11 +323,10 @@ public class SecurityCheckActivity extends AppCompatActivity
                     buttonSecurityCheck_continue.setText("Spróbuj ponownie");
                     appConfigurationSuccessful = false;
 
-                    String announcement = "Nieprawidłowa wersja!";
-                    announcement = announcement.concat(" Twoja wersja aplikacji to: ")
-                            .concat(getResources().getString(R.string.version_value)).concat("!")
-                            .concat(" Wymagana wersja wyższa od ").concat(minAppVersion)
-                            .concat(" oraz niższa od ").concat(maxAppVersion).concat("!");
+                    String announcement = "Niewłaściwa wersja aplikacji ";
+                    announcement = announcement.concat(getResources().getString(R.string.version_value)).concat("!")
+                            .concat(" Wymagana wersja co najmniej ").concat(minAppVersion)
+                            .concat(" i nie wyższa niż ").concat(maxAppVersion).concat("!");
 
                     new AlertDialog.Builder(SecurityCheckActivity.this)
                             .setIcon(android.R.drawable.ic_dialog_alert)
