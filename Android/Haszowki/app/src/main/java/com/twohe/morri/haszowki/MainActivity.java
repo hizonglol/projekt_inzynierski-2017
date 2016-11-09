@@ -277,11 +277,12 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Used to close database when this activity is being destroyed.
+     * It also disables Incoming Call Receiver.
      */
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        disableIncomingCallReceiver();
         databaseMain.close();
     }
 
@@ -302,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
      * <p>
      * Resets shared preferences to prevent TabsActivity closing itself.
      * Loads all the fields on this activity with saved data by calling
-     * resumeState().
+     * resumeState(). It also disables Incoming Call Receiver.
      */
     @Override
     public void onResume() {

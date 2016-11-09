@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created by morri on 08.10.2016.
@@ -18,7 +19,7 @@ public class Decrypter {
 
     private static String VERSION_NUMBER = "0.7.3";
     private static String cryptoPass = "my simple aes key";
-	
+
     /*
     private static List<String> argsList = new ArrayList<>();
     private static List<Option> optsList = new ArrayList<>();
@@ -32,12 +33,15 @@ public class Decrypter {
     private static String outputFileName = "";
 
     private static String decryptIt(String text) {
-		
-		StringBuilder buildCrypto = new StringBuilder(cryptoPass);
-		buildCrypto.replace(8, 9, "#");
-		buildCryptoNano.replace(13, 15, "78");
-		buildCrypto.replace(3, 4, "+");
-		enrichedCryptoPass = buildCrypto.toString();
+
+        StringBuilder buildCrypto = new StringBuilder(cryptoPass);
+        buildCrypto.replace(8, 9, "#");
+        buildCrypto.replace(13, 15, "78");
+        buildCrypto.replace(3, 4, "+");
+        String enrichedCryptoPass = buildCrypto.toString();
+        System.err.println(enrichedCryptoPass);
+        String decrypedText;
+        String decompressedText;
 
         try {
             DESKeySpec keySpec = new DESKeySpec(enrichedCryptoPass.getBytes("UTF8"));
@@ -50,26 +54,68 @@ public class Decrypter {
             cipher.init(Cipher.DECRYPT_MODE, key);
             byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
 
-            String decrypedValue = new String(decrypedValueBytes);
+            //decrypedText = new String(decrypedValueBytes);
+            decrypedText = new String(decrypedValueBytes);
             //System.err.println(decrypedValue);
-            return decrypedValue;
 
         } catch (InvalidKeyException e) {
             e.printStackTrace();
+            return "";
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            return "";
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
+            return "";
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
+            return "";
         } catch (BadPaddingException e) {
             e.printStackTrace();
+            return "";
         } catch (NoSuchPaddingException e) {
             e.printStackTrace();
+            return "";
         } catch (IllegalBlockSizeException e) {
             e.printStackTrace();
+            return "";
         }
-        return text;
+
+        //decompressedText = decompressIt(decrypedText);
+
+        //if (decompressedText.equals("")) return "";
+
+        //return decompressedText;
+        return decrypedText;
+    }
+
+    private static String decompressIt(String text) {
+
+        byte[] compressed = Base64.getDecoder().decode(text);
+        try {
+            if (compressed.length > 4) {
+                GZIPInputStream gzipInputStream = new GZIPInputStream(
+                        new ByteArrayInputStream(compressed, 4,
+                                compressed.length - 4));
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                for (int value = 0; value != -1; ) {
+                    value = gzipInputStream.read();
+                    if (value != -1) {
+                        baos.write(value);
+                    }
+                }
+                gzipInputStream.close();
+                baos.close();
+                String sReturn = new String(baos.toByteArray(), "UTF-8");
+                return sReturn;
+            } else {
+                return "";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     private static List<String> readFile(String filename) {
@@ -143,7 +189,7 @@ public class Decrypter {
 
             for (int i = 0; i < decodedText.size(); ++i) {
                 writer.write(decodedText.get(i));
-		writer.write(System.getProperty("line.separator"));
+                writer.write(System.getProperty("line.separator"));
                 writer.flush();
             }
             writer.close();
@@ -265,7 +311,7 @@ public class Decrypter {
             return;
         }
 
-        if (flagInput){
+        if (flagInput) {
             List<String> input;
 
             input = readFile(inputFileName);
@@ -274,11 +320,11 @@ public class Decrypter {
 
             input = runDecrypter(input);
 
-            if (flagOutput){
+            if (flagOutput) {
                 writeDecodedToFile(input);
             } else {
-		writeDecodedToOutput(input);
-	    }
+                writeDecodedToOutput(input);
+            }
         }
     }
 }

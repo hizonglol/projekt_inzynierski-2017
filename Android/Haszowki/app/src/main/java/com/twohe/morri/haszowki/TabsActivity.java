@@ -38,6 +38,7 @@ import android.widget.Toast;
 import com.twohe.morri.tools.IncomingCallReceiver;
 import com.twohe.morri.tools.SettingsDataSource;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -47,6 +48,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -56,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.zip.GZIPOutputStream;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -71,6 +74,23 @@ import javax.crypto.spec.DESKeySpec;
  */
 @SuppressWarnings("FieldCanBeLocal")
 public class TabsActivity extends AppCompatActivity {
+
+    private static String cryptoPass;
+    threadKiller threadKillerTabs;
+    int guestionsAmount = 1;
+    int tabs_fileYesAnswers = 0;
+    int tabs_fileNoAnswers = 0;
+    int tabs_fileDunnoAnswers = 0;
+    int tabs_serverYesAnswers = 0;
+    int tabs_serverNoAnswers = 0;
+    int tabs_serverDunnoAnswers = 0;
+    //variables and classes
+    private boolean wasInBackgroundTabs = false;
+    private SharedPreferences sharedPrefTabs;
+    private SectionsPagerAdapter SectionsPagerAdapterTabs;
+    private ViewPager ViewPagerTabs;
+    private AlertDialog alertDialog;
+    private File fileTabs_toWrite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,13 +110,7 @@ public class TabsActivity extends AppCompatActivity {
             registerComponentCallbacks(mMemoryBoss);
         }
 
-        SettingsDataSource databaseTabs = new SettingsDataSource(this);
-        databaseTabs.open();
-        stringTabs_sessionID = generateSessionID();
-        databaseTabs.createSetting("setting_sessionID", stringTabs_sessionID);
-        databaseTabs.close();
-
-        createTestFile(stringTabs_sessionID);
+        if(createTestFile()) endTestWhenTestFileCreationFailure();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -119,16 +133,31 @@ public class TabsActivity extends AppCompatActivity {
 
         addTab();
 
-        //enableIncomingCallReceiver();
+        enableIncomingCallReceiver();
+    }
+
+    /**
+     * Method used to terminate Tabs Activity in case of failure with
+     * test file creation.
+     */
+    private void endTestWhenTestFileCreationFailure(){
+        alertDialog = new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Błąd")
+                .setMessage("Plik testu nie mógł być poprawnie utworzony.")
+                .setCancelable(false)
+                .show();
+
+        threadKillerTabs.start();
     }
 
     /**
      * Used to enable IncomingCallReceiver that rejects any incoming calls
      */
-    private void enableIncomingCallReceiver(){
-        PackageManager pm  = TabsActivity.this.getPackageManager();
+    private void enableIncomingCallReceiver() {
+        PackageManager pm = TabsActivity.this.getPackageManager();
         ComponentName componentName = new ComponentName(TabsActivity.this, IncomingCallReceiver.class);
-        pm.setComponentEnabledSetting(componentName,PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+        pm.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
         //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń aktywowany", Toast.LENGTH_LONG).show();
     }
@@ -184,6 +213,10 @@ public class TabsActivity extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * Called when Tabs Activity is being destroyed.
+     * Disables Incoming Call Receiver.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -206,6 +239,12 @@ public class TabsActivity extends AppCompatActivity {
         SectionsPagerAdapterTabs.addFragment();
     }
 
+    /**
+     * Generates random string containing characters safe for URL requests.
+     * String is shortened to 4 characters and all characters are changed to lower case characters.
+     *
+     * @return shortened random string
+     */
     private String generateSessionID() {
         SecureRandom randomizer = new SecureRandom();
         byte bytes[] = new byte[6];
@@ -217,10 +256,29 @@ public class TabsActivity extends AppCompatActivity {
         return shortenedBase64;
     }
 
-    private boolean createTestFile(String token) {
+    /**
+     * Creates test file with a name in format: YYYY_MM_DD-HH_MM_SS-TTTT.txt where:
+     * Y - year
+     * M - month
+     * D - day
+     * H - hour
+     * M - minute
+     * S - second
+     * T - token
+     * Heading of file contains:
+     * name_of_course test_id session_id app_version time_stamp
+     *
+     * Before creating file, checks if directory for test files exists. If not then creates it.
+     *
+     * @return true if something went bad with creating test file, false if everything was okay
+     */
+    private boolean createTestFile() {
 
         SettingsDataSource databaseTabsTestFile = new SettingsDataSource(this);
         databaseTabsTestFile.open();
+
+        String sessionID = generateSessionID();
+        databaseTabsTestFile.createSetting("setting_sessionID", sessionID);
 
         StringBuilder buildCryptoNano = new StringBuilder(cryptoPass);
         buildCryptoNano.replace(13, 15, "78");
@@ -228,7 +286,7 @@ public class TabsActivity extends AppCompatActivity {
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss", Locale.getDefault());
         Date now = new Date();
-        String fileName = formatter.format(now) + "-" + token + ".txt";//like 2016_01_12-12_30_00-ABCdef12.txt
+        String fileName = formatter.format(now) + "-" + sessionID + ".txt";//like 2016_01_12-12_30_00-ABCdef12.txt
 
         try {
             File root = new File(Environment.getExternalStorageDirectory() + "/Haszowki");
@@ -248,7 +306,7 @@ public class TabsActivity extends AppCompatActivity {
             writer.append("\t");
             writer.append(databaseTabsTestFile.getSetting("setting_test_id"));
             writer.append("\t");
-            writer.append(token);
+            writer.append(sessionID);
             writer.append("\t");
             writer.append(getResources().getString(R.string.version_value));
             writer.append("\t");
@@ -261,7 +319,7 @@ public class TabsActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
             finish();
-            return false;
+            return true;
         }
 
         StringBuilder buildCrypto = new StringBuilder(cryptoPass);
@@ -269,15 +327,21 @@ public class TabsActivity extends AppCompatActivity {
         cryptoPass = buildCrypto.toString();
         databaseTabsTestFile.close();
 
-        return true;
+        return false;
     }
 
+    /**
+     * Method that ciphers given text and appends it to test file.
+     * Informs about the success of operation by returning proper bool value.
+     *
+     * @param text String that will be ciphered and appended to test file
+     * @return false if IO operation failed, true if everything went fine
+     */
     public boolean appendToFileCiphered(String text) {
-        //Log.v("appendToFileCiphered", text);
 
         text = encryptIt(text);
 
-        //decryptIt(text);
+        if(text.equals("")) return false;
 
         try {
             FileWriter writer = new FileWriter(fileTabs_toWrite, true);
@@ -285,16 +349,26 @@ public class TabsActivity extends AppCompatActivity {
             writer.append("\n");
             writer.flush();
             writer.close();
-            //Log.v("appendToFileCiphered", text);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
-
         return true;
     }
 
+    /**
+     * Ciphers given text using DES algorythm and password stored in
+     * cryptoPass variable.
+     *
+     * @param text encrypted string containing test answer
+     * @return ciphered text if everything fine, "" if something went wrong
+     */
     private String encryptIt(String text) {
+
+        //String compressedText = compressIt(text);
+        String cipheredText;
+
+        //if(compressedText.equals("")) return "";
 
         try {
             Log.d("moje crypto", cryptoPass);
@@ -302,43 +376,70 @@ public class TabsActivity extends AppCompatActivity {
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
             SecretKey key = keyFactory.generateSecret(keySpec);
 
+            //byte[] clearText = compressedText.getBytes("UTF8");
             byte[] clearText = text.getBytes("UTF8");
             // Cipher is not threadTabs_killer safe
             Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, key);
 
-            text = Base64.encodeToString(cipher.doFinal(clearText), Base64.DEFAULT);
-            //Log.d("appendToFileCiphered", "Encrypted: " + text + " -> " + text);
+            cipheredText = Base64.encodeToString(cipher.doFinal(clearText), Base64.DEFAULT);
 
         } catch (InvalidKeyException e) {
             e.printStackTrace();
+            return "";
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            return "";
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
+            return "";
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
+            return "";
         } catch (BadPaddingException e) {
             e.printStackTrace();
+            return "";
         } catch (NoSuchPaddingException e) {
             e.printStackTrace();
+            return "";
         } catch (IllegalBlockSizeException e) {
             e.printStackTrace();
+            return "";
         }
 
-        return text;
+        return cipheredText;
     }
 
-    protected void summariseTest() {
+    private String compressIt(String text) {
 
-        /*
-        Log.d("File yes answers", String.valueOf(tabs_fileYesAnswers));
-        Log.d("File no answers", String.valueOf(tabs_fileNoAnswers));
-        Log.d("File dunno answers", String.valueOf(tabs_fileDunnoAnswers));
-        Log.d("Server yes answers", String.valueOf(tabs_serverYesAnswers));
-        Log.d("Server no answers", String.valueOf(tabs_serverNoAnswers));
-        Log.d("Server dunno answers", String.valueOf(tabs_serverDunnoAnswers));
-        */
+        try {
+            byte[] blockcopy = ByteBuffer
+                    .allocate(4)
+                    .order(java.nio.ByteOrder.LITTLE_ENDIAN)
+                    .putInt(text.length())
+                    .array();
+            ByteArrayOutputStream os = new ByteArrayOutputStream(text.length());
+            GZIPOutputStream gos = new GZIPOutputStream(os);
+            gos.write(text.getBytes());
+            gos.close();
+            os.close();
+            byte[] compressed = new byte[4 + os.toByteArray().length];
+            System.arraycopy(blockcopy, 0, compressed, 0, 4);
+            System.arraycopy(os.toByteArray(), 0, compressed, 4,
+                    os.toByteArray().length);
+            return Base64.encodeToString(compressed, Base64.DEFAULT);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    /**
+     * Prepares bundle for Summary Activity.
+     * Starts Summary Activity after bundle has been prepared.
+     */
+    protected void summariseTest() {
 
         Intent intentSummary = new Intent(getApplicationContext(), SummaryActivity.class);
         Bundle b = new Bundle();
@@ -356,6 +457,40 @@ public class TabsActivity extends AppCompatActivity {
      * A placeholder fragment containing one question tab.
      */
     public static class QuestionFragment extends Fragment {
+
+        //variables and classes
+        private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String ARG_SECTION_ANSWER_FILE = "section_answer_file";
+        private static final String ARG_SECTION_ANSWER_SERVER = "section_answer_server";
+        private static final String DEBUG_TAG = "HttpExample";
+        private String serverResponse = "";
+        private Integer serverResponseCode = 404;
+        //used to check whether any answer has been choosen or not
+        private boolean anyAnswerSent;
+
+        /**
+         * Instantiates fragment. Creates bundle with arguments that carry fragment
+         * number, current choosen answer for file and current choosen answer
+         * that has been sent successfully to server.
+         * <p>
+         * ARG_SECTION_ANSWER_FILE and ARG_SECTION_ANSWER_SERVER parameters explanation:
+         * 0 - no answer
+         * 1 - yes answer
+         * 2 - no answer
+         * 3 - dunno answer
+         *
+         * @param sectionNumber Number of corresponding tab
+         * @return New instance of fragment to the given section number
+         */
+        public static QuestionFragment newInstance(int sectionNumber) {
+            QuestionFragment fragment = new QuestionFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            args.putInt(ARG_SECTION_ANSWER_FILE, 0);
+            args.putInt(ARG_SECTION_ANSWER_SERVER, 0);
+            fragment.setArguments(args);
+            return fragment;
+        }
 
         /**
          * Initializes corresponding tab. Sets up button handlers.
@@ -388,7 +523,7 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    saveToFile(rootView, 1, "yes");
+                    if (saveToFile(rootView, 1, "yes")) return;
                     sendToServer(rootView, 1, "yes");
                     anyAnswerSent = true;
                 }
@@ -398,7 +533,7 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    saveToFile(rootView, 2, "no");
+                    if (saveToFile(rootView, 2, "no")) return;
                     sendToServer(rootView, 2, "no");
                     anyAnswerSent = true;
                 }
@@ -408,7 +543,7 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    saveToFile(rootView, 3, "dunno");
+                    if (saveToFile(rootView, 3, "dunno")) return;
                     sendToServer(rootView, 3, "dunno");
                     anyAnswerSent = true;
                 }
@@ -481,41 +616,18 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         /**
-         * Instantiates fragment. Creates bundle with arguments that carry fragment
-         * number, current choosen answer for file and current choosen answer
-         * that has been sent successfully to server.
-         * <p>
-         * ARG_SECTION_ANSWER_FILE and ARG_SECTION_ANSWER_SERVER parameters explanation:
-         * 0 - no answer
-         * 1 - yes answer
-         * 2 - no answer
-         * 3 - dunno answer
-         *
-         * @param sectionNumber Number of corresponding tab
-         * @return New instance of fragment to the given section number
-         */
-        public static QuestionFragment newInstance(int sectionNumber) {
-            QuestionFragment fragment = new QuestionFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            args.putInt(ARG_SECTION_ANSWER_FILE, 0);
-            args.putInt(ARG_SECTION_ANSWER_SERVER, 0);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        /**
          * Used to save an answer of corresponding tab into test file.
          * <p>
          * It also sets up ARG_SECTION_ANSWER_SERVER to 0 before sendToServer() is terminated.
-         * If GER in sendToServer() will be terminated successfully then ARG_SECTION_ANSWER_SERVER
+         * If GET in sendToServer() will be terminated successfully then ARG_SECTION_ANSWER_SERVER
          * will be set to proper number.
          *
          * @param rootView Root view of corresponding tab
          * @param question Number of corresponding tab
          * @param answerNo Type of given answer
+         * @return false if everything went well, true if something bad happened
          */
-        private void saveToFile(View rootView, int question, String answerNo) {
+        private boolean saveToFile(View rootView, int question, String answerNo) {
 
             if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", answerNo))) {
                 setGivenAnswerGray(rootView, question);
@@ -528,7 +640,9 @@ public class TabsActivity extends AppCompatActivity {
                 //Sets it to 0. If sending will be successful then it will be set to proper answer number.
                 //I use it as an information if question has been sent to server or not.
                 getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 0);
+                return false;
             }
+            return true;
         }
 
         /**
@@ -573,7 +687,7 @@ public class TabsActivity extends AppCompatActivity {
             if (mode.equals("to_server")) {
                 String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
                 String stringServerUrl = getResources().getString(R.string.server_address);
-                if (stringDbServerUrl.length() > 1){
+                if (stringDbServerUrl.length() > 1) {
                     stringServerUrl = stringDbServerUrl;
                 }
                 stringServerUrl = stringServerUrl.concat("empty.html");
@@ -718,54 +832,6 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         /**
-         * Uses AsyncTask to create a task away from the main UI threadTabs_killer. This task takes a
-         * URL string and uses it to create an HttpUrlConnection. Once the connection
-         * has been established, the AsyncTask downloads the contents of the webpage.
-         * Finally it sets up corresponding tab if server response code is 200.
-         */
-        private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
-            View rootView;
-            int answerNo;
-
-            @Override
-            protected String doInBackground(String... urls) {
-
-                try {
-                    return downloadUrl(urls[0]);
-                } catch (IOException e) {
-                    return "Unable to retrieve web page. URL may be invalid.";
-                }
-            }
-
-            /**
-             * Sets color of button according to successfully sent answer.
-             * Updates tab's info about current sent answer - look into
-             * sendToServer() to understand what is going on.
-             *
-             * @param result Response code got from server.
-             */
-            @Override
-            protected void onPostExecute(String result) {
-                Log.d(serverResponseCode.toString(), serverResponse);
-                if (result.equals("200")) {
-                    setGivenAnswerBlue(rootView, answerNo);
-                    getArguments().putInt(ARG_SECTION_ANSWER_SERVER, answerNo);
-                } else {
-                    Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getResources().getString(R.string.message_unable_to_send_answer), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            /**
-             * @param passedView     Root view of corresponding tab.
-             * @param passedAnswerNo Number of corresponding tab.
-             */
-            void configure(View passedView, int passedAnswerNo) {
-                rootView = passedView;
-                answerNo = passedAnswerNo;
-            }
-        }
-
-        /**
          * Given a URL, establishes an HttpUrlConnection and retrieves
          * the server response code, which it returns as string.
          *
@@ -840,16 +906,53 @@ public class TabsActivity extends AppCompatActivity {
             return netInfo != null && netInfo.isConnectedOrConnecting();
         }
 
-        //variables and classes
-        private static final String ARG_SECTION_NUMBER = "section_number";
-        private static final String ARG_SECTION_ANSWER_FILE = "section_answer_file";
-        private static final String ARG_SECTION_ANSWER_SERVER = "section_answer_server";
-        private static final String DEBUG_TAG = "HttpExample";
+        /**
+         * Uses AsyncTask to create a task away from the main UI threadTabs_killer. This task takes a
+         * URL string and uses it to create an HttpUrlConnection. Once the connection
+         * has been established, the AsyncTask downloads the contents of the webpage.
+         * Finally it sets up corresponding tab if server response code is 200.
+         */
+        private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
+            View rootView;
+            int answerNo;
 
-        private String serverResponse = "";
-        private Integer serverResponseCode = 404;
-        //used to check whether any answer has been choosen or not
-        private boolean anyAnswerSent;
+            @Override
+            protected String doInBackground(String... urls) {
+
+                try {
+                    return downloadUrl(urls[0]);
+                } catch (IOException e) {
+                    return "Unable to retrieve web page. URL may be invalid.";
+                }
+            }
+
+            /**
+             * Sets color of button according to successfully sent answer.
+             * Updates tab's info about current sent answer - look into
+             * sendToServer() to understand what is going on.
+             *
+             * @param result Response code got from server.
+             */
+            @Override
+            protected void onPostExecute(String result) {
+                Log.d(serverResponseCode.toString(), serverResponse);
+                if (result.equals("200")) {
+                    setGivenAnswerBlue(rootView, answerNo);
+                    getArguments().putInt(ARG_SECTION_ANSWER_SERVER, answerNo);
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getResources().getString(R.string.message_unable_to_send_answer), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            /**
+             * @param passedView     Root view of corresponding tab.
+             * @param passedAnswerNo Number of corresponding tab.
+             */
+            void configure(View passedView, int passedAnswerNo) {
+                rootView = passedView;
+                answerNo = passedAnswerNo;
+            }
+        }
     }
 
     /**
@@ -960,23 +1063,4 @@ public class TabsActivity extends AppCompatActivity {
             // you might as well implement some memory cleanup here and be a nice Android dev.
         }
     }
-
-    //variables and classes
-    private boolean wasInBackgroundTabs = false;
-    threadKiller threadKillerTabs;
-    private SharedPreferences sharedPrefTabs;
-    private SectionsPagerAdapter SectionsPagerAdapterTabs;
-    private ViewPager ViewPagerTabs;
-    private AlertDialog alertDialog;
-
-    int guestionsAmount = 1;
-    int tabs_fileYesAnswers = 0;
-    int tabs_fileNoAnswers = 0;
-    int tabs_fileDunnoAnswers = 0;
-    int tabs_serverYesAnswers = 0;
-    int tabs_serverNoAnswers = 0;
-    int tabs_serverDunnoAnswers = 0;
-    private String stringTabs_sessionID;
-    private File fileTabs_toWrite;
-    private static String cryptoPass;
 }
