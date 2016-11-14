@@ -2,7 +2,7 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Haszówki</string>
-    <string name="version_value">0.7.4</string>
+    <string name="version_value">0.7.6</string>
     <string name="zero_value">0</string>
     <string name="six_zeros_value">000000</string>
     <string name="label_null">null</string>
@@ -74,6 +74,14 @@
     <string name="message_give_surname">Podaj nazwisko!</string>
     <string name="message_give_course">Podaj przedmiot!</string>
     <string name="message_data_saved">Dane zapisane</string>
+
+
+    <!--*** LABEL strings of SECURITYCHECK ***-->
+    <string name="label_attention">Uwaga</string>
+
+    <!--*** BUTTON strings of SECURITYCHECK ***-->
+    <string name="button_continue">Kontynuuj</string>
+    <string name="button_try_again">Spróbuj ponownie</string>
 
 
     <!--*** LABEL strings of TABS ***-->

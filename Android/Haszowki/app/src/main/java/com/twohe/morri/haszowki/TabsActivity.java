@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,7 +39,6 @@ import android.widget.Toast;
 import com.twohe.morri.tools.IncomingCallReceiver;
 import com.twohe.morri.tools.SettingsDataSource;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -48,7 +48,6 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -58,7 +57,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.zip.GZIPOutputStream;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -110,7 +108,7 @@ public class TabsActivity extends AppCompatActivity {
             registerComponentCallbacks(mMemoryBoss);
         }
 
-        if(createTestFile()) endTestWhenTestFileCreationFailure();
+        if (createTestFile()) endTestWhenTestFileCreationFailure();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -133,14 +131,22 @@ public class TabsActivity extends AppCompatActivity {
 
         addTab();
 
-        enableIncomingCallReceiver();
+        /*
+        To cos pozwala na unikniecie bledu gdy polaczenie przychodzace na androidzie Lollipop
+        zostanie odrzucone przez broadcast receiver. Odpowiedzi do serwera nie dochodza,
+        przyciski sa zakolorowane na szaro a aplikacja zachowuje sie tak jakby
+        nie miala przyznanych uprawnien do internetu, a socket bylby zajety.
+         */
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            enableIncomingCallReceiver();
+        }
     }
 
     /**
      * Method used to terminate Tabs Activity in case of failure with
      * test file creation.
      */
-    private void endTestWhenTestFileCreationFailure(){
+    private void endTestWhenTestFileCreationFailure() {
         alertDialog = new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Błąd")
@@ -267,7 +273,7 @@ public class TabsActivity extends AppCompatActivity {
      * T - token
      * Heading of file contains:
      * name_of_course test_id session_id app_version time_stamp
-     *
+     * <p>
      * Before creating file, checks if directory for test files exists. If not then creates it.
      *
      * @return true if something went bad with creating test file, false if everything was okay
@@ -341,9 +347,10 @@ public class TabsActivity extends AppCompatActivity {
 
         text = encryptIt(text);
 
-        if(text.equals("")) return false;
+        if (text.equals("")) return false;
 
         try {
+            scanFile(fileTabs_toWrite.getAbsolutePath());
             FileWriter writer = new FileWriter(fileTabs_toWrite, true);
             writer.append(text);
             writer.append("\n");
@@ -356,6 +363,18 @@ public class TabsActivity extends AppCompatActivity {
         return true;
     }
 
+    private void scanFile(String path) {
+
+        MediaScannerConnection.scanFile(TabsActivity.this,
+                new String[]{path}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("TAG", "Finished scanning " + path);
+                    }
+                });
+    }
+
     /**
      * Ciphers given text using DES algorythm and password stored in
      * cryptoPass variable.
@@ -365,10 +384,9 @@ public class TabsActivity extends AppCompatActivity {
      */
     private String encryptIt(String text) {
 
-        //String compressedText = compressIt(text);
         String cipheredText;
 
-        //if(compressedText.equals("")) return "";
+        if (text.equals("")) return "";
 
         try {
             Log.d("moje crypto", cryptoPass);
@@ -376,8 +394,8 @@ public class TabsActivity extends AppCompatActivity {
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
             SecretKey key = keyFactory.generateSecret(keySpec);
 
-            //byte[] clearText = compressedText.getBytes("UTF8");
             byte[] clearText = text.getBytes("UTF8");
+            //byte[] clearText = text.getBytes("UTF8");
             // Cipher is not threadTabs_killer safe
             Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -408,31 +426,6 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         return cipheredText;
-    }
-
-    private String compressIt(String text) {
-
-        try {
-            byte[] blockcopy = ByteBuffer
-                    .allocate(4)
-                    .order(java.nio.ByteOrder.LITTLE_ENDIAN)
-                    .putInt(text.length())
-                    .array();
-            ByteArrayOutputStream os = new ByteArrayOutputStream(text.length());
-            GZIPOutputStream gos = new GZIPOutputStream(os);
-            gos.write(text.getBytes());
-            gos.close();
-            os.close();
-            byte[] compressed = new byte[4 + os.toByteArray().length];
-            System.arraycopy(blockcopy, 0, compressed, 0, 4);
-            System.arraycopy(os.toByteArray(), 0, compressed, 4,
-                    os.toByteArray().length);
-            return Base64.encodeToString(compressed, Base64.DEFAULT);
-        }
-        catch(IOException e){
-            e.printStackTrace();
-            return "";
-        }
     }
 
     /**

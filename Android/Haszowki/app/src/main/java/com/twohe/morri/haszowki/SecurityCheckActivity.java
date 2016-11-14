@@ -316,11 +316,11 @@ public class SecurityCheckActivity extends AppCompatActivity
             if (result.equals("success")) {
                 if (isAppVersionAcceptable(minAppVersion, maxAppVersion)) {
                     spinnerSuccessful(progressButtonSecurityCheck_appConfiguration);
-                    buttonSecurityCheck_continue.setText("Kontynuuj");
+                    buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_continue));
                     appConfigurationSuccessful = true;
                 } else {
                     spinnerUnsuccessful(progressButtonSecurityCheck_appConfiguration);
-                    buttonSecurityCheck_continue.setText("Spróbuj ponownie");
+                    buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_try_again));
                     appConfigurationSuccessful = false;
 
                     String announcement = "Niewłaściwa wersja aplikacji ";
@@ -330,15 +330,22 @@ public class SecurityCheckActivity extends AppCompatActivity
 
                     new AlertDialog.Builder(SecurityCheckActivity.this)
                             .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setTitle("Uwaga")
+                            .setTitle(getResources().getString(R.string.label_attention))
                             .setMessage(announcement)
-                            .setPositiveButton("Ok", null)
+                            .setPositiveButton(getResources().getString(R.string.button_ok), null)
                             .show();
                 }
             } else if (result.equals("failure")) {
                 spinnerUnsuccessful(progressButtonSecurityCheck_appConfiguration);
-                buttonSecurityCheck_continue.setText("Spróbuj ponownie");
+                buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_try_again));
                 appConfigurationSuccessful = false;
+
+                new AlertDialog.Builder(SecurityCheckActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getResources().getString(R.string.label_attention))
+                        .setMessage("Błąd połączenia internetowego!")
+                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                        .show();
             }
         }
     }

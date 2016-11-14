@@ -41,7 +41,6 @@ public class Decrypter {
         String enrichedCryptoPass = buildCrypto.toString();
         System.err.println(enrichedCryptoPass);
         String decrypedText;
-        String decompressedText;
 
         try {
             DESKeySpec keySpec = new DESKeySpec(enrichedCryptoPass.getBytes("UTF8"));
@@ -54,9 +53,7 @@ public class Decrypter {
             cipher.init(Cipher.DECRYPT_MODE, key);
             byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
 
-            //decrypedText = new String(decrypedValueBytes);
             decrypedText = new String(decrypedValueBytes);
-            //System.err.println(decrypedValue);
 
         } catch (InvalidKeyException e) {
             e.printStackTrace();
@@ -81,41 +78,7 @@ public class Decrypter {
             return "";
         }
 
-        //decompressedText = decompressIt(decrypedText);
-
-        //if (decompressedText.equals("")) return "";
-
-        //return decompressedText;
         return decrypedText;
-    }
-
-    private static String decompressIt(String text) {
-
-        byte[] compressed = Base64.getDecoder().decode(text);
-        try {
-            if (compressed.length > 4) {
-                GZIPInputStream gzipInputStream = new GZIPInputStream(
-                        new ByteArrayInputStream(compressed, 4,
-                                compressed.length - 4));
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                for (int value = 0; value != -1; ) {
-                    value = gzipInputStream.read();
-                    if (value != -1) {
-                        baos.write(value);
-                    }
-                }
-                gzipInputStream.close();
-                baos.close();
-                String sReturn = new String(baos.toByteArray(), "UTF-8");
-                return sReturn;
-            } else {
-                return "";
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
     }
 
     private static List<String> readFile(String filename) {

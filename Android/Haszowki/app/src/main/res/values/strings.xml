@@ -36,7 +36,7 @@
     <string name="label_weight">Weights vector:</string>
     <string name="label_yes_answers">YES:</string>
     <string name="six_zeros_value">000000</string>
-    <string name="version_value">0.7.4</string>
+    <string name="version_value">0.7.6</string>
     <string name="zero_value">0</string>
     <string name="message_your_test_file_was_created">Your test file has been created</string>
     <string name="message_you_quit_test">You have left application</string>
@@ -77,4 +77,7 @@
     <string name="message_going_to_test_without_position">You\'re going to test without giving row and seat!</string>
     <string name="label_server_address">Server address:</string>
     <string name="server_address">http://sequoia.ict.pwr.wroc.pl/~witold/</string>
+    <string name="button_continue">Continue</string>
+    <string name="button_try_again">Try again</string>
+    <string name="label_attention">Attention</string>
 </resources>

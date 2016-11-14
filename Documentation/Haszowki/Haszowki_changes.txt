@@ -1,7 +1,10 @@
-## Upcoming
+## 0.7.6 - 2016-11-13
+### Added
++ dodane trochê dokumentacji
+
 ### Changed
 ~ metody tworzenia pliku z testem oraz zapisywania danych do pliku z testem uzupe³nione o obs³ugê b³êdów
-~ dodane trochê dokumentacji
+~ czêœæ twardo zakodowanych stringów zamienione na zasoby
 
 ## 0.7.4 - 2016-11-06
 ### Changed
