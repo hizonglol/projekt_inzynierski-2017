@@ -133,15 +133,7 @@ public class TabsActivity extends AppCompatActivity {
 
         addTab();
 
-        /*
-        To cos pozwala na unikniecie bledu gdy polaczenie przychodzace na androidzie Lollipop
-        zostanie odrzucone przez broadcast receiver. Odpowiedzi do serwera nie dochodza,
-        przyciski sa zakolorowane na szaro a aplikacja zachowuje sie tak jakby
-        nie miala przyznanych uprawnien do internetu, a socket bylby zajety.
-         */
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            enableIncomingCallReceiver();
-        }
+        enableIncomingCallReceiver();
     }
 
     /**
