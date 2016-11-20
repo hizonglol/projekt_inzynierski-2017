@@ -1,9 +1,7 @@
 package com.twohe.morri.haszowki;
 
 import android.content.ComponentCallbacks2;
-import android.content.ComponentName;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,11 +15,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.twohe.morri.tools.IncomingCallReceiver;
-
 /**
  * Created by morri on 30.07.2016.
- *
+ * <p>
  * This file contains class Summary Activity.
  */
 public class SummaryActivity extends AppCompatActivity {
@@ -29,63 +25,13 @@ public class SummaryActivity extends AppCompatActivity {
     SharedPreferences sharedPrefSummary;
 
     boolean wasInBackgroundSummary = false;
-
-    /**
-     * A {@link ComponentCallbacks2} which is used to determine if app has been in
-     * background. If it was then wasInBackgroundTabs is changed to true.
-     */
-    public class MemoryBoss implements ComponentCallbacks2 {
-        @Override
-        public void onConfigurationChanged(final Configuration newConfig) {
-        }
-
-        @Override
-        public void onLowMemory() {
-        }
-
-        @Override
-        public void onTrimMemory(final int level) {
-            if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
-                // We're in the Background
-
-                wasInBackgroundSummary = true;
-
-
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        disableIncomingCallReceiver();
-                    }
-                }, 1500);
-
-            }
-            // you might as well implement some memory cleanup here and be a nice Android dev.
-        }
-    }
-
-    /**
-     * Used to enable IncomingCallReceiver that rejects any incoming calls
-     */
-    private void enableIncomingCallReceiver(){
-        PackageManager pm  = SummaryActivity.this.getPackageManager();
-        ComponentName componentName = new ComponentName(SummaryActivity.this, IncomingCallReceiver.class);
-        pm.setComponentEnabledSetting(componentName,PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP);
-        //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń aktywowany", Toast.LENGTH_LONG).show();
-    }
-
-    /**
-     * Used to disable IncomingCallReceiver that rejects any incoming calls
-     */
-    private void disableIncomingCallReceiver(){
-        PackageManager pm  = SummaryActivity.this.getPackageManager();
-        ComponentName componentName = new ComponentName(SummaryActivity.this, IncomingCallReceiver.class);
-        pm.setComponentEnabledSetting(componentName,PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP);
-        //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń dezaktywowany", Toast.LENGTH_LONG).show();
-    }
-
+    int fileYesAnswers = -1;
+    int fileNoAnswers = -1;
+    int fileDunnoAnswers = -1;
+    int serverYesAnswers = -1;
+    int serverNoAnswers = -1;
+    int serverDunnoAnswers = -1;
+    AlertDialog alertDialog;
     Thread thread = new Thread() {
         @Override
         public void run() {
@@ -99,6 +45,26 @@ public class SummaryActivity extends AppCompatActivity {
             }
         }
     };
+
+    /**
+     * Used to enable IncomingCallReceiver that rejects any incoming calls
+     */
+    private void enableIncomingCallReceiver() {
+
+        SharedPreferences.Editor editor = sharedPrefSummary.edit();
+        editor.putBoolean("Rejecting enabled", true);
+        editor.apply();
+    }
+
+    /**
+     * Used to disable IncomingCallReceiver that rejects any incoming calls
+     */
+    private void disableIncomingCallReceiver() {
+
+        SharedPreferences.Editor editor = sharedPrefSummary.edit();
+        editor.putBoolean("Rejecting enabled", false);
+        editor.apply();
+    }
 
     /**
      * Creates layout.
@@ -204,7 +170,7 @@ public class SummaryActivity extends AppCompatActivity {
 
         if (wasInBackgroundSummary) {
 
-            if (sharedPrefSummary.getBoolean("Call handled", false)){
+            if (sharedPrefSummary.getBoolean("Call handled", false)) {
                 wasInBackgroundSummary = false;
 
                 SharedPreferences.Editor editor = sharedPrefSummary.edit();
@@ -290,12 +256,37 @@ public class SummaryActivity extends AppCompatActivity {
 
     }
 
-    int fileYesAnswers = -1;
-    int fileNoAnswers = -1;
-    int fileDunnoAnswers = -1;
-    int serverYesAnswers = -1;
-    int serverNoAnswers = -1;
-    int serverDunnoAnswers = -1;
+    /**
+     * A {@link ComponentCallbacks2} which is used to determine if app has been in
+     * background. If it was then wasInBackgroundTabs is changed to true.
+     */
+    public class MemoryBoss implements ComponentCallbacks2 {
+        @Override
+        public void onConfigurationChanged(final Configuration newConfig) {
+        }
 
-    AlertDialog alertDialog;
+        @Override
+        public void onLowMemory() {
+        }
+
+        @Override
+        public void onTrimMemory(final int level) {
+            if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+                // We're in the Background
+
+                wasInBackgroundSummary = true;
+
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        disableIncomingCallReceiver();
+                    }
+                }, 1500);
+
+            }
+            // you might as well implement some memory cleanup here and be a nice Android dev.
+        }
+    }
 }

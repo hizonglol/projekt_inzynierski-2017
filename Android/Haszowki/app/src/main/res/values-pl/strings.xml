@@ -2,7 +2,7 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Haszówki</string>
-    <string name="version_value">0.7.9</string>
+    <string name="version_value">0.8.0</string>
     <string name="zero_value">0</string>
     <string name="six_zeros_value">000000</string>
     <string name="label_null">null</string>
@@ -88,6 +88,7 @@
     <string name="message_missing_min_version">Błędna konfiguracja! Brak minimalnej wersji aplikacji!</string>
     <string name="message_missing_max_version">Błędna konfiguracja! Brak maksymalnej wersji aplikacji!</string>
     <string name="message_missing_key">Błędna konfiguracja! Brak klucza do testu!</string>
+    <string name="message_wrong_key_abort_test">Klucz do testu nieprawidłowy! Sprawdź poprawność ID testu lub kontynuuj test na kartce!</string>
 
     <!--*** LABEL strings of TABS ***-->
     <string name="label_section">Pytanie nr %1$d</string>

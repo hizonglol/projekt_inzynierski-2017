@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.android.internal.telephony.ITelephony;
 
@@ -14,7 +15,7 @@ import java.lang.reflect.Method;
 
 /**
  * Created by morri on 16.10.2016.
- *
+ * <p>
  * This file contains class IncomingCallReceiver.
  * It is being used to reject incoming calls.
  */
@@ -33,19 +34,14 @@ public class IncomingCallReceiver extends BroadcastReceiver {
             ITelephony telephonyService = (ITelephony) m.invoke(telephonyManagerICR);
             Bundle bundle = intent.getExtras();
             String phoneNumber = bundle.getString("incoming_number");
-            //Log.e("INCOMING", phoneNumber);
-            if (phoneNumber != null) {
-                telephonyService.silenceRinger();
-                telephonyService.endCall();
-                //Log.e("HANG UP", phoneNumber);
+            Log.e("INCOMING", phoneNumber);
 
-                /*
-                SharedPreferences.Editor editor = sharedPrefICR.edit();
-                editor.putBoolean("Call handled", true);
-                editor.putBoolean("Call handle changed", true);
-                editor.apply();
-                */
-            }
+            if (sharedPrefICR.getBoolean("Rejecting enabled", false))
+                if (phoneNumber != null) {
+                    telephonyService.silenceRinger();
+                    telephonyService.endCall();
+                    //Log.e("HANG UP", phoneNumber);
+                }
 
         } catch (Exception e) {
             e.printStackTrace();

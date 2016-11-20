@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,9 +26,21 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 /**
  * Created by morri.
@@ -88,6 +101,17 @@ public class SecurityCheckActivity extends AppCompatActivity
         buttonSecurityCheck_abort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                serverCheckTask.cancel(true);
+                configurationTask.cancel(true);
+
+                try {
+                    if (alertDialog != null && alertDialog.isShowing()) {
+                        alertDialog.dismiss();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 finish();
             }
         });
@@ -100,18 +124,21 @@ public class SecurityCheckActivity extends AppCompatActivity
      */
     private void retryChecks() {
         if (!serverConnectionSuccessful) {
+            serverCheckTask.cancel(true);
             restartSpinning(progressButtonSecurityCheck_serverConnection);
             serverCheckTask = new serverConnectionCheckTask();
             serverCheckTask.execute();
         }
 
         if (!appConfigurationSuccessful) {
+            configurationTask.cancel(true);
             restartSpinning(progressButtonSecurityCheck_appConfiguration);
             configurationTask = new appConfigurationTask();
             configurationTask.execute();
         }
 
         if (!validationSuccessful) {
+            configurationTask.cancel(true);
             restartSpinning(progressButtonSecurityCheck_validation);
             configurationTask = new appConfigurationTask();
             configurationTask.execute();
@@ -364,7 +391,7 @@ public class SecurityCheckActivity extends AppCompatActivity
                     String announcePattern = getResources().getString(R.string.message_invalid_app_version);
                     String announcement = String.format(announcePattern, getResources().getString(R.string.version_value), minAppVersion, maxAppVersion);
 
-                    new AlertDialog.Builder(SecurityCheckActivity.this)
+                    alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setTitle(getResources().getString(R.string.label_attention))
                             .setMessage(announcement)
@@ -378,7 +405,7 @@ public class SecurityCheckActivity extends AppCompatActivity
                 appConfigurationSuccessful = false;
                 validationSuccessful = false;
 
-                new AlertDialog.Builder(SecurityCheckActivity.this)
+                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(getResources().getString(R.string.label_attention))
                         .setMessage("Błąd połączenia internetowego lub niewłaściwe ID testu!")
@@ -451,7 +478,7 @@ public class SecurityCheckActivity extends AppCompatActivity
     private boolean isConfigurationProper(String minVersion, String maxVersion, String rsaKey){
 
         if (minVersion == null){
-            new AlertDialog.Builder(SecurityCheckActivity.this)
+            alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle(getResources().getString(R.string.label_attention))
                     .setMessage(getResources().getString(R.string.message_missing_min_version))
@@ -461,7 +488,7 @@ public class SecurityCheckActivity extends AppCompatActivity
         }
         else{
             if (minVersion.equals("")) {
-                new AlertDialog.Builder(SecurityCheckActivity.this)
+                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(getResources().getString(R.string.label_attention))
                         .setMessage(getResources().getString(R.string.message_missing_min_version))
@@ -472,7 +499,7 @@ public class SecurityCheckActivity extends AppCompatActivity
         }
 
         if (maxVersion == null) {
-            new AlertDialog.Builder(SecurityCheckActivity.this)
+            alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle(getResources().getString(R.string.label_attention))
                     .setMessage(getResources().getString(R.string.message_missing_max_version))
@@ -481,7 +508,7 @@ public class SecurityCheckActivity extends AppCompatActivity
             return false;
         } else{
             if (maxVersion.equals("")) {
-                new AlertDialog.Builder(SecurityCheckActivity.this)
+                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(getResources().getString(R.string.label_attention))
                         .setMessage(getResources().getString(R.string.message_missing_max_version))
@@ -492,7 +519,7 @@ public class SecurityCheckActivity extends AppCompatActivity
         }
 
         if (rsaKey == null){
-            new AlertDialog.Builder(SecurityCheckActivity.this)
+            alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle(getResources().getString(R.string.label_attention))
                     .setMessage(getResources().getString(R.string.message_missing_key))
@@ -501,10 +528,19 @@ public class SecurityCheckActivity extends AppCompatActivity
             return false;
         } else {
             if (rsaKey.equals("")) {
-                new AlertDialog.Builder(SecurityCheckActivity.this)
+                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(getResources().getString(R.string.label_attention))
                         .setMessage(getResources().getString(R.string.message_missing_key))
+                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                        .show();
+                return false;
+            }
+            else if(!isRSAkeyValid()){
+                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getResources().getString(R.string.label_attention))
+                        .setMessage(getResources().getString(R.string.message_wrong_key_abort_test))
                         .setPositiveButton(getResources().getString(R.string.button_ok), null)
                         .show();
                 return false;
@@ -580,6 +616,54 @@ public class SecurityCheckActivity extends AppCompatActivity
         return false;
     }
 
+    /**
+     * Checks if RSA key is valid or not by trying to cipher text
+     *
+     * @return true i valid, false if not
+     */
+    private boolean isRSAkeyValid(){
+
+        String text = "Blebleble";
+
+        try {
+            byte[] keyBytes = Base64.decode(cipheringKey.getBytes(), Base64.DEFAULT);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+            PublicKey key = keyFactory.generatePublic(spec);
+            Cipher cipher = Cipher.getInstance("RSA/None/PKCS1Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+
+            new String(cipher.doFinal(text.getBytes("ISO-8859-1")), "ISO-8859-1");
+
+            return true;
+
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+            return false;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return false;
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+            return false;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return false;
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+            return false;
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private CircularProgressButton progressButtonSecurityCheck_validation;
     private CircularProgressButton progressButtonSecurityCheck_serverConnection;
     private CircularProgressButton progressButtonSecurityCheck_appConfiguration;
@@ -588,6 +672,7 @@ public class SecurityCheckActivity extends AppCompatActivity
     private serverConnectionCheckTask serverCheckTask;
     private appConfigurationTask configurationTask;
     private SettingsDataSource databaseSecurityCheck;
+    private AlertDialog alertDialog;
 
     /*
     * A flag indicating that app validation was successful.

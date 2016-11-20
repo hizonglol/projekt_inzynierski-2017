@@ -57,7 +57,6 @@
 
         <receiver
             android:name="com.twohe.morri.tools.IncomingCallReceiver"
-            android:enabled="false"
             android:priority="999">
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />

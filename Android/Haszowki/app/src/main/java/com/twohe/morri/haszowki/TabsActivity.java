@@ -1,12 +1,10 @@
 package com.twohe.morri.haszowki;
 
 import android.content.ComponentCallbacks2;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaScannerConnection;
@@ -36,7 +34,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.twohe.morri.tools.IncomingCallReceiver;
 import com.twohe.morri.tools.SettingsDataSource;
 
 import java.io.File;
@@ -69,7 +66,7 @@ import javax.crypto.NoSuchPaddingException;
 
 /**
  * Created by TwoHe on 10.07.2016.
- *
+ * <p>
  * This file contains class Tabs Activity.
  */
 @SuppressWarnings("FieldCanBeLocal")
@@ -142,9 +139,7 @@ public class TabsActivity extends AppCompatActivity {
         przyciski sa zakolorowane na szaro a aplikacja zachowuje sie tak jakby
         nie miala przyznanych uprawnien do internetu, a socket bylby zajety.
          */
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            enableIncomingCallReceiver();
-        }
+        enableIncomingCallReceiver();
     }
 
     /**
@@ -166,16 +161,26 @@ public class TabsActivity extends AppCompatActivity {
      * Used to enable IncomingCallReceiver that rejects any incoming calls
      */
     private void enableIncomingCallReceiver() {
-        PackageManager pm = TabsActivity.this.getPackageManager();
-        ComponentName componentName = new ComponentName(TabsActivity.this, IncomingCallReceiver.class);
-        pm.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP);
-        //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń aktywowany", Toast.LENGTH_LONG).show();
+
+
+        SharedPreferences.Editor editor = sharedPrefTabs.edit();
+        editor.putBoolean("Rejecting enabled", true);
+        editor.apply();
+    }
+
+    /**
+     * Used to disable IncomingCallReceiver that rejects any incoming calls
+     */
+    private void disableIncomingCallReceiver() {
+
+        SharedPreferences.Editor editor = sharedPrefTabs.edit();
+        editor.putBoolean("Rejecting enabled", false);
+        editor.apply();
     }
 
     /**
      * Called when activity is being resumed.
-     *
+     * <p>
      * Enables incoming call receiver.
      * Checks if test should be ended by not authorised app usage.
      */
@@ -243,17 +248,6 @@ public class TabsActivity extends AppCompatActivity {
         super.onDestroy();
 
         disableIncomingCallReceiver();
-    }
-
-    /**
-     * Used to disable IncomingCallReceiver that rejects any incoming calls
-     */
-    private void disableIncomingCallReceiver() {
-        PackageManager pm = TabsActivity.this.getPackageManager();
-        ComponentName componentName = new ComponentName(TabsActivity.this, IncomingCallReceiver.class);
-        pm.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP);
-        //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń dezaktywowany", Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -380,6 +374,7 @@ public class TabsActivity extends AppCompatActivity {
     /**
      * Scanning method used to scan file after text appending
      * so it's content is visible after connecting to Windows PC.
+     *
      * @param path of file to be scanned
      */
     private void scanFile(String path) {
@@ -452,7 +447,7 @@ public class TabsActivity extends AppCompatActivity {
      * Used to end test in emergency situations.
      * Shows to user an alert that something went wrong and launches terminator.
      */
-    private void endTestEmergency(){
+    private void endTestEmergency() {
         alertDialog = new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(getResources().getString(R.string.label_attention))

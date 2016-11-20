@@ -41,7 +41,7 @@ import java.io.File;
 
 /**
  * Created by morri on 30.07.2016.
- *
+ * <p>
  * This file contains class Main Activity.
  */
 @SuppressWarnings("FieldCanBeLocal")
@@ -60,15 +60,15 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("On create", "MainActivity");
 
-        disableIncomingCallReceiver();
-
-
         checkIfCloseRequested();
         canBeginTestFlag = false;
 
         createAppFolder();
 
         sharedPrefMain = PreferenceManager.getDefaultSharedPreferences(this);
+
+        disableIncomingCallReceiver();
+
         databaseMain = new SettingsDataSource(this);
 
         toolbarMain = (Toolbar) findViewById(R.id.toolbarMain);
@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         if (editMain_testID != null)
             editMain_testID.setOnEditorActionListener(doneKeyboardButton);
 
+        instantiateIncomingCallReceiver();
     }
 
     /**
@@ -331,11 +332,21 @@ public class MainActivity extends AppCompatActivity {
      * Used to disable IncomingCallReceiver that rejects any incoming calls
      */
     private void disableIncomingCallReceiver() {
+
+        SharedPreferences.Editor editor = sharedPrefMain.edit();
+        editor.putBoolean("Rejecting enabled", false);
+        editor.apply();
+    }
+
+    /**
+     * Used to launch IncomingCallReceiver
+     */
+    private void instantiateIncomingCallReceiver(){
+
         PackageManager pm = MainActivity.this.getPackageManager();
         ComponentName componentName = new ComponentName(MainActivity.this, IncomingCallReceiver.class);
-        pm.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+        pm.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
-        //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń dezaktywowany", Toast.LENGTH_LONG).show();
     }
 
     /**

@@ -23,7 +23,7 @@ import java.security.*;
  */
 public class configGenerator {
 
-    private static String VERSION_NUMBER = "0.7.9";
+    private static String VERSION_NUMBER = "0.8.0";
 
 
     private static boolean flagVersion = false;

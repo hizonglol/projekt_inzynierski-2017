@@ -1,3 +1,12 @@
+## 0.8.0 - 2016-11-20
+### Added
++ sprawdzanie poprawnoœci klucza szyfrowania w SecurityCheckActivity
++ koñczenie AlertDialog w razie ich wyœwietlenia w trakcie wychodzenia z SecurityCheckActivity
+
+### Changed
+~ nowy sposób blokowania i odblokowywania IncomingCallReceiver. Powinien pozbyæ siê b³êdu z niewysy³aj¹cymi siê odpowiedziami.
+~ poprawiony b³¹d przy AsyncTask gdzie te zadania nie koñcz¹c siê przed wejœciem do testu wywala³y po paru odpowiedziach aplikacjê
+
 ## 0.7.9 - 2016-11-20
 ### Added
 + koñczenie testu w przypadku wyst¹pienia b³êdu w szyfrowaniu
