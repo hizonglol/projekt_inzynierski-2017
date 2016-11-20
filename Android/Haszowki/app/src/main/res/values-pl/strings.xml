@@ -2,7 +2,7 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Haszówki</string>
-    <string name="version_value">0.7.6</string>
+    <string name="version_value">0.7.9</string>
     <string name="zero_value">0</string>
     <string name="six_zeros_value">000000</string>
     <string name="label_null">null</string>
@@ -83,6 +83,11 @@
     <string name="button_continue">Kontynuuj</string>
     <string name="button_try_again">Spróbuj ponownie</string>
 
+    <!--*** MESSAGES strings of SECURITYCHECK ***-->
+    <string name="message_invalid_app_version">Niewłaściwa wersja aplikacji %1$s! Wymagana wersja co najmniej %2$s i nie wyższa niż %3$s!</string>
+    <string name="message_missing_min_version">Błędna konfiguracja! Brak minimalnej wersji aplikacji!</string>
+    <string name="message_missing_max_version">Błędna konfiguracja! Brak maksymalnej wersji aplikacji!</string>
+    <string name="message_missing_key">Błędna konfiguracja! Brak klucza do testu!</string>
 
     <!--*** LABEL strings of TABS ***-->
     <string name="label_section">Pytanie nr %1$d</string>
@@ -107,6 +112,7 @@
     <string name="message_test_ended">Test zakończony</string>
     <string name="message_unable_to_send_answer">Nie udało się wysłać odpowiedzi!</string>
     <string name="message_no_internet_connection">Brak połączenia z Internetem!</string>
+    <string name="message_something_went_wrong_end_test">Coś poszło nie tak… Test zostanie zakończony. Kontynuuj test na kartce!</string>
 
 
     <!--*** LABEL strings of SUMMARY ***-->

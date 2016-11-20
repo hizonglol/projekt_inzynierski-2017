@@ -15,7 +15,8 @@ import java.lang.reflect.Method;
 /**
  * Created by morri on 16.10.2016.
  *
- * dd
+ * This file contains class IncomingCallReceiver.
+ * It is being used to reject incoming calls.
  */
 
 public class IncomingCallReceiver extends BroadcastReceiver {

@@ -39,6 +39,11 @@ import com.twohe.morri.tools.SettingsDataSource;
 
 import java.io.File;
 
+/**
+ * Created by morri on 30.07.2016.
+ *
+ * This file contains class Main Activity.
+ */
 @SuppressWarnings("FieldCanBeLocal")
 public class MainActivity extends AppCompatActivity {
 
@@ -53,9 +58,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d("On create", "MainActivity");
+
         disableIncomingCallReceiver();
 
-        Log.d("On create", "MainActivity");
 
         checkIfCloseRequested();
         canBeginTestFlag = false;
@@ -372,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             ArrayAdapter<String> adapter =
-                    new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, possibleTests);
+                    new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, possibleTests);
             editMain_testID.setAdapter(adapter);
             editMain_testID.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
 

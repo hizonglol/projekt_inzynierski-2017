@@ -36,7 +36,7 @@
     <string name="label_weight">Weights vector:</string>
     <string name="label_yes_answers">YES:</string>
     <string name="six_zeros_value">000000</string>
-    <string name="version_value">0.7.6</string>
+    <string name="version_value">0.7.9</string>
     <string name="zero_value">0</string>
     <string name="message_your_test_file_was_created">Your test file has been created</string>
     <string name="message_you_quit_test">You have left application</string>
@@ -80,4 +80,9 @@
     <string name="button_continue">Continue</string>
     <string name="button_try_again">Try again</string>
     <string name="label_attention">Attention</string>
+    <string name="message_invalid_app_version">Invalid app version %1$s! Required version at least %2$s and not higher than %3$s!</string>
+    <string name="message_missing_key">Invalid configuration! Missing key for test!</string>
+    <string name="message_missing_max_version">Invalid configuration! Missing maximal acceptable app version!</string>
+    <string name="message_missing_min_version">Invalid configuration! Missing minimal acceptable app version!</string>
+    <string name="message_something_went_wrong_end_test">Something went wrong… Test will be ended. Continue it on paper!</string>
 </resources>

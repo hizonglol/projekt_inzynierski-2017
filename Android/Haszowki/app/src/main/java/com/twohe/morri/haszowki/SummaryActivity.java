@@ -21,6 +21,8 @@ import com.twohe.morri.tools.IncomingCallReceiver;
 
 /**
  * Created by morri on 30.07.2016.
+ *
+ * This file contains class Summary Activity.
  */
 public class SummaryActivity extends AppCompatActivity {
 
@@ -28,6 +30,10 @@ public class SummaryActivity extends AppCompatActivity {
 
     boolean wasInBackgroundSummary = false;
 
+    /**
+     * A {@link ComponentCallbacks2} which is used to determine if app has been in
+     * background. If it was then wasInBackgroundTabs is changed to true.
+     */
     public class MemoryBoss implements ComponentCallbacks2 {
         @Override
         public void onConfigurationChanged(final Configuration newConfig) {
@@ -94,6 +100,13 @@ public class SummaryActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Creates layout.
+     * Initializes variables.
+     * Launches proper methods to instantiate activity.
+     *
+     * @param savedInstanceState instance state of created activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -179,6 +192,10 @@ public class SummaryActivity extends AppCompatActivity {
         checkErrors();
     }
 
+    /**
+     * Enables incoming call receiver.
+     * Checks whether app was in background or not.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -217,6 +234,9 @@ public class SummaryActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks if there were any missing answers in test and informs user about it.
+     */
     private void checkErrors() {
         boolean ifError = false;
 

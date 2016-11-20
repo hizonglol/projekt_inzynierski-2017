@@ -11,6 +11,9 @@ import com.twohe.morri.tools.DBHelper;
 
 /**
  * Created by morri on 23.08.2016.
+ *
+ * This file contains class SettingsDataSource.
+ * It is database that creates two colums containing values bounded with corresponding settings.
  */
 public class SettingsDataSource {
 

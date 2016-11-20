@@ -3,9 +3,8 @@ Aplikacja:
 - przesy³anie do serwera podpisu cyfrowego do walidacji
 - https przy wysy³aniu GET do serwera
 - sprawdzanie jakoœci ³¹cza internetowego przed rozpoczêciem testu (sprawdza jedynie ³¹cznoœæ z serwerem)
-- kompresja odpowiedzi przed zapisaniem do pliku
+- kompresja odpowiedzi przed zapisaniem do pliku (niepotrzebne)
 - poprawienie z³ych granic scrollview w Tabs Activity
-- przerzuciæ siê na lepsze szyfrowanie
 - w SecurityCheckActivity dodanie t³umaczeñ do stringów (plik java oraz layout)
 
 

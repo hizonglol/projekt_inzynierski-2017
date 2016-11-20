@@ -51,12 +51,9 @@ import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -68,13 +65,12 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
 
 
 /**
  * Created by TwoHe on 10.07.2016.
+ *
+ * This file contains class Tabs Activity.
  */
 @SuppressWarnings("FieldCanBeLocal")
 public class TabsActivity extends AppCompatActivity {
@@ -96,6 +92,13 @@ public class TabsActivity extends AppCompatActivity {
     private AlertDialog alertDialog;
     private File fileTabs_toWrite;
 
+    /**
+     * Creates layout.
+     * Initializes variables.
+     * Launches proper methods to instantiate activity.
+     *
+     * @param savedInstanceState instance state of created activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("On create", "TabsActivity");
@@ -130,10 +133,6 @@ public class TabsActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         if (tabLayout != null)
             tabLayout.setupWithViewPager(ViewPagerTabs);
-
-        StringBuilder buildCrypto = new StringBuilder(cryptoPass);
-        buildCrypto.replace(3, 4, "+");
-        cryptoPass = buildCrypto.toString();
 
         addTab();
 
@@ -174,6 +173,12 @@ public class TabsActivity extends AppCompatActivity {
         //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń aktywowany", Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Called when activity is being resumed.
+     *
+     * Enables incoming call receiver.
+     * Checks if test should be ended by not authorised app usage.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -208,6 +213,10 @@ public class TabsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Called when user presses back button.
+     * Asks him if he really wants to quit test.
+     */
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this)
@@ -247,6 +256,10 @@ public class TabsActivity extends AppCompatActivity {
         //Toast.makeText(getApplicationContext(), "Odrzucacz połączeń dezaktywowany", Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Adds fragment to fragment adapter.
+     * Fragment represents one tab with one question on test.
+     */
     public void addTab() {
         SectionsPagerAdapterTabs.addFragment();
     }
@@ -292,10 +305,6 @@ public class TabsActivity extends AppCompatActivity {
         String sessionID = generateSessionID();
         databaseTabsTestFile.createSetting("setting_sessionID", sessionID);
 
-        StringBuilder buildCryptoNano = new StringBuilder(cryptoPass);
-        buildCryptoNano.replace(13, 15, "78");
-        cryptoPass = buildCryptoNano.toString();
-
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss", Locale.getDefault());
         Date now = new Date();
         String fileName = formatter.format(now) + "-" + sessionID + ".txt";//like 2016_01_12-12_30_00-ABCdef12.txt
@@ -323,7 +332,7 @@ public class TabsActivity extends AppCompatActivity {
             writer.append(getResources().getString(R.string.version_value));
             writer.append("\t");
             writer.append(formatter.format(now));
-            writer.append("\n\n");
+            writer.append("\n====\n");
             writer.flush();
             writer.close();
             MediaScannerConnection.scanFile(this, new String[]{fileTabs_toWrite.getAbsolutePath()}, null, null);
@@ -334,9 +343,6 @@ public class TabsActivity extends AppCompatActivity {
             return true;
         }
 
-        StringBuilder buildCrypto = new StringBuilder(cryptoPass);
-        buildCrypto.replace(8, 9, "#");
-        cryptoPass = buildCrypto.toString();
         databaseTabsTestFile.close();
 
         return false;
@@ -351,10 +357,7 @@ public class TabsActivity extends AppCompatActivity {
      */
     public boolean appendToFileCiphered(String text) {
 
-        Log.d("decrypted", encryptItRSA(text));
-
         text = encryptItRSA(text);
-
 
         if (text.equals("")) return false;
 
@@ -362,6 +365,8 @@ public class TabsActivity extends AppCompatActivity {
             scanFile(fileTabs_toWrite.getAbsolutePath());
             FileWriter writer = new FileWriter(fileTabs_toWrite, true);
             writer.append(text);
+            writer.append("\n");
+            writer.append("====");
             writer.append("\n");
             writer.flush();
             writer.close();
@@ -372,6 +377,11 @@ public class TabsActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Scanning method used to scan file after text appending
+     * so it's content is visible after connecting to Windows PC.
+     * @param path of file to be scanned
+     */
     private void scanFile(String path) {
 
         MediaScannerConnection.scanFile(TabsActivity.this,
@@ -385,200 +395,72 @@ public class TabsActivity extends AppCompatActivity {
     }
 
     /**
-     * Ciphers given text using DES algorythm and password stored in
-     * cryptoPass variable.
+     * Ciphers given text using RSA algorythm and password stored in
+     * keyString variable.
      *
      * @param text encrypted string containing test answer
      * @return ciphered text if everything fine, "" if something went wrong
      */
-    private String encryptIt(String text) {
-
-        String cipheredText;
-
-        if (text.equals("")) return "";
-
-        try {
-            DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
-            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-            SecretKey key = keyFactory.generateSecret(keySpec);
-
-            byte[] clearText = text.getBytes("UTF8");
-            //byte[] clearText = text.getBytes("UTF8");
-            // Cipher is not threadTabs_killer safe
-            Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-
-            cipheredText = Base64.encodeToString(cipher.doFinal(clearText), Base64.DEFAULT);
-
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-            return "";
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return "";
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-            return "";
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return "";
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-            return "";
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-            return "";
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-            return "";
-        }
-
-        return cipheredText;
-    }
-
-    static String keyString = "MIICITANBgkqhkiG9w0BAQEFAAOCAg4AMIICCQKCAgBb5xkCfWc2eNXcXFhR3r2e\n" +
-            "2SAtyJsT1vXlP9Fu5d7W7Mf/uDTswf2ZWZsLu8wXX8RwTTZ4+yn8tHClUr9E8oVt\n" +
-            "bnJvut7z0/cPrrvMc1Al5VMrwl1NBznEI3Ih+Dl2+c7c9WPlYOJaI8cqnSLPSLzD\n" +
-            "2WJ1h4xZo6sLB7fPj1zJIARwFQPjas7bX0vO/MzJXHAP0CxmajVF69mcDUHVtbeA\n" +
-            "yPOMddv1Zw4twK+YS6gGjjiSXg73PA9oLrPJCBiuy7P0PFbXArzQIY/Q65kOaOgb\n" +
-            "BGGiWDSklobxaqdu2kZBMQGVTJop02ydkbOc1S6y/hSHCkpldVFeJOTm6shiAW6x\n" +
-            "xxOV0UilXSvZup+CwyLsaGWSP/3LnHooAtp7ANixRBe258hJPUBEHfRgjHyjk6vS\n" +
-            "qdKHuCgeO3pMIQB8/UbjDaMAgY0U8C16GcnpqIBQcsKmF9ng76+7Qs8TCQJY8VDT\n" +
-            "mneUHL8bi4OCR3g6udbvZ3qrWzJ1B03fe794ktMEDtlpBFKnl5WQiySrBzrilb14\n" +
-            "hkyk2VWpty9pQ9YXbKV0iqWJJyE7fFlttHJ7sbR1MIeLjeBYDbOMm0w/r1wReC1t\n" +
-            "bKJuaTgyz5sLO+T4iW+luDBo7xHFeqLm5wx39+6ix7vYxnZqstE6c9/GdkffYzSS\n" +
-            "FJArmjxXs2wmA8wnxRT4gwIDAQAB";
-
-    static String privateKeyString = "MIIJJgIBAAKCAgBb5xkCfWc2eNXcXFhR3r2e2SAtyJsT1vXlP9Fu5d7W7Mf/uDTs\n" +
-            "wf2ZWZsLu8wXX8RwTTZ4+yn8tHClUr9E8oVtbnJvut7z0/cPrrvMc1Al5VMrwl1N\n" +
-            "BznEI3Ih+Dl2+c7c9WPlYOJaI8cqnSLPSLzD2WJ1h4xZo6sLB7fPj1zJIARwFQPj\n" +
-            "as7bX0vO/MzJXHAP0CxmajVF69mcDUHVtbeAyPOMddv1Zw4twK+YS6gGjjiSXg73\n" +
-            "PA9oLrPJCBiuy7P0PFbXArzQIY/Q65kOaOgbBGGiWDSklobxaqdu2kZBMQGVTJop\n" +
-            "02ydkbOc1S6y/hSHCkpldVFeJOTm6shiAW6xxxOV0UilXSvZup+CwyLsaGWSP/3L\n" +
-            "nHooAtp7ANixRBe258hJPUBEHfRgjHyjk6vSqdKHuCgeO3pMIQB8/UbjDaMAgY0U\n" +
-            "8C16GcnpqIBQcsKmF9ng76+7Qs8TCQJY8VDTmneUHL8bi4OCR3g6udbvZ3qrWzJ1\n" +
-            "B03fe794ktMEDtlpBFKnl5WQiySrBzrilb14hkyk2VWpty9pQ9YXbKV0iqWJJyE7\n" +
-            "fFlttHJ7sbR1MIeLjeBYDbOMm0w/r1wReC1tbKJuaTgyz5sLO+T4iW+luDBo7xHF\n" +
-            "eqLm5wx39+6ix7vYxnZqstE6c9/GdkffYzSSFJArmjxXs2wmA8wnxRT4gwIDAQAB\n" +
-            "AoICAAXsuxcHAJ1pYtgm9+anRnA0LTfmY+D+jbGu0JCmrxwJ/cbFmFvfEbtOJIm4\n" +
-            "HKsxGFfpEmbwQj+xXkW6NOx7+hAY+7WqRW9Qre/L4v2GPZeD1j3O9PbfTWEQq+32\n" +
-            "s7Ww2x4xj7Qc79rBzbg4kyLr3Id/vzI2f9zTiVZXtAjkhCXPM5oKMMr7esR3u0pn\n" +
-            "z8f3dp3+XK5pkG+micvequzdHyxlSBY5DuoeL7LRZkCaOAXcK1d8StizfYbI4/xE\n" +
-            "0lqKdVp8fVi1K3j7gOsGFULxjm0XdjfiGdq2fZKYvpyN49OWFjUK0DF8GNd7qiml\n" +
-            "MLKHYMln523tB0bbeApO/oYa84jctK1H7Ot9n46XJ+sd8J18qG8Z4ybmLSfTQcf6\n" +
-            "zxKjHDO9Cp6ywO6jfO4+w0vAvyWaFIC6wBoUsa5ut++kQWtyo35ovICw88/bio1s\n" +
-            "WGSqRJzTB4djbF5TBFoeKLF08j2um6HOG/b6L1Tae19hbVuPbCF4eMgXx4qWbGU/\n" +
-            "sZhNJaXc0I5IPKUphyECmNkH36GkbLahHoDujw/PeNHuO5h1YYnpFE8z0LmoYKPU\n" +
-            "LNzkLje717SvJA2ZGsvDHGRCwKFc1nJRFi6J0P+DXwjL6ghUcAbDYK6wKZ5KQlt3\n" +
-            "Dc2mKaerlbnyueXIIc+MUjkLf7VrEwTBZoAxSyYCSP25NmORAoIBAQCd2TiuzA3q\n" +
-            "JuUpTS68SjltNdL6wf8JQg0EEoFNAeiz0eXjK72rmqSRd4U+NG1/680n0x3MdgEk\n" +
-            "wRWFI8LOjMTMTD1ItsuRK1CTj8zz0icuJCswrCfMg8TBPFsF1yYI/hcbYAJ9O0qj\n" +
-            "fe+iyO3LZl7tZGf7Qz1Daf4tXvvgGRIONbzdU31NBdVAAN2y3U9rp20t3HFXp25y\n" +
-            "AWop9e0mWQPwx0TfN7Qntn/ypTneifFr4uKRoz28+ijVo3op+Ka7Z5x1SB+1mGrM\n" +
-            "oX5jD5Q7STNHxupqw40r/110xZxmifrXxO1sM98xLWA7tTEmAx67iOBGBPlbdly0\n" +
-            "tOwIFAMncK4pAoIBAQCVDG+jp/M2fD9a8KNKDxWrJk83hkd+6ulYexH2yidB4HSp\n" +
-            "VrLezXgEfERUbf09UnNYyfu/5e4FeCFRIVsaPklkm1l5vHLZUAi5CeIeqpXt9MHR\n" +
-            "KZPgWpK/swGKLbTWhwyrH4q7OCG6A5IrfNYAgwusVhKfW9MWnrkDyh5KdR0JyrFl\n" +
-            "Ufz7MNIgSKt5stmWv13ttvgThEyI+3DMpMLH31U3CxZBHNUu8+lEW+Clnqo9wmpz\n" +
-            "dOA3mDOIEv81wvKTRiR+bFq6I0m9FH5X3HiLyEXQq7Vy8waCm6Hu0GrnLL9y8gWD\n" +
-            "f7XVJRBTdRHh0uDoGDgm3Cg44WR/ZFGWeHXq467LAoIBAD7Qkp381gy4Lbmh3VdQ\n" +
-            "skmjgbIIQVWN02ArfQkIGXJ1tOYSIgiIIbVBuuRmOK0PSTTv7ovO6eWWcNnqwTsx\n" +
-            "CZ/DNyAYninG8unF7+mXV8Ak5IsZ9zyLs2CyhAZu99PcSZW7P0JWtf0ZwKMnEno+\n" +
-            "4sfVjQuQVnDdXSjxA4rKb0T4XZA2CUb9az9tGMx1BYXxuqDleLVJC8qShYztMNJx\n" +
-            "2f+XTPEHWcnz9ja5Sa4lds1YHJGYRJlPc7CQvay2JqOtN7X0XaoGXXnRSlpheLuf\n" +
-            "Bakqn16dMzCvDqHJgdPMVOZIl7LXcZpAVGtuT4Cw/Snj7lvu3sxm7b17wfH1BMxN\n" +
-            "KwECggEAGQ9lOeQELZYIZPbuzYXpw8QGL7TBEqLWpwzSQWdN4HKnys0L+BAd7Msk\n" +
-            "BfoUSRoy0KvtSx+SvJKtL2HnWms8ldDU43X+7XDadpolzbgqyz6K0+sktOUlpVuo\n" +
-            "l54FuMguJhuAjOfsK8Vr7ynnJWDjNo+mQ+sBe90mCHAUVbqJLltJJlr5qRZVTh5J\n" +
-            "zoV2tjToyw4neciVwbZdCdtt8IMpZb7UeBAr++AAyYCVLeOWhhnJIi51gINzrp5b\n" +
-            "EKP9eyug+SyouIE0ZbkrYQRttDrxGhu0v2YDIzSdrnSWdNX+PopYyPpRDUxVCWM2\n" +
-            "pXx6WiuwTUBY9u9WoWCxoxYP5XVwrwKCAQBjY93rue7nx7LfdWpyMsd9xR+JLApJ\n" +
-            "OOBGWf01ae3wCjyjJOldoSee9YTZ53PVm94sOUGaB6R24HWjo4U3D45S2Wci9KUn\n" +
-            "Vsh39uTvbb4tPF/UgZPf/sq0pBGWaTieQ9cZaGiAealBFPvxmO39VidSfgfwMMZW\n" +
-            "phG1NXphS9Ze9WysQ4qFECjmHqclmvkddihSUjfyCBNgpTYTpt5TKDYIDBgZND4V\n" +
-            "cuKst1s76mlm5J7Z5xoHR/k9R6/DrAOOaCEQFmuhoOgW6hhNhrZ4CvnBGr6mB+Mx\n" +
-            "0Qx53ukTfEMyWpx2ceAmomsyHlLycGttKvnrhAP7j1RWFIXjzo/7Q5jo";
-
     private String encryptItRSA(String text) {
 
         String cipheredText;
 
         try {
-            byte[] keyBytes = Base64.decode(keyString.getBytes(), Base64.DEFAULT);
+            byte[] keyBytes = Base64.decode(cryptoPass.getBytes(), Base64.DEFAULT);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
             PublicKey key = keyFactory.generatePublic(spec);
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("RSA/None/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, key);
 
             cipheredText = new String(cipher.doFinal(text.getBytes("ISO-8859-1")), "ISO-8859-1");
 
         } catch (InvalidKeyException e) {
             e.printStackTrace();
+            endTestEmergency();
             return "";
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            endTestEmergency();
             return "";
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
+            endTestEmergency();
             return "";
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
+            endTestEmergency();
             return "";
         } catch (BadPaddingException e) {
             e.printStackTrace();
+            endTestEmergency();
             return "";
         } catch (NoSuchPaddingException e) {
             e.printStackTrace();
+            endTestEmergency();
             return "";
         } catch (IllegalBlockSizeException e) {
             e.printStackTrace();
+            endTestEmergency();
             return "";
         }
 
         return cipheredText;
     }
 
-    private String decryptItRsa(String text) {
+    /**
+     * Used to end test in emergency situations.
+     * Shows to user an alert that something went wrong and launches terminator.
+     */
+    private void endTestEmergency(){
+        alertDialog = new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(getResources().getString(R.string.label_attention))
+                .setMessage(getResources().getString(R.string.message_something_went_wrong_end_test))
+                .setCancelable(false)
+                .show();
 
-        String cipheredText;
-
-        try {
-            byte[] keyBytes = Base64.decode(privateKeyString.getBytes(), Base64.DEFAULT);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA", "BC");
-            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-            PrivateKey key = keyFactory.generatePrivate(spec);
-            Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-
-            cipheredText = new String(cipher.doFinal(text.getBytes("ISO-8859-1")), "ISO-8859-1");
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-            return "";
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return "";
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-            return "";
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-            return "";
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return "";
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-            return "";
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-            return "";
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-            return "";
-        }
-
-        return cipheredText;
+        threadKillerTabs.start();
     }
 
     /**
@@ -659,7 +541,9 @@ public class TabsActivity extends AppCompatActivity {
 
                     ((TabsActivity) getActivity()).summariseTest();
                     if ((getArguments().getInt(ARG_SECTION_NUMBER) % 16) == 0 && !anyAnswerSent) {
-                        sendToServer(rootView, 0, "no_answer");
+                        String timestamp = makeTimeStamp();
+                        if (saveToFile(rootView, 0, "no_answer", timestamp)) return;
+                        sendToServer(rootView, 0, "no_answer", timestamp);
                         anyAnswerSent = true;
                     }
                 }
@@ -669,8 +553,9 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    if (saveToFile(rootView, 1, "yes")) return;
-                    sendToServer(rootView, 1, "yes");
+                    String timestamp = makeTimeStamp();
+                    if (saveToFile(rootView, 1, "yes", timestamp)) return;
+                    sendToServer(rootView, 1, "yes", timestamp);
                     anyAnswerSent = true;
                 }
             });
@@ -679,8 +564,9 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    if (saveToFile(rootView, 2, "no")) return;
-                    sendToServer(rootView, 2, "no");
+                    String timestamp = makeTimeStamp();
+                    if (saveToFile(rootView, 2, "no", timestamp)) return;
+                    sendToServer(rootView, 2, "no", timestamp);
                     anyAnswerSent = true;
                 }
             });
@@ -689,8 +575,9 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    if (saveToFile(rootView, 3, "dunno")) return;
-                    sendToServer(rootView, 3, "dunno");
+                    String timestamp = makeTimeStamp();
+                    if (saveToFile(rootView, 3, "dunno", timestamp)) return;
+                    sendToServer(rootView, 3, "dunno", timestamp);
                     anyAnswerSent = true;
                 }
             });
@@ -702,7 +589,9 @@ public class TabsActivity extends AppCompatActivity {
                     ((TabsActivity) getActivity()).addTab();
                     int nextTab = ((TabsActivity) getActivity()).guestionsAmount++;
                     if (getArguments().getInt(ARG_SECTION_ANSWER_FILE) == 0 && !anyAnswerSent) {
-                        sendToServer(rootView, 0, "no_answer");
+                        String timestamp = makeTimeStamp();
+                        if (saveToFile(rootView, 0, "no_answer", timestamp)) return;
+                        sendToServer(rootView, 0, "no_answer", timestamp);
                         anyAnswerSent = true;
                     }
 
@@ -773,9 +662,9 @@ public class TabsActivity extends AppCompatActivity {
          * @param answerNo Type of given answer
          * @return false if everything went well, true if something bad happened
          */
-        private boolean saveToFile(View rootView, int question, String answerNo) {
+        private boolean saveToFile(View rootView, int question, String answerNo, String timestamp) {
 
-            if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", answerNo))) {
+            if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", answerNo, timestamp))) {
                 setGivenAnswerGray(rootView, question);
 
                 //Gets last answer to decrease corresponding variable
@@ -798,15 +687,28 @@ public class TabsActivity extends AppCompatActivity {
          * @param question Number of corresponding tab
          * @param answerNo Type of given answer
          */
-        private void sendToServer(View rootView, int question, String answerNo) {
+        private void sendToServer(View rootView, int question, String answerNo, String timestamp) {
 
             if (isOnline()) {
                 DownloadWebpageTask task = new DownloadWebpageTask();
                 task.configure(rootView, question);
-                task.execute(createDataURL("to_server", answerNo));
+                task.execute(createDataURL("to_server", answerNo, timestamp));
             } else {
                 Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
             }
+        }
+
+        /**
+         * Generates timestamp
+         *
+         * @return timestamp of given format
+         */
+        private String makeTimeStamp() {
+
+            //Get current timestamp
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss_SSS", Locale.getDefault());
+            Date timestamp = new Date();
+            return formatter.format(timestamp);
         }
 
         /**
@@ -817,7 +719,7 @@ public class TabsActivity extends AppCompatActivity {
          * @param answer Type of answer
          * @return Built URL with all significant data
          */
-        private String createDataURL(String mode, String answer) {
+        private String createDataURL(String mode, String answer, String timestamp) {
 
             SettingsDataSource databaseCreateDataURL = new SettingsDataSource(getActivity());
             databaseCreateDataURL.open();
@@ -825,18 +727,18 @@ public class TabsActivity extends AppCompatActivity {
             StringBuilder sbServerQuery = new StringBuilder();
             String divider = "&";
 
-            //Get current timestamp
-            SimpleDateFormat formatter = new SimpleDateFormat("HH_mm_ss_SSS", Locale.getDefault());
-            Date timestamp = new Date();
-            String stringTimestamp = formatter.format(timestamp);
-
             if (mode.equals("to_server")) {
                 String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
                 String stringServerUrl = getResources().getString(R.string.server_address);
                 if (stringDbServerUrl.length() > 1) {
                     stringServerUrl = stringDbServerUrl;
                 }
-                stringServerUrl = stringServerUrl.concat("empty.html");
+                stringServerUrl = stringServerUrl
+                        .concat(databaseCreateDataURL.getSetting("setting_course"))
+                        .concat("/")
+                        .concat(databaseCreateDataURL.getSetting("setting_test_id"))
+                        .concat(".xml").toLowerCase();
+                stringServerUrl = stringServerUrl.replace(" ", "");
                 sbServerQuery.append(stringServerUrl).append("?");
             }
 
@@ -858,7 +760,7 @@ public class TabsActivity extends AppCompatActivity {
             sbServerQuery.append("hall_row=").append(hall_row).append(divider);
             sbServerQuery.append("hall_seat=").append(hall_seat).append(divider);
             sbServerQuery.append("group=").append(group).append(divider);
-            sbServerQuery.append("timestamp=").append(stringTimestamp).append(divider);
+            sbServerQuery.append("timestamp=").append(timestamp).append(divider);
             sbServerQuery.append("question_no=").append(question_no).append(divider);
             sbServerQuery.append("answer=").append(answer).append(divider);
             sbServerQuery.append("vector=").append(vector).append(divider);
@@ -869,8 +771,6 @@ public class TabsActivity extends AppCompatActivity {
 
             String sentUrl = sbServerQuery.toString();
             sentUrl = sentUrl.replace(" ", "");
-
-            Log.d("Sent uri", sentUrl);
 
             databaseCreateDataURL.close();
 
@@ -989,14 +889,14 @@ public class TabsActivity extends AppCompatActivity {
             InputStream is = null;
             // Only display the first 500 characters of the retrieved
             // web page content.
-            int len = 500;
+            int len = 1;
 
             try {
                 URL url = new URL(myurl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(10000 /* milliseconds */);
                 conn.setConnectTimeout(15000 /* milliseconds */);
-                conn.setRequestMethod("GET");
+                conn.setRequestMethod("HEAD");
                 conn.setDoInput(true);
                 // Starts the query
                 conn.connect();
@@ -1032,7 +932,7 @@ public class TabsActivity extends AppCompatActivity {
          * @throws IOException
          * @throws UnsupportedEncodingException
          */
-        public String convertInputStreamToString(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+        public String convertInputStreamToString(InputStream stream, int len) throws IOException {
             Reader reader = null;
             reader = new InputStreamReader(stream, "UTF-8");
             char[] buffer = new char[len];

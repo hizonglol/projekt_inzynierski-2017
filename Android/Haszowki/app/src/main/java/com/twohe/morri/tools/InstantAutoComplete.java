@@ -7,6 +7,10 @@ import android.widget.AutoCompleteTextView;
 
 /**
  * Created by morri on 25.10.2016.
+ *
+ * This file contains class InstantAutoComplete which is extended
+ * version of AutoCompleteTextView.
+ * It shows all possible matching attributes only by clicking on it.
  */
 
 public class InstantAutoComplete extends AutoCompleteTextView {

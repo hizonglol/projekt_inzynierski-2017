@@ -18,16 +18,16 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <com.dd.CircularProgressButton
                 android:id="@+id/progressButtonSecurityCheck_serverConnection"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:textColor="@color/cpb_white"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/cpb_white"
                 android:textSize="18sp"
                 app:cpb_iconComplete="@drawable/ic_action_accept"
                 app:cpb_iconError="@drawable/ic_action_cancel" />
@@ -35,15 +35,15 @@
             <com.twohe.morri.tools.AutoResizeTextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:gravity="center|start"
-                android:maxLines="1"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/progressButtonSecurityCheck_serverConnection"
-                android:layout_toLeftOf="@id/progressButtonSecurityCheck_serverConnection"
-                android:paddingRight="@dimen/activity_vertical_margin"
-                android:paddingEnd="@dimen/activity_vertical_margin"
                 android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/progressButtonSecurityCheck_serverConnection"
+                android:layout_toStartOf="@id/progressButtonSecurityCheck_serverConnection"
+                android:gravity="center|start"
+                android:maxLines="1"
+                android:paddingEnd="@dimen/activity_vertical_margin"
+                android:paddingRight="@dimen/activity_vertical_margin"
                 android:text="Test jakości połączenia"
                 android:textColor="#000000"
                 android:textSize="25sp" /> <!-- maximum size -->
@@ -58,18 +58,19 @@
             android:layout_marginTop="10sp"
             android:background="@android:color/darker_gray" />
 
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <com.dd.CircularProgressButton
-                android:id="@+id/progressButtonSecurityCheck_validation"
+                android:id="@+id/progressButtonSecurityCheck_appConfiguration"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:textColor="@color/cpb_white"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/cpb_white"
                 android:textSize="18sp"
                 app:cpb_iconComplete="@drawable/ic_action_accept"
                 app:cpb_iconError="@drawable/ic_action_cancel" />
@@ -77,16 +78,16 @@
             <com.twohe.morri.tools.AutoResizeTextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/progressButtonSecurityCheck_appConfiguration"
+                android:layout_toStartOf="@id/progressButtonSecurityCheck_appConfiguration"
                 android:gravity="center|start"
                 android:maxLines="1"
-                android:layout_alignParentLeft="true"
-                android:paddingRight="@dimen/activity_vertical_margin"
                 android:paddingEnd="@dimen/activity_vertical_margin"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/progressButtonSecurityCheck_validation"
-                android:layout_toLeftOf="@id/progressButtonSecurityCheck_validation"
-                android:layout_centerVertical="true"
-                android:text="Walidacja aplikacji"
+                android:paddingRight="@dimen/activity_vertical_margin"
+                android:text="Inicjalizacja testu"
                 android:textColor="#000000"
                 android:textSize="25sp" /> <!-- maximum size -->
 
@@ -99,18 +100,19 @@
             android:layout_marginTop="10sp"
             android:background="@android:color/darker_gray" />
 
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <com.dd.CircularProgressButton
-                android:id="@+id/progressButtonSecurityCheck_appConfiguration"
+                android:id="@+id/progressButtonSecurityCheck_validation"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:textColor="@color/cpb_white"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/cpb_white"
                 android:textSize="18sp"
                 app:cpb_iconComplete="@drawable/ic_action_accept"
                 app:cpb_iconError="@drawable/ic_action_cancel" />
@@ -118,20 +120,21 @@
             <com.twohe.morri.tools.AutoResizeTextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:gravity="center|start"
-                android:maxLines="1"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:paddingRight="@dimen/activity_vertical_margin"
-                android:paddingEnd="@dimen/activity_vertical_margin"
-                android:layout_toStartOf="@id/progressButtonSecurityCheck_appConfiguration"
-                android:layout_toLeftOf="@id/progressButtonSecurityCheck_appConfiguration"
                 android:layout_centerVertical="true"
-                android:text="Inicjalizacja testu"
+                android:layout_toLeftOf="@id/progressButtonSecurityCheck_validation"
+                android:layout_toStartOf="@id/progressButtonSecurityCheck_validation"
+                android:gravity="center|start"
+                android:maxLines="1"
+                android:paddingEnd="@dimen/activity_vertical_margin"
+                android:paddingRight="@dimen/activity_vertical_margin"
+                android:text="Walidacja aplikacji"
                 android:textColor="#000000"
                 android:textSize="25sp" /> <!-- maximum size -->
 
         </RelativeLayout>
+
 
         <TableRow
             android:layout_width="fill_parent"

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -21,6 +22,8 @@ import com.twohe.morri.tools.SettingsDataSource;
 
 /**
  * Created by TwoHe on 10.07.2016.
+ *
+ * This file contains class Settings Activity.
  */
 public class SettingsActivity extends AppCompatActivity {
 
@@ -30,6 +33,8 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        Log.d("On create", "SettingsActivity");
 
         db.open();
 
@@ -108,7 +113,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         if (editSettings_course != null) {
             ArrayAdapter<String> adapter =
-                    new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, courses);
+                    new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, courses);
             editSettings_course.setAdapter(adapter);
             editSettings_course.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
 

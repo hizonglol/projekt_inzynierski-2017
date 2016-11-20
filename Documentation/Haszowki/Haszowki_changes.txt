@@ -1,3 +1,26 @@
+## 0.7.9 - 2016-11-20
+### Added
++ koñczenie testu w przypadku wyst¹pienia b³êdu w szyfrowaniu
++ sprawdzanie istnienia klucza RSA, minimalnej wersji oraz maksymalnej wersji
++ sprawdzanie (jeœli !null) czy klucz, minimalna wersja oraz maksymalna wersja s¹ ró¿ne od ""
+
+### Changed
+~ uzupe³nienie i zaaktualizowanie dokumentacji
+~ zmiana i uzupe³nienie angielskiego t³umaczenia
+
+## 0.7.8 - 2016-11-18
+### Changed
+~ klucz do szyfrowania za pomoc¹ algorytmu RSA pobierany z pliku XML serwera
+
+## 0.7.7 - 2016-11-16
+### Changed
+~ szyfrowanie odbywa siê teraz za pomoc¹ algorytmu RSA
+~ przy wysy³aniu odpowiedzi zapytanie HEAD zamiast GET
+~ zmieniony wygl¹d layoutu w Security Check
+~ zmienione zachowanie Security Check:
+  - konfiguracja aplikacji pobiera klucz szyfrowania oraz max-min wersjê aplikacji
+  - walidacja aplikacji sprawdza wersjê aplikacji
+
 ## 0.7.6 - 2016-11-13
 ### Added
 + dodane trochê dokumentacji

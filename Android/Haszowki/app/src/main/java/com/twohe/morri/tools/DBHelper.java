@@ -7,6 +7,9 @@ import android.util.Log;
 
 /**
  * Created by morri on 23.08.2016.
+ *
+ * This file contains class DBHelper.
+ * It is used to manage app database in more suitable way for user.
  */
 public class DBHelper extends SQLiteOpenHelper {
 

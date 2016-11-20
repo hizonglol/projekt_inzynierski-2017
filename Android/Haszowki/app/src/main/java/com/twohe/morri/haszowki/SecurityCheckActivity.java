@@ -1,7 +1,6 @@
 package com.twohe.morri.haszowki;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -10,7 +9,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,19 +30,23 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * This activity is being used to check application
+ * Created by morri.
+ *
+ * This file contains class Settings Activity.
  */
 public class SecurityCheckActivity extends AppCompatActivity
         implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
     /**
-     * @param savedInstanceState
+     * @param savedInstanceState instance state of created activity
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_security_check);
+
+        Log.d("On create", "SecurityCheckActivity");
 
         sharedPrefSecurity = PreferenceManager.getDefaultSharedPreferences(this);
         databaseSecurityCheck = new SettingsDataSource(this);
@@ -65,15 +67,12 @@ public class SecurityCheckActivity extends AppCompatActivity
         configurationTask = new appConfigurationTask();
         configurationTask.execute();
 
-        progressButtonSecurityCheck_validation.setProgress(0);
-
         buttonSecurityCheck_continue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (serverConnectionSuccessful && appConfigurationSuccessful) {
+                if (serverConnectionSuccessful && appConfigurationSuccessful && validationSuccessful) {
 
                     SharedPreferences.Editor editor = sharedPrefSecurity.edit();
-                    Log.d("Przekazany klucz", cipheringKey);
                     editor.putString("Key", cipheringKey);
                     editor.apply();
 
@@ -95,6 +94,10 @@ public class SecurityCheckActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Used to execute check tasks.
+     * Restarts spinners.
+     */
     private void retryChecks() {
         if (!serverConnectionSuccessful) {
             restartSpinning(progressButtonSecurityCheck_serverConnection);
@@ -107,19 +110,37 @@ public class SecurityCheckActivity extends AppCompatActivity
             configurationTask = new appConfigurationTask();
             configurationTask.execute();
         }
+
+        if (!validationSuccessful) {
+            restartSpinning(progressButtonSecurityCheck_validation);
+            configurationTask = new appConfigurationTask();
+            configurationTask.execute();
+        }
     }
 
+    /**
+     * USE IT FOR SAFETYNET
+     *
+     * @param connectionHint not yet described
+     */
     @Override
     public void onConnected(Bundle connectionHint) {
     }
 
+    /**
+     * USE IT FOR SAFETYNET
+     *
+     * @param cause not yet described
+     */
     @Override
     public void onConnectionSuspended(int cause) {
         mGoogleApiClient.connect();
     }
 
     /**
-     * @param result
+     * USE IT FOR SAFETYNET
+     *
+     * @param result not yet described
      */
     @Override
     public void onConnectionFailed(ConnectionResult result) {
@@ -143,7 +164,7 @@ public class SecurityCheckActivity extends AppCompatActivity
     }
 
     /**
-     *
+     * USE IT FOR SAFETYNET
      */
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -230,11 +251,11 @@ public class SecurityCheckActivity extends AppCompatActivity
         protected void onPostExecute(String result) {
             if (result.equals("success")) {
                 spinnerSuccessful(progressButtonSecurityCheck_serverConnection);
-                buttonSecurityCheck_continue.setText("Kontynuuj");
+                buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_continue));
                 serverConnectionSuccessful = true;
             } else if (result.equals("failure")) {
                 spinnerUnsuccessful(progressButtonSecurityCheck_serverConnection);
-                buttonSecurityCheck_continue.setText("Spróbuj ponownie");
+                buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_try_again));
                 serverConnectionSuccessful = false;
             }
         }
@@ -245,7 +266,7 @@ public class SecurityCheckActivity extends AppCompatActivity
      *
      * @param context       of application
      * @param serverAddress address of checked server
-     * @return
+     * @return true if server is reachable, false if not
      */
     public static boolean isReachable(Context context, String serverAddress) {
         // First, check we have any sort of connectivity
@@ -271,6 +292,9 @@ public class SecurityCheckActivity extends AppCompatActivity
         return isReachable;
     }
 
+    /**
+     * Being used to download app configuration.
+     */
     private class appConfigurationTask extends AsyncTask<String, String, String> {
 
         /**
@@ -314,19 +338,31 @@ public class SecurityCheckActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(String result) {
             if (result.equals("success")) {
-                if (isAppVersionAcceptable(minAppVersion, maxAppVersion)) {
-                    spinnerSuccessful(progressButtonSecurityCheck_appConfiguration);
-                    buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_continue));
-                    appConfigurationSuccessful = true;
-                } else {
+
+                spinnerSuccessful(progressButtonSecurityCheck_appConfiguration);
+                buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_continue));
+                appConfigurationSuccessful = true;
+
+                if(!isConfigurationProper(minAppVersion, maxAppVersion, cipheringKey)){
                     spinnerUnsuccessful(progressButtonSecurityCheck_appConfiguration);
+                    spinnerUnsuccessful(progressButtonSecurityCheck_validation);
                     buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_try_again));
                     appConfigurationSuccessful = false;
+                    validationSuccessful = false;
+                    return;
+                }
 
-                    String announcement = "Niewłaściwa wersja aplikacji ";
-                    announcement = announcement.concat(getResources().getString(R.string.version_value)).concat("!")
-                            .concat(" Wymagana wersja co najmniej ").concat(minAppVersion)
-                            .concat(" i nie wyższa niż ").concat(maxAppVersion).concat("!");
+                if (isAppVersionAcceptable(minAppVersion, maxAppVersion)) {
+                    spinnerSuccessful(progressButtonSecurityCheck_validation);
+                    buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_continue));
+                    validationSuccessful = true;
+                } else {
+                    spinnerUnsuccessful(progressButtonSecurityCheck_validation);
+                    buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_try_again));
+                    validationSuccessful = false;
+
+                    String announcePattern = getResources().getString(R.string.message_invalid_app_version);
+                    String announcement = String.format(announcePattern, getResources().getString(R.string.version_value), minAppVersion, maxAppVersion);
 
                     new AlertDialog.Builder(SecurityCheckActivity.this)
                             .setIcon(android.R.drawable.ic_dialog_alert)
@@ -337,13 +373,15 @@ public class SecurityCheckActivity extends AppCompatActivity
                 }
             } else if (result.equals("failure")) {
                 spinnerUnsuccessful(progressButtonSecurityCheck_appConfiguration);
+                spinnerUnsuccessful(progressButtonSecurityCheck_validation);
                 buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_try_again));
                 appConfigurationSuccessful = false;
+                validationSuccessful = false;
 
                 new AlertDialog.Builder(SecurityCheckActivity.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage("Błąd połączenia internetowego!")
+                        .setMessage("Błąd połączenia internetowego lub niewłaściwe ID testu!")
                         .setPositiveButton(getResources().getString(R.string.button_ok), null)
                         .show();
             }
@@ -355,7 +393,7 @@ public class SecurityCheckActivity extends AppCompatActivity
      *
      * @param context               of application
      * @param serverDocumentAddress address of configuration file
-     * @return
+     * @return true if downloaded configuration, false if not
      */
     public static boolean downloadedConfiguration(Context context, String serverDocumentAddress) {
         // First, check we have any sort of connectivity
@@ -385,7 +423,7 @@ public class SecurityCheckActivity extends AppCompatActivity
                                 minAppVersion = configurationParser.getAttributeValue(null, "min");
                                 maxAppVersion = configurationParser.getAttributeValue(null, "max");
                             } else if (name.equals("key")) {
-                                cipheringKey = configurationParser.getAttributeValue(null, "aes");
+                                cipheringKey = configurationParser.getAttributeValue(null, "rsa");
                             }
                             break;
                     }
@@ -401,7 +439,89 @@ public class SecurityCheckActivity extends AppCompatActivity
         return downloadedConfiguration;
     }
 
+    /**
+     * Used to check if these values are not null.
+     * If they're not null then checks if they're not equal "".
+     *
+     * @param minVersion minimal version
+     * @param maxVersion maximal version
+     * @param rsaKey ciphering key
+     * @return true if proper, false if not
+     */
+    private boolean isConfigurationProper(String minVersion, String maxVersion, String rsaKey){
 
+        if (minVersion == null){
+            new AlertDialog.Builder(SecurityCheckActivity.this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(getResources().getString(R.string.label_attention))
+                    .setMessage(getResources().getString(R.string.message_missing_min_version))
+                    .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                    .show();
+            return false;
+        }
+        else{
+            if (minVersion.equals("")) {
+                new AlertDialog.Builder(SecurityCheckActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getResources().getString(R.string.label_attention))
+                        .setMessage(getResources().getString(R.string.message_missing_min_version))
+                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                        .show();
+                return false;
+            }
+        }
+
+        if (maxVersion == null) {
+            new AlertDialog.Builder(SecurityCheckActivity.this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(getResources().getString(R.string.label_attention))
+                    .setMessage(getResources().getString(R.string.message_missing_max_version))
+                    .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                    .show();
+            return false;
+        } else{
+            if (maxVersion.equals("")) {
+                new AlertDialog.Builder(SecurityCheckActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getResources().getString(R.string.label_attention))
+                        .setMessage(getResources().getString(R.string.message_missing_max_version))
+                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                        .show();
+                return false;
+            }
+        }
+
+        if (rsaKey == null){
+            new AlertDialog.Builder(SecurityCheckActivity.this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(getResources().getString(R.string.label_attention))
+                    .setMessage(getResources().getString(R.string.message_missing_key))
+                    .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                    .show();
+            return false;
+        } else {
+            if (rsaKey.equals("")) {
+                new AlertDialog.Builder(SecurityCheckActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getResources().getString(R.string.label_attention))
+                        .setMessage(getResources().getString(R.string.message_missing_key))
+                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                        .show();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks whether application version higher or equal than minimal version,
+     * and lower or equal than maximal version
+     *
+     * @param minVersion minimal app version
+     * @param maxVersion maximal app version
+     * @return true if acceptable, false if not
+     */
     private boolean isAppVersionAcceptable(String minVersion, String maxVersion) {
 
         String appVersion = getResources().getString(R.string.version_value);
