@@ -3,7 +3,13 @@
 \usepackage[left=3cm,right=3cm,top=1cm,bottom=2cm]{geometry}
 \usepackage{polski}
 \usepackage[utf8]{inputenc}
-\usepackage{graphicx}
+\usepackage{graphicx, float}
+
+\newenvironment{absolutelynopagebreak}
+{\par\nobreak\vfil\penalty0\vfilneg
+	\vtop\bgroup}
+{\par\xdef\tpd{\the\prevdepth}\egroup
+	\prevdepth=\tpd}
 
 \title{%
 	System pisania testów na platformie Android \\
@@ -61,6 +67,8 @@
 	
 	Stworzony został też deszyfrator plików przechowywanych na telefonach studentów pozwalający na odzyskanie odpowiedzi studenta w razie problemów z połączeniem z serwerem gdy nie wszystkie odpowiedzi do niego dotarły.
 	
+	Do tworzenia plików konfiguracyjnych stworzony został konfigurator. Tworzy on dokument XML zawierający klucz szyfrowania i zakres dopuszczalnych wersji aplikacji, oraz tworzy on plik przechowujący klucz do deszyfrowania.
+	
 	\chapter{Elementy aplikacji}
 	
 		\section{Widoki aplikacji}
@@ -70,13 +78,42 @@
 		Widoki jakie zostały zaimplementowane w aplikacji to:
 		\begin{itemize}
 			\item Widok główny\\
-			Za jego pomocą użytkownik może wprowadzić swoje miejsce i rząd w jakim się znajduje, wektor wag służący do wyliczenia grupy na teście oraz kod testu. Na tym widoku można uruchomić również skaner kodów QR do automatycznego pobrania wektora wag i kodu testu oraz wyliczenia grupy na teście. Trzy dolne przyciski służą do wyjścia z aplikacji, ręcznego wyliczenia numeru grupy oraz przejścia do testu. Z tego widoku można również otworzyć menu, z którego można dostać się do widoku ustawień i widoku informacji.
+			\begin{minipage}{0.45\textwidth}
+				Za jego pomocą użytkownik może wprowadzić swoje miejsce i rząd w jakim się znajduje, wektor wag służący do wyliczenia grupy na teście oraz kod testu. Na tym widoku można uruchomić również skaner kodów QR do automatycznego pobrania wektora wag i kodu testu oraz wyliczenia grupy na teście. Trzy dolne przyciski służą do wyjścia z aplikacji, ręcznego wyliczenia numeru grupy oraz przejścia do testu. Z tego widoku można również otworzyć menu, z którego można dostać się do widoku ustawień i widoku informacji.
+			\end{minipage}
+			\begin{minipage}{0.5\textwidth}
+				\begin{figure}[H]
+					\begin{center}
+					\includegraphics[scale=0.1]{widok_glowny}
+					\end{center}
+				\end{figure}
+			\end{minipage} \hfill
+			
+			\pagebreak
 			
 			\item Widok ustawień\\
+			\begin{minipage}{0.45\textwidth}
 			Tutaj użytkownik może wprowadzić i zapisać w aplikacji swoje dane takie jak: imię, nazwisko, numer indeksu oraz nazwa przedmiotu. Opcjonalnie może wprowadzić inny adres serwera, na który aplikacja będzie przesyłać odpowiedzi użytkownika.
+			\end{minipage}
+			\begin{minipage}{0.5\textwidth}
+				\begin{figure}[H]
+					\begin{center}
+					\includegraphics[scale=0.1]{widok_ustawien}
+					\end{center}
+				\end{figure}
+			\end{minipage} \hfill
 			
 			\item Widok informacji\\
-			W tym widoku użytkownik może się dowiedzieć z jakiej wersji aplikacji korzysta
+			\begin{minipage}{0.45\textwidth}
+			W tym widoku użytkownik może się dowiedzieć z jakiej wersji aplikacji korzysta.
+			\end{minipage}
+			\begin{minipage}{0.5\textwidth}
+				\begin{figure}[H]
+					\begin{center}
+					\includegraphics[scale=0.1]{widok_ustawien}
+					\end{center}
+				\end{figure}
+			\end{minipage} \hfill
 			
 			\item Widok konfigurowania testu\\
 			Tutaj użytkownik jest informowany o przebiegu połączenia testowego z serwerem, pobrania pliku konfiguracyjnego, sprawdzeniu poprawności wersji aplikacji oraz sprawdzeniu poprawności otrzymanego klucza szyfrowania.
@@ -88,9 +125,7 @@
 		
 		\section{Interaktywne elementy na widokach}
 		
-		Rozwijane listy z testami w widoku ustawień.
-		
-		Rozwijane propozycje kodów testu w widoku głównym.
+		W widoku ustawień po kliknięciu na pole do edycji  nazwy testu zastosowano rozwijaną listę z proponowanymi nazwami testów.	W widoku głównym zastosowano podobną listę, która geneuruje propozycje na podstawie wybranej wcześniej nazwy przedmiotu. Celem było zminimalizowanie błędów popełnianych przez studentów przy konfigurowaniu aplikacji.
 		
 		W aplikacji zastosowano również interaktywne elementy sygnalizujące operacje zachodzące w trakcie korzystania z aplikacji.
 		Pierwszym z nich jest przycisk o nazwie Android Circular Progress\footnote{https://github.com/flavioarfaria/circular-progress-button} Button został stworzony przez Danylyk Dmytra i udostępniony na licencji MIT. Przycisk ten w aplikacji zmienia swój kolor oraz wygląd sygnalizując:
@@ -128,8 +163,14 @@
 		
 		\section{Generator konfiguracji}
 		
+		Generator został napisany w języku Java w wersji pozwalającej uruchomienie go tylko w linii poleceń. W parametrach wywołania takiego programu podaje się kod testu, minimalną wersję aplikacji oraz maksymalną wersję aplikacji dopuszczoną do testu. Program ten generuje dwa pliki. Pierwszy jest dokumentem XML zawierającym minimalną wersję, maksymalną wersję oraz klucz publiczny RSA do szyfrowania odpowiedzi. Drugi plik zawiera klucz prywatny służący do rozszyfrowywania odpowiedzi w pliku.
+		
 		\section{Deszyfrator}
 		
+		Deszyfrator również został napisany w języku Java i umożliwia uruchomienie jedynie w linii poleceń. W parametrach wywołania wprowadza się nazwę pliku z kluczem prywatnym, nazwę pliku z zaszyfrowanymi odpowiedziami i opcjonalnie nazwę pliku wyjściowego, w którym rozszyfrowane odpowiedzi zostaną zapisane. Bez wybrania nazwy pliku wyjściowego deszyfrator będzie wysyłać dane na strumień wyjściowy.
+		
 		\section{Generator kodów QR}
+		
+		Do generowania slajdów z pytaniami wykorzystano również bibliotekę do generowania kodów QR o nazwie libqrencode\footnote{https://github.com/fukuchi/libqrencode}. Jest to biblioteka napisana w języku C udostępniająca generator kodów oraz pliki nagłówkowe pozwalające na napisanie własnej aplikacji do generowania kodów QR.
 			
 \end{document}
