@@ -61,11 +61,11 @@
 	
 	\chapter{Stopień zaawansowaia prac}
 	
-	Aplikacja mobilna przechowuje dane użytkownika takie jak: Imię, Nazwisko, numer indeksu oraz nazwa przedmiotu na którym wykonywany jest test. Umożliwia też zmianę adresu serwera, na który przysyłane są odpowiedzi z testu. Dane te zmienia się w ustawieniach aplikacji. W menu głównym pozwala na wprowadzenie rzędu i miejsca, na którym student siedzi podczas testu, wektora wag służącego do obliczania grupy oraz ID testu jaki jest przeprowadzany. Zostało też zaimplementowane udogodnienie dla studenta w postaci skanera kodów QR umożliwiającego zautomatyzowane wczytanie wektora wag, ID testu i wyliczenie grupy studenta. Do skanowania kodów QR została wykorzystana biblioteka zxing\footnote{https://github.com/zxing/zxing} (Zebra Crossing). Po przejściu do testu wyświetlany jest ekran konfiguracyjny aplikacji gdzie student jest informowany o operacjach przeprowadzanych przed rozpoczęciem testu. Na obecnym etapie prac aplikacja sprawdza osiągalność serwera, do którego wysyła odpowiedzi oraz pobiera plik konfiguracyjny zawierający takie dane jak minimalna i maksymalna wersja aplikacji dopuszczona do testu oraz klucz szyfrowania danych w plikach testu przechowywanych na telefonie użytkownika. Po przejściu do testu wyświetlana jest zakładka pytania, a na niej: nr grupy w jakiej student jest, nr pytania, przyciski do wysłania odpowiedzi "tak", "nie", "nie wiem"; przyciski do dodania pytania i do podsumowania testu oraz unikalny identyfikator sesji wygenerowany dla aktualnej sesji testowej otwartej na telefonie. Dodanie pytania wymusza przejście do następnego pytania a UI użytkownika pozwala na przesuwanie ekranu w celu dostania się do innych pytań. Podsumowanie testu wyświetla ilość poprawnie przesłanych odpowiedzi "tak", "nie" oraz "nie wiem" do serwera, oraz ilość odpowiedzi zapisanych w pliku testowym. W razie różnicy w odpowiedziach przesłanych do serwera a zapisanych w pliku aplikacja wyświetla odpowiednie ostrzeżenie sugerujące użytkownikowi powrót do testu i ponowne przesłanie odpowiedzi. Na ekranie podsumowania wyświetlany jest przycisk pozwalający powrót do testu oraz przycisk kończący test powodujący powrót do menu głównego aplikacji.
+	Aplikacja mobilna przechowuje dane użytkownika takie jak: Imię, Nazwisko, numer indeksu oraz nazwa przedmiotu na którym wykonywany jest test. Umożliwia też zmianę adresu serwera, na który przysyłane są odpowiedzi z testu. Dane te zmienia się w ustawieniach aplikacji. W menu głównym pozwala na wprowadzenie rzędu i miejsca, na którym użytkownik siedzi podczas testu, wektora wag służącego do obliczania grupy oraz ID testu jaki jest przeprowadzany. Zostało też zaimplementowane udogodnienie dla użytkownika w postaci skanera kodów QR umożliwiającego zautomatyzowane wczytanie wektora wag, ID testu i wyliczenie grupy użytkownika. Do skanowania kodów QR została wykorzystana biblioteka zxing\footnote{https://github.com/zxing/zxing} (Zebra Crossing). Po przejściu do testu wyświetlany jest ekran konfiguracyjny aplikacji gdzie użytkownik jest informowany o operacjach przeprowadzanych przed rozpoczęciem testu. Na obecnym etapie prac aplikacja sprawdza osiągalność serwera, do którego wysyła odpowiedzi oraz pobiera plik konfiguracyjny zawierający takie dane jak minimalna i maksymalna wersja aplikacji dopuszczona do testu oraz klucz szyfrowania danych w plikach testu przechowywanych na telefonie użytkownika. Po przejściu do testu wyświetlana jest zakładka pytania, a na niej: nr grupy w jakiej użytkownik się znajduje, nr pytania, przyciski do wysłania odpowiedzi "tak", "nie", "nie wiem"; przyciski do dodania pytania i do podsumowania testu oraz unikalny identyfikator sesji wygenerowany dla aktualnej sesji testowej otwartej na telefonie. Dodanie pytania wymusza przejście do następnego pytania a UI użytkownika pozwala na przesuwanie ekranu w celu dostania się do innych pytań. Podsumowanie testu wyświetla ilość poprawnie przesłanych odpowiedzi "tak", "nie" oraz "nie wiem" do serwera, oraz ilość odpowiedzi zapisanych w pliku testowym. W razie różnicy w odpowiedziach przesłanych do serwera a zapisanych w pliku aplikacja wyświetla odpowiednie ostrzeżenie sugerujące użytkownikowi powrót do testu i ponowne przesłanie odpowiedzi. Na ekranie podsumowania wyświetlany jest przycisk pozwalający powrót do testu oraz przycisk kończący test powodujący powrót do menu głównego aplikacji.
 	
 	Obecnie serwerem do obsługi zapytań sieciowych jest Apache. Do przetwarzania danych wykorzystano skrypt napisany w języku AWK. Skanuje on logi serwera Apache w poszukiwaniu zarejestrowanych zapytań przysłanych z aplikacji mobilnych i umożliwia zapisanie ich w formacie użytecznym dla użytkownika całego systemu.
 	
-	Stworzony został też deszyfrator plików przechowywanych na telefonach studentów pozwalający na odzyskanie odpowiedzi studenta w razie problemów z połączeniem z serwerem gdy nie wszystkie odpowiedzi do niego dotarły.
+	Stworzony został też deszyfrator plików przechowywanych na telefonach użytkowników pozwalający na odzyskanie odpowiedzi w razie problemów z połączeniem z serwerem gdy nie wszystkie odpowiedzi do niego dotarły.
 	
 	Do tworzenia plików konfiguracyjnych stworzony został konfigurator. Tworzy on dokument XML zawierający klucz szyfrowania i zakres dopuszczalnych wersji aplikacji, oraz tworzy on plik przechowujący klucz do deszyfrowania.
 	
@@ -73,7 +73,7 @@
 	
 		\section{Widoki aplikacji}
 		
-		Wygląd aplikacji stanowi ważny element aplikacji. W początkowych fazach projektu rozmieszczenie elementów na ekranie telefonu komórkowego jak też ich estetyka wielokrotnie była zmieniana. Potrzebne było wypracowanie przejrzystego oraz przyjaznego dla studenta interfejsu użytkownika. W trakcie tworzenia aplikacji zauważono, że istotnym elementem jest zachowanie kompatybilności z różnymi wersjami systemu Android realizując jednolite i przewidywalne zachowanie się interfejsu aplikacji.
+		Wygląd aplikacji stanowi ważny element aplikacji. W początkowych fazach projektu rozmieszczenie elementów na ekranie telefonu komórkowego jak też ich estetyka wielokrotnie była zmieniana. Potrzebne było wypracowanie przejrzystego oraz przyjaznego dla studenta interfejsu aplikacji. W trakcie tworzenia aplikacji zauważono, że istotnym elementem jest zachowanie kompatybilności z różnymi wersjami systemu Android realizując jednolite i przewidywalne zachowanie się interfejsu aplikacji.
 		Na przykład nie można było zastosować kolorowania przycisków korzystając z metody setColorFilter obecnej we wszystkich wersjach systemu od Android 4.0 do Android 7.0. Wywołanie tej metody w systemach Android 4.0 do 4.4 powodowało zakolorowanie przycisku w sposób ujawniający się dopiero po odtworzeniu widoku. W systemach Android 5.0 i wyższych powodowało natychmiastową zmianę koloru przycisku.
 		Widoki jakie zostały zaimplementowane w aplikacji to:
 		\begin{itemize}
@@ -125,29 +125,29 @@
 		
 		\section{Interaktywne elementy na widokach}
 		
-		W widoku ustawień po kliknięciu na pole do edycji  nazwy testu zastosowano rozwijaną listę z proponowanymi nazwami testów.	W widoku głównym zastosowano podobną listę, która geneuruje propozycje na podstawie wybranej wcześniej nazwy przedmiotu. Celem było zminimalizowanie błędów popełnianych przez studentów przy konfigurowaniu aplikacji.
+		W widoku ustawień po kliknięciu na pole do edycji  nazwy testu zastosowano rozwijaną listę z proponowanymi nazwami testów.	W widoku głównym zastosowano podobną listę, która generuje propozycje na podstawie wybranej wcześniej nazwy przedmiotu. Celem było zminimalizowanie błędów popełnianych przez studentów przed testem przy konfigurowaniu aplikacji.
 		
 		W aplikacji zastosowano również interaktywne elementy sygnalizujące operacje zachodzące w trakcie korzystania z aplikacji.
-		Pierwszym z nich jest przycisk o nazwie Android Circular Progress\footnote{https://github.com/flavioarfaria/circular-progress-button} Button został stworzony przez Danylyk Dmytra i udostępniony na licencji MIT. Przycisk ten w aplikacji zmienia swój kolor oraz wygląd sygnalizując:
+		Pierwszym z nich jest przycisk o nazwie Android Circular Progress Button\footnote{https://github.com/flavioarfaria/circular-progress-button} został stworzony przez Danylyk Dmytra i udostępniony na licencji MIT. Przycisk ten w aplikacji zmienia swój kolor oraz wygląd sygnalizując:
 		\begin{itemize}
 			\item bezczynność - niebieski pusty przycisk
 			\item przetwarzanie operacji - wirujące kółko
 			\item powodzenie przetwarzania operacji - zielony przycisk z checkmark
 			\item niepowodzenie przetwarzania operacji - czerwony przycisk 
 		\end{itemize}
-		Bezczynność została początkowo użyta dla jednej nieaktywnej funkcji, którą była walidacja aplikacji. Zielony kolor wykorzystany został do sygnalizowania powodzenia połączenia z serwerem oraz do sygnalizowania poprawnego pobrania pliku konfiguracyjnego z walidacją klucza szyfrowania i dopuszczalnej wersji aplikacji.
+		Sygnalizowanie bezczynności zostało początkowo użyte dla jednej nieaktywnej funkcji, którą była walidacja aplikacji. Zielony kolor wykorzystany został do sygnalizowania powodzenia połączenia z serwerem oraz do sygnalizowania poprawnego pobrania pliku konfiguracyjnego z walidacją klucza szyfrowania i dopuszczalnej wersji aplikacji.
 		Czerwony kolor został wykorzystany do sygnalizowania niepowodzenia wyżej wymienionych operacji.
 		Wirujące kółko trwało tak długo jak te asynchronicznie wykonywane operacje nie zakończyły swojego działania.\\
 		
 		tutaj będą obrazki pokazujące jak zmienia się przycisk\\
 		
-		Drugim z nich są przyciski występujące na kartach z odpowiedziami w aplikacji. Przyciski te sygnalizują swoimi kolorami etap przetwarzania odpowiedzi użytkownika. Biały przycisk sygnalizuje brak wybranej do tej pory odpowiedzi. Szary przycisk sygnalizuje poprawnie zapisaną odpowiedź do pliku testowego. Niebieski przycisk sygnalizuje poprawnie wysłaną odpowiedź na serwer. Jeżeli operacja zapisywania do pliku się nie powiedzie to przycisk pozostaje biały. Jeżeli operacja wysyłania do serwera się nie powiedzie to przycisk zakolorowywany jest jedynie na szaro informując użytkownika o tym, że jego odpowiedzi przechowywane są jedynie lokalnie na telefonie.\\
+		Drugim z nich są przyciski występujące na kartach z odpowiedziami w aplikacji. Przyciski te sygnalizują swoimi kolorami etap przetwarzania odpowiedzi użytkownika. Biały przycisk sygnalizuje brak wybranej do tej pory odpowiedzi. Szary przycisk sygnalizuje poprawnie zapisaną odpowiedź do pliku testowego. Niebieski przycisk sygnalizuje poprawnie wysłaną odpowiedź na serwer. Jeżeli operacja zapisywania do pliku się nie powiedzie to przycisk pozostaje biały. Jeżeli operacja wysyłania do serwera się nie powiedzie to przycisk zakolorowywany jest jedynie na szaro informując użytkownika o tym, że ta odpowiedź będzie przechowywana jedynie lokalnie na telefonie.\\
 		
 		tutaj będą obrazki pokazujące przykładowo wybraną odpowiedź\\
 		
 		\section{Powiadomienia}
 		
-		Istotnym elementem aplikacji okazały się być powiadomienia pozwalające na zrozumienie użytkownikowi wydarzeń występujących w aplikacji. Dzięki wypracowaniu zestawu chmurek oraz monitów student jest informowany o powodzeniu w edycji ustawień aplikacji, błędach występujących przy konfigurowaniu testu oraz różnych innych zdarzeń takich jak utrata połączenia z serwerem albo brak poprawnego testu, na który użytkownik chce wysyłać odpowiedzi.
+		Istotnym elementem aplikacji okazały się być powiadomienia pozwalające na zrozumienie użytkownikowi wydarzeń występujących w aplikacji. Dzięki wypracowaniu zestawu chmurek oraz monitów użytkownik jest informowany o powodzeniu w edycji ustawień aplikacji, błędach występujących przy konfigurowaniu testu oraz różnych innych zdarzeniach takich jak utrata połączenia z serwerem czy też brak poprawnego testu, na który użytkownik chce wysyłać odpowiedzi.
 		
 	
 		\section{Szyfrowanie plików}
@@ -157,26 +157,28 @@
 	
 		\section{Skaner QR}
 		
-		W aplikacji wykorzystano również skaner kodów QR. Jak wcześniej o tym wspomniano, wykorzystano do tego bibliotekę zxing. Pozwala ona nie tylko na skanowanie kodów QR ale również kodów kreskowych, kodów Aztec i innych. Skaner skanuje kod QR wyświetlany na rzutniku pozwalając na automatyczne wpisanie kodu testu, wektora wag i wyliczenie grupy na teście. Ułatwia to pracę z aplikacją potencjalnemu użytkownikowi oraz pozwala na zmniejszenie prawdopodobieństwa popełnienia błędu przez użytkownika przy wyliczaniu grupy na teście.
+		W aplikacji wykorzystano również skaner kodów QR. Jak wcześniej o tym wspomniano, wykorzystano do tego bibliotekę zxing. Pozwala ona nie tylko na skanowanie kodów QR ale również kodów kreskowych, kodów Aztec i innych. Skaner skanuje kod QR wyświetlany na rzutniku  automatyczne wpisując w aplikacji kodu testu, wektor wag. Po operacji wczytywania wymusza wyliczenie nowego numeru grupy. Ułatwia to pracę z aplikacją potencjalnemu użytkownikowi oraz pozwala na zmniejszenie prawdopodobieństwa popełnienia błędu przez użytkownika przy wyliczaniu grupy na teście.
 		
 		\section{Baza danych}
 		
-		Do długotrwałego przechowywania danych w aplikacji wykorzystano bazę danych MySQL.
+		Do długotrwałego przechowywania danych w aplikacji wykorzystano bazę danych MySQL. W tym celu stworzono klasę imitującą bazę danych MySQL oraz klasę imitującą interfejs dostępowy do tej klasy.
 		
 		\section{Odrzucanie połączeń w trakcie testu}
+		
+		W trakcie testowania aplikacji na grupie studentów pojawiła się potrzeba automatycznego odrzucania połączeń. W tym celu stworzono klasę na bazie wbudowanej BroadcastReceiver, która to odrzuca wszystkie przychodzące połączenia o ile użytkownik jest w trakcie pisania testu.
 		
 	\chapter{Elementy serwera}
 		
 		\section{Generator konfiguracji}
 		
-		Generator został napisany w języku Java w wersji pozwalającej uruchomienie go tylko w linii poleceń. W parametrach wywołania takiego programu podaje się kod testu, minimalną wersję aplikacji oraz maksymalną wersję aplikacji dopuszczoną do testu. Program ten generuje dwa pliki. Pierwszy jest dokumentem XML zawierającym minimalną wersję, maksymalną wersję oraz klucz publiczny RSA do szyfrowania odpowiedzi. Drugi plik zawiera klucz prywatny służący do rozszyfrowywania odpowiedzi w pliku.
+		Generator został napisany w języku Java w wersji pozwalającej uruchomienie go tylko w linii poleceń. W parametrach wywołania tego programu podaje się kod testu, minimalną wersję aplikacji oraz maksymalną wersję aplikacji dopuszczoną do testu. Program generuje dwa pliki. Pierwszy jest dokumentem XML zawierającym minimalną wersję, maksymalną wersję oraz klucz publiczny RSA do szyfrowania odpowiedzi. Drugi plik zawiera klucz prywatny służący do rozszyfrowywania odpowiedzi w pliku z zaszyfrowanymi odpowiedziami na telefonie Android.
 		
 		\section{Deszyfrator}
 		
-		Deszyfrator również został napisany w języku Java i umożliwia uruchomienie jedynie w linii poleceń. W parametrach wywołania wprowadza się nazwę pliku z kluczem prywatnym, nazwę pliku z zaszyfrowanymi odpowiedziami i opcjonalnie nazwę pliku wyjściowego, w którym rozszyfrowane odpowiedzi zostaną zapisane. Bez wybrania nazwy pliku wyjściowego deszyfrator będzie wysyłać dane na strumień wyjściowy.
+		Deszyfrator również został napisany w języku Java i umożliwia uruchomienie jedynie w linii poleceń. W parametrach wywołania wprowadza się nazwę pliku z kluczem prywatnym, nazwę pliku z zaszyfrowanymi odpowiedziami i opcjonalnie nazwę pliku wyjściowego. Jeśli zostanie podana nazwa pliku wyjściowego to w nim zostaną zapisane rozszyfrowane odpowiedzi. Bez wybrania nazwy pliku wyjściowego deszyfrator będzie kierować dane na strumień wyjściowy.
 		
 		\section{Generator kodów QR}
 		
-		Do generowania slajdów z pytaniami wykorzystano również bibliotekę do generowania kodów QR o nazwie libqrencode\footnote{https://github.com/fukuchi/libqrencode}. Jest to biblioteka napisana w języku C udostępniająca generator kodów oraz pliki nagłówkowe pozwalające na napisanie własnej aplikacji do generowania kodów QR.
+		Do generowania slajdów z pytaniami wykorzystano również bibliotekę do generowania kodów QR o nazwie libqrencode\footnote{https://github.com/fukuchi/libqrencode}. Jest to biblioteka napisana w języku C udostępniająca generator kodów oraz pliki nagłówkowe pozwalające na napisanie własnej aplikacji generującej kody QR, Aztec lub inne.
 			
 \end{document}
