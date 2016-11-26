@@ -36,7 +36,7 @@
     <string name="label_weight">Weights vector:</string>
     <string name="label_yes_answers">YES:</string>
     <string name="six_zeros_value">000000</string>
-    <string name="version_value">0.8.0</string>
+    <string name="version_value">0.9.0</string>
     <string name="zero_value">0</string>
     <string name="message_your_test_file_was_created">Your test file has been created</string>
     <string name="message_you_quit_test">You have left application</string>
@@ -86,4 +86,8 @@
     <string name="message_missing_min_version">Invalid configuration! Missing minimal acceptable app version!</string>
     <string name="message_something_went_wrong_end_test">Something went wrong… Test will be ended. Continue it on paper!</string>
     <string name="message_wrong_key_abort_test">Key for test is invalid! Verify test ID or continue test on paper!</string>
+    <string name="button_abort">Abort</string>
+    <string name="label_quality_check">Connection quality test</string>
+    <string name="label_initialization">Test initialization</string>
+    <string name="label_validation">App validation</string>
 </resources>

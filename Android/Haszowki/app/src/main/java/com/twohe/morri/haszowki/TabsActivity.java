@@ -401,14 +401,19 @@ public class TabsActivity extends AppCompatActivity {
         String cipheredText;
 
         try {
-            byte[] keyBytes = Base64.decode(cryptoPass.getBytes(), Base64.DEFAULT);
+            byte[] keyBytes = Base64.decode(cryptoPass.getBytes("UTF-8"), Base64.DEFAULT);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
             PublicKey key = keyFactory.generatePublic(spec);
             Cipher cipher = Cipher.getInstance("RSA/None/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, key);
 
-            cipheredText = new String(cipher.doFinal(text.getBytes("ISO-8859-1")), "ISO-8859-1");
+            //version with base64 encoding
+            byte[] encodedAnswer = Base64.encode(cipher.doFinal(text.getBytes("UTF-8")), Base64.DEFAULT);
+            cipheredText = new String(encodedAnswer, "UTF-8");
+
+            //version with ISO-8859-1 encoding
+            //cipheredText = new String(cipher.doFinal(text.getBytes("UTF-8")), "ISO-8859-1");
 
         } catch (InvalidKeyException e) {
             e.printStackTrace();

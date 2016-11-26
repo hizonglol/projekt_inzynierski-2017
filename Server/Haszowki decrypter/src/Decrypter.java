@@ -17,12 +17,14 @@ import java.util.regex.Pattern;
 
 /**
  * Created by morri on 08.10.2016.
+ *
+ * This class is used to decode files with RSA encrypted data.
  */
 
-
+@SuppressWarnings("FieldCanBeLocal")
 public class Decrypter {
 
-    private static String VERSION_NUMBER = "0.8.0";
+    private static String VERSION_NUMBER = "0.9.0";
 
     private static boolean flagVersion = false;
     private static boolean flagInput = false;
@@ -34,10 +36,17 @@ public class Decrypter {
 
     private static String privateKeyString = "";
 
+    /**
+     * Used to read private key from config file.
+     * Config file consists only private key. Nothing else.
+     *
+     * @param configFileName name of config file
+     * @return true if reading was correct, false if something went wrong
+     */
     private static boolean readConfigFile(String configFileName) {
 
         try {
-            privateKeyString = new Scanner(new FileInputStream(configFileName + ".privKey")).useDelimiter("\\Z").next();
+            privateKeyString = new Scanner(new FileInputStream(configFileName + ".privKey"), "UTF-8").useDelimiter("\\Z").next();
 
             return true;
         } catch (IOException e) {
@@ -50,10 +59,20 @@ public class Decrypter {
         }
     }
 
+    //Here BouncyCastle library is being added to handle ciphering with RSA keys
     static {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     }
 
+    /**
+     * Method that decrypts answer and returns it.
+     * Input string is decoded using base64.
+     * Then it is deciphered using RSA decryption.
+     * Afterwards it is encoded to UTF-8 and returned.
+     *
+     * @param text base64 encoded, ciphered answer
+     * @return UTF-8 encoded, deciphered answer
+     */
     private static String decryptItRsa(String text) {
 
         String cipheredText;
@@ -66,17 +85,23 @@ public class Decrypter {
             Cipher cipher = Cipher.getInstance("RSA/None/PKCS1Padding");
             cipher.init(Cipher.DECRYPT_MODE, key);
 
-            cipheredText = new String(cipher.doFinal(text.getBytes("ISO-8859-1")), "ISO-8859-1");
+            //version with base64 decoding
+            byte[] decodedText = DatatypeConverter.parseBase64Binary(text);
+            cipheredText = new String(cipher.doFinal(decodedText), "UTF-8");
+
+            //version with ISO-8859-1 decoding
+            //cipheredText = new String(cipher.doFinal(text.getBytes("ISO-8859-1")), "UTF-8");
+
         } catch (InvalidKeyException e) {
-            e.printStackTrace();
-            return "";
-        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return "";
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
             return "";
         } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+            return "";
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return "";
         } catch (NoSuchAlgorithmException e) {
@@ -99,8 +124,14 @@ public class Decrypter {
         return cipheredText;
     }
 
+    /**
+     * Method that reads formatted file and converts it into list of strings.
+     *
+     * @param filename name of file from which ciphered answers will be read.
+     * @return list of strings containing header and answers in file
+     */
     private static List<String> readFile(String filename) {
-        List<String> records = new ArrayList<String>();
+        List<String> records = new ArrayList<>();
         try {
             Scanner scan = new Scanner(new FileInputStream(filename));
             scan.useDelimiter(Pattern.compile("\n====\n"));
@@ -117,8 +148,15 @@ public class Decrypter {
         }
     }
 
+    /**
+     * Method that runs decryption for list of strings.
+     * It avoids header by iterating on list starting from second element.
+     *
+     * @param cipheredLines list of strings containing header and answers
+     * @return decoded text
+     */
     private static List<String> runDecrypter(List<String> cipheredLines) {
-        List<String> decodedText = new ArrayList<String>();
+        List<String> decodedText = new ArrayList<>();
 
         for (int i = 1; i < cipheredLines.size(); ++i) {
             decodedText.add(decryptItRsa(cipheredLines.get(i)));
@@ -127,6 +165,12 @@ public class Decrypter {
         return decodedText;
     }
 
+    /**
+     * Writes decoded answers to file.
+     *
+     * @param decodedText list with decoded answers
+     * @return true if everything went well, false if something went wrong
+     */
     private static boolean writeDecodedToFile(List<String> decodedText) {
 
         try {
@@ -137,8 +181,8 @@ public class Decrypter {
             }
             PrintWriter writer = new PrintWriter(outputFileName, "UTF-8");
 
-            for (int i = 0; i < decodedText.size(); ++i) {
-                writer.println(decodedText.get(i));
+            for (String dtIter : decodedText) {
+                writer.println(dtIter);
                 writer.flush();
             }
             writer.close();
@@ -157,13 +201,19 @@ public class Decrypter {
         return true;
     }
 
+    /**
+     * Writes decoded answers to standard output.
+     *
+     * @param decodedText list with decoded answers
+     * @return true if everything went well, false if something went wrong
+     */
     private static boolean writeDecodedToOutput(List<String> decodedText) {
 
         try {
             OutputStreamWriter writer = new OutputStreamWriter(System.out);
 
-            for (int i = 0; i < decodedText.size(); ++i) {
-                writer.write(decodedText.get(i));
+            for (String dtIter : decodedText) {
+                writer.write(dtIter);
                 writer.write(System.getProperty("line.separator"));
                 writer.flush();
             }
@@ -183,6 +233,12 @@ public class Decrypter {
         return true;
     }
 
+    /**
+     * Decodes command line parameters and sets up related flags.
+     *
+     * @param args array containing command line parameters
+     * @throws IllegalArgumentException that says what went wrong with decoding command line parameters
+     */
     private static void decodeArguments(String[] args) throws IllegalArgumentException {
 
         for (int i = 0; i < args.length; i++) {
@@ -243,6 +299,13 @@ public class Decrypter {
         }
     }
 
+    /**
+     * Used to run decode of command line parameters.
+     * Made to handle exceptions that are thrown by decodeArguments().
+     *
+     * @param args array containing command line parameters
+     * @return true went well, false if something went wrong
+     */
     private static boolean parseArguments(String[] args) {
 
         try {
@@ -255,6 +318,11 @@ public class Decrypter {
         return true;
     }
 
+    /**
+     * Main method of class.
+     *
+     * @param args array containing command line parameters
+     */
     public static void main(String[] args) {
 
 

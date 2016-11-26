@@ -2,7 +2,7 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Haszówki</string>
-    <string name="version_value">0.8.0</string>
+    <string name="version_value">0.9.0</string>
     <string name="zero_value">0</string>
     <string name="six_zeros_value">000000</string>
     <string name="label_null">null</string>
@@ -78,9 +78,13 @@
 
     <!--*** LABEL strings of SECURITYCHECK ***-->
     <string name="label_attention">Uwaga</string>
+    <string name="label_quality_check">Test jakości połączenia</string>
+    <string name="label_initialization">Inicjalizacja testu</string>
+    <string name="label_validation">Walidacja aplikacji</string>
 
     <!--*** BUTTON strings of SECURITYCHECK ***-->
     <string name="button_continue">Kontynuuj</string>
+    <string name="button_abort">Przerwij</string>
     <string name="button_try_again">Spróbuj ponownie</string>
 
     <!--*** MESSAGES strings of SECURITYCHECK ***-->

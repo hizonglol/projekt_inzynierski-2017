@@ -3,17 +3,13 @@ Aplikacja:
 - przesy³anie do serwera podpisu cyfrowego do walidacji
 - https przy wysy³aniu GET do serwera
 - sprawdzanie jakoœci ³¹cza internetowego przed rozpoczêciem testu (sprawdza jedynie ³¹cznoœæ z serwerem)
-- kompresja odpowiedzi przed zapisaniem do pliku (niepotrzebne)
 - poprawienie z³ych granic scrollview w Tabs Activity
-- w SecurityCheckActivity dodanie t³umaczeñ do stringów (plik java oraz layout)
-
 
 Serwer:
 - pobieranie i zapisywanie danych z aplikacji
 - przechowywanie i wysy³anie klucza publicznego po autoryzacji:
 	- sprawdzenie z serwerami Google czy aplikacja przesz³a autoryzacjê
 	- sprawdzanie podpisu cyfrowego aplikacji
-
 
 Dodatkowo a propos serwera:
 Jak pisaæ, ¿eby zapisy by³y bezpieczne i bez ci¹g³ego otwierania i zamykania.

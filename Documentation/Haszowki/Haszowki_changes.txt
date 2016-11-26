@@ -1,3 +1,8 @@
+## 0.9.0 - 2016-11-26
+### Changed
+~ dekrypter i aplikacja korzystaj¹ teraz z base64 zamiast ISO-8859-1 jako kodowanie transportowe przy zapisywaniu zakodowanych odpowiedzi do pliku
+  i odczytywaniu ich
+
 ## 0.8.0 - 2016-11-20
 ### Added
 + sprawdzanie poprawnoœci klucza szyfrowania w SecurityCheckActivity
