@@ -270,9 +270,7 @@ public class TabsActivity extends AppCompatActivity {
         randomizer.nextBytes(bytes);
         String base64 = Base64.encodeToString(bytes, Base64.URL_SAFE | Base64.NO_WRAP);
 
-        String shortenedBase64 = base64.substring(0, 4).toLowerCase();
-
-        return shortenedBase64;
+        return base64.substring(0, 4).toLowerCase();
     }
 
     /**
@@ -306,12 +304,11 @@ public class TabsActivity extends AppCompatActivity {
         try {
             File root = new File(Environment.getExternalStorageDirectory() + "/Haszowki");
             if (!root.exists()) {
-                root.mkdir();
+                if(!root.mkdir()) {
+                    return true;
+                }
             }
             fileTabs_toWrite = new File(root, fileName);
-
-            fileTabs_toWrite.setReadable(true);
-            fileTabs_toWrite.setWritable(true);
 
             MediaScannerConnection.scanFile(this, new String[]{fileTabs_toWrite.getAbsolutePath()}, null, null);
 
@@ -350,6 +347,8 @@ public class TabsActivity extends AppCompatActivity {
      * @return false if IO operation failed, true if everything went fine
      */
     public boolean appendToFileCiphered(String text) {
+
+        Log.d("What is appended", text);
 
         text = encryptItRSA(text);
 
@@ -490,11 +489,11 @@ public class TabsActivity extends AppCompatActivity {
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static final String ARG_SECTION_ANSWER_FILE = "section_answer_file";
         private static final String ARG_SECTION_ANSWER_SERVER = "section_answer_server";
+        private static final String ARG_ANY_ANSWER_SENT = "section_any_answer_sent";
         private static final String DEBUG_TAG = "HttpExample";
         private String serverResponse = "";
         private Integer serverResponseCode = 404;
         //used to check whether any answer has been choosen or not
-        private boolean anyAnswerSent;
 
         /**
          * Instantiates fragment. Creates bundle with arguments that carry fragment
@@ -516,6 +515,7 @@ public class TabsActivity extends AppCompatActivity {
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             args.putInt(ARG_SECTION_ANSWER_FILE, 0);
             args.putInt(ARG_SECTION_ANSWER_SERVER, 0);
+            args.putBoolean(ARG_ANY_ANSWER_SENT, false);
             fragment.setArguments(args);
             return fragment;
         }
@@ -540,11 +540,11 @@ public class TabsActivity extends AppCompatActivity {
                 public void onClick(View v) {
 
                     ((TabsActivity) getActivity()).summariseTest();
-                    if ((getArguments().getInt(ARG_SECTION_NUMBER) % 16) == 0 && !anyAnswerSent) {
+                    if ((getArguments().getInt(ARG_SECTION_NUMBER) % 16) == 0 && !getArguments().getBoolean(ARG_ANY_ANSWER_SENT)) {
                         String timestamp = makeTimeStamp();
                         if (saveToFile(rootView, 0, "no_answer", timestamp)) return;
                         sendToServer(rootView, 0, "no_answer", timestamp);
-                        anyAnswerSent = true;
+                        getArguments().putBoolean(ARG_ANY_ANSWER_SENT, true);
                     }
                 }
             });
@@ -556,7 +556,7 @@ public class TabsActivity extends AppCompatActivity {
                     String timestamp = makeTimeStamp();
                     if (saveToFile(rootView, 1, "yes", timestamp)) return;
                     sendToServer(rootView, 1, "yes", timestamp);
-                    anyAnswerSent = true;
+                    getArguments().putBoolean(ARG_ANY_ANSWER_SENT, true);
                 }
             });
 
@@ -567,7 +567,7 @@ public class TabsActivity extends AppCompatActivity {
                     String timestamp = makeTimeStamp();
                     if (saveToFile(rootView, 2, "no", timestamp)) return;
                     sendToServer(rootView, 2, "no", timestamp);
-                    anyAnswerSent = true;
+                    getArguments().putBoolean(ARG_ANY_ANSWER_SENT, true);
                 }
             });
 
@@ -578,7 +578,7 @@ public class TabsActivity extends AppCompatActivity {
                     String timestamp = makeTimeStamp();
                     if (saveToFile(rootView, 3, "dunno", timestamp)) return;
                     sendToServer(rootView, 3, "dunno", timestamp);
-                    anyAnswerSent = true;
+                    getArguments().putBoolean(ARG_ANY_ANSWER_SENT, true);
                 }
             });
 
@@ -586,15 +586,23 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    ((TabsActivity) getActivity()).addTab();
-                    int nextTab = ((TabsActivity) getActivity()).guestionsAmount++;
-                    if (getArguments().getInt(ARG_SECTION_ANSWER_FILE) == 0 && !anyAnswerSent) {
-                        String timestamp = makeTimeStamp();
-                        if (saveToFile(rootView, 0, "no_answer", timestamp)) return;
-                        sendToServer(rootView, 0, "no_answer", timestamp);
-                        anyAnswerSent = true;
+                    List<Fragment> fragmentsToCheck = ((TabsActivity) getActivity()).SectionsPagerAdapterTabs.fragments;
+
+                    for (int i = 0; i < fragmentsToCheck.size(); ++i) {
+                        int answer = fragmentsToCheck.get(i).getArguments().getInt(ARG_SECTION_ANSWER_FILE);
+                        boolean ifAnyAnswerSent = fragmentsToCheck.get(i).getArguments().getBoolean(ARG_ANY_ANSWER_SENT);
+
+                        if (answer == 0 && !ifAnyAnswerSent) {
+                            String timestamp = makeTimeStamp();
+                            if (saveToFile(fragmentsToCheck.get(i), 0, "no_answer", timestamp))
+                                return;
+                            sendToServer(fragmentsToCheck.get(i), 0, "no_answer", timestamp);
+                            fragmentsToCheck.get(i).getArguments().putBoolean(ARG_ANY_ANSWER_SENT, true);
+                        }
                     }
 
+                    ((TabsActivity) getActivity()).addTab();
+                    int nextTab = ((TabsActivity) getActivity()).guestionsAmount++;
                     ((TabsActivity) getActivity()).ViewPagerTabs.setCurrentItem(nextTab);
                 }
             });
@@ -657,9 +665,10 @@ public class TabsActivity extends AppCompatActivity {
          * If GET in sendToServer() will be terminated successfully then ARG_SECTION_ANSWER_SERVER
          * will be set to proper number.
          *
-         * @param rootView Root view of corresponding tab
-         * @param question Number of corresponding tab
-         * @param answerNo Type of given answer
+         * @param rootView   Root view of corresponding tab
+         * @param question   Number of corresponding tab
+         * @param answerNo  Type of given answer
+         * @param timestamp Current timestamp
          * @return false if everything went well, true if something bad happened
          */
         private boolean saveToFile(View rootView, int question, String answerNo, String timestamp) {
@@ -681,11 +690,43 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         /**
+         * Used to save an answer of correspondning fragment into test file.
+         * <p>
+         * It also sets up ARG_SECTION_ANSWER_SERVER to 0 before sendToServer() is terminated.
+         * If GET in sendToServer() will be terminated successfully then ARG_SECTION_ANSWER_SERVER
+         * will be set to proper number.
+         *
+         * @param fragment  Fragment representing tab
+         * @param question   Number of corresponding tab
+         * @param answerNo   Type of given answer
+         * @param timestamp Current timestamp
+         * @return false if everything went well, true if something bad happened
+         */
+        private boolean saveToFile(Fragment fragment, int question, String answerNo, String timestamp) {
+
+            if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", fragment, answerNo, timestamp))) {
+                setGivenAnswerGray(fragment, question);
+
+                //Gets last answer to decrease corresponding variable
+                int last_answer = fragment.getArguments().getInt(ARG_SECTION_ANSWER_SERVER);
+                if (last_answer == 1) ((TabsActivity) getActivity()).tabs_serverYesAnswers--;
+                else if (last_answer == 2) ((TabsActivity) getActivity()).tabs_serverNoAnswers--;
+                else if (last_answer == 3) ((TabsActivity) getActivity()).tabs_serverDunnoAnswers--;
+                //Sets it to 0. If sending will be successful then it will be set to proper answer number.
+                //I use it as an information if question has been sent to server or not.
+                fragment.getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 0);
+                return false;
+            }
+            return true;
+        }
+
+        /**
          * Used to make a GET request on server for given answer on corresponding tab.
          *
-         * @param rootView Root view of corresponding tab
-         * @param question Number of corresponding tab
-         * @param answerNo Type of given answer
+         * @param rootView   Root view of corresponding tab
+         * @param question   Number of corresponding tab
+         * @param answerNo  Type of given answer
+         * @param timestamp Current timestamp
          */
         private void sendToServer(View rootView, int question, String answerNo, String timestamp) {
 
@@ -693,6 +734,25 @@ public class TabsActivity extends AppCompatActivity {
                 DownloadWebpageTask task = new DownloadWebpageTask();
                 task.configure(rootView, question);
                 task.execute(createDataURL("to_server", answerNo, timestamp));
+            } else {
+                Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        /**
+         * Used to make a GET request on server for given answer on corresponding fragment.
+         *
+         * @param fragment  Fragment representing tab
+         * @param question  Number of corresponding tab
+         * @param answerNo  Type of given answer
+         * @param timestamp Current timestamp
+         */
+        private void sendToServer(Fragment fragment, int question, String answerNo, String timestamp) {
+
+            if (isOnline()) {
+                DownloadWebpageTaskInvisible task = new DownloadWebpageTaskInvisible();
+                task.configure(fragment, question);
+                task.execute(createDataURL("to_server", fragment, answerNo, timestamp));
             } else {
                 Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
             }
@@ -715,8 +775,9 @@ public class TabsActivity extends AppCompatActivity {
          * Creates URL for corresponding tab and answer. Gives it in format for server
          * or for file.
          *
-         * @param mode   Determines if string has to be built for server or for file
-         * @param answer Type of answer
+         * @param mode      Determines if string has to be built for server or for file
+         * @param answer    Type of answer
+         * @param timestamp Current timestamp
          * @return Built URL with all significant data
          */
         private String createDataURL(String mode, String answer, String timestamp) {
@@ -778,9 +839,78 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         /**
+         * Creates URL for corresponding fragment and answer. Gives it in format for server
+         * or for file.
+         *
+         * @param mode      Determines if string has to be built for server or for file
+         * @param fragment  Fragment representing tab
+         * @param answer    Type of answer
+         * @param timestamp Current timestamp
+         * @return Built URL with all significant data
+         */
+        private String createDataURL(String mode, Fragment fragment, String answer, String timestamp) {
+
+            SettingsDataSource databaseCreateDataURL = new SettingsDataSource(getActivity());
+            databaseCreateDataURL.open();
+
+            StringBuilder sbServerQuery = new StringBuilder();
+            String divider = "&";
+
+            if (mode.equals("to_server")) {
+                String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
+                String stringServerUrl = getResources().getString(R.string.server_address);
+                if (stringDbServerUrl.length() > 1) {
+                    stringServerUrl = stringDbServerUrl;
+                }
+                stringServerUrl = stringServerUrl
+                        .concat(databaseCreateDataURL.getSetting("setting_course"))
+                        .concat("/")
+                        .concat(databaseCreateDataURL.getSetting("setting_test_id"))
+                        .concat(".xml").toLowerCase();
+                stringServerUrl = stringServerUrl.replace(" ", "");
+                sbServerQuery.append(stringServerUrl).append("?");
+            }
+
+            String studentNo = databaseCreateDataURL.getSetting("setting_studentNo");
+            String course = databaseCreateDataURL.getSetting("setting_course");
+            String testId = databaseCreateDataURL.getSetting("setting_test_id");
+            String hall_row = databaseCreateDataURL.getSetting("setting_hall_row");
+            String hall_seat = databaseCreateDataURL.getSetting("setting_hall_seat");
+            String name = databaseCreateDataURL.getSetting("setting_name");
+            String surname = databaseCreateDataURL.getSetting("setting_surname");
+            String vector = databaseCreateDataURL.getSetting("setting_vector");
+            String group = databaseCreateDataURL.getSetting("setting_group");
+            String question_no = String.valueOf(fragment.getArguments().getInt(ARG_SECTION_NUMBER));
+            String sessionID = databaseCreateDataURL.getSetting("setting_sessionID");
+
+            sbServerQuery.append("student_no=").append(studentNo).append(divider);
+            sbServerQuery.append("course=").append(course).append(divider);
+            sbServerQuery.append("test_id=").append(testId).append(divider);
+            sbServerQuery.append("hall_row=").append(hall_row).append(divider);
+            sbServerQuery.append("hall_seat=").append(hall_seat).append(divider);
+            sbServerQuery.append("group=").append(group).append(divider);
+            sbServerQuery.append("timestamp=").append(timestamp).append(divider);
+            sbServerQuery.append("question_no=").append(question_no).append(divider);
+            sbServerQuery.append("answer=").append(answer).append(divider);
+            sbServerQuery.append("vector=").append(vector).append(divider);
+            sbServerQuery.append("version=").append(getResources().getString(R.string.version_value)).append(divider);
+            sbServerQuery.append("session_id=").append(sessionID).append(divider);
+            sbServerQuery.append("name=").append(name).append(divider);
+            sbServerQuery.append("surname=").append(surname);
+
+            String sentUrl = sbServerQuery.toString();
+            sentUrl = sentUrl.replace(" ", "");
+
+            databaseCreateDataURL.close();
+
+            return sentUrl;
+        }
+
+        /**
          * Sets choosen button's background from corresponding view to gray
          * and makes letters on gray button white.
          * Resets other button's texts to black.
+         * Changes correlated variables and flags.
          *
          * @param rootView Root view of corresponding tab.
          * @param arg      Choosen answer
@@ -832,8 +962,37 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         /**
+         * Changes correlated variables and flags.
+         *
+         * @param fragment Fragment representing tab.
+         * @param arg      Choosen answer
+         */
+        private void setGivenAnswerGray(Fragment fragment, int arg) {
+
+            int last_answer = fragment.getArguments().getInt(ARG_SECTION_ANSWER_FILE);
+
+            if (last_answer == 1) ((TabsActivity) getActivity()).tabs_fileYesAnswers--;
+            else if (last_answer == 2) ((TabsActivity) getActivity()).tabs_fileNoAnswers--;
+            else if (last_answer == 3) ((TabsActivity) getActivity()).tabs_fileDunnoAnswers--;
+
+            if (arg == 1) {
+                fragment.getArguments().putInt(ARG_SECTION_ANSWER_FILE, 1);
+                ((TabsActivity) getActivity()).tabs_fileYesAnswers++;
+            } else if (arg == 2) {
+                fragment.getArguments().putInt(ARG_SECTION_ANSWER_FILE, 2);
+                ((TabsActivity) getActivity()).tabs_fileNoAnswers++;
+            } else if (arg == 3) {
+                fragment.getArguments().putInt(ARG_SECTION_ANSWER_FILE, 3);
+                ((TabsActivity) getActivity()).tabs_fileDunnoAnswers++;
+            } else if (arg == 0) {
+                fragment.getArguments().putInt(ARG_SECTION_ANSWER_FILE, 0);
+            }
+        }
+
+        /**
          * Sets choosen button's background from corresponding view to blue
          * and sets button's text to black.
+         * Changes correlated variables and flags.
          *
          * @param rootView Root view of corresponding tab.
          * @param arg      Choosen answer
@@ -874,6 +1033,33 @@ public class TabsActivity extends AppCompatActivity {
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
                 getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 0);
+            }
+        }
+
+        /**
+         * Changes correlated variables and flags.
+         *
+         * @param fragment Fragment representing tab.
+         * @param arg      Choosen answer
+         */
+        private void setGivenAnswerBlue(Fragment fragment, int arg) {
+
+            int last_answer = fragment.getArguments().getInt(ARG_SECTION_ANSWER_SERVER);
+            if (last_answer == 1) ((TabsActivity) getActivity()).tabs_serverYesAnswers--;
+            else if (last_answer == 2) ((TabsActivity) getActivity()).tabs_serverNoAnswers--;
+            else if (last_answer == 3) ((TabsActivity) getActivity()).tabs_serverDunnoAnswers--;
+
+            if (arg == 1) {
+                fragment.getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 1);
+                ((TabsActivity) getActivity()).tabs_serverYesAnswers++;
+            } else if (arg == 2) {
+                fragment.getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 2);
+                ((TabsActivity) getActivity()).tabs_serverNoAnswers++;
+            } else if (arg == 3) {
+                fragment.getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 3);
+                ((TabsActivity) getActivity()).tabs_serverDunnoAnswers++;
+            } else if (arg == 0) {
+                fragment.getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 0);
             }
         }
 
@@ -933,7 +1119,7 @@ public class TabsActivity extends AppCompatActivity {
          * @throws UnsupportedEncodingException
          */
         public String convertInputStreamToString(InputStream stream, int len) throws IOException {
-            Reader reader = null;
+            Reader reader;
             reader = new InputStreamReader(stream, "UTF-8");
             char[] buffer = new char[len];
             reader.read(buffer);
@@ -999,6 +1185,54 @@ public class TabsActivity extends AppCompatActivity {
                 answerNo = passedAnswerNo;
             }
         }
+
+        /**
+         * Uses AsyncTask to create a task away from the main UI threadTabs_killer. This task takes a
+         * URL string and uses it to create an HttpUrlConnection. Once the connection
+         * has been established, the AsyncTask downloads the contents of the webpage.
+         * Finally it sets up corresponding tab if server response code is 200.
+         */
+        private class DownloadWebpageTaskInvisible extends AsyncTask<String, Void, String> {
+            Fragment fragment;
+            int answerNo;
+
+            @Override
+            protected String doInBackground(String... urls) {
+
+                try {
+                    return downloadUrl(urls[0]);
+                } catch (IOException e) {
+                    return "Unable to retrieve web page. URL may be invalid.";
+                }
+            }
+
+            /**
+             * Sets color of button according to successfully sent answer.
+             * Updates tab's info about current sent answer - look into
+             * sendToServer() to understand what is going on.
+             *
+             * @param result Response code got from server.
+             */
+            @Override
+            protected void onPostExecute(String result) {
+                Log.d(serverResponseCode.toString(), serverResponse);
+                if (result.equals("200")) {
+                    setGivenAnswerBlue(fragment, answerNo);
+                    fragment.getArguments().putInt(ARG_SECTION_ANSWER_SERVER, answerNo);
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getResources().getString(R.string.message_unable_to_send_answer), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            /**
+             * @param passedFragment Fragment of tab.
+             * @param passedAnswerNo Number of corresponding tab.
+             */
+            void configure(Fragment passedFragment, int passedAnswerNo) {
+                fragment = passedFragment;
+                answerNo = passedAnswerNo;
+            }
+        }
     }
 
     /**
@@ -1046,9 +1280,8 @@ public class TabsActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
 
             String titlePattern = getResources().getString(R.string.label_section);
-            String title = String.format(titlePattern, position + 1);
 
-            return title;
+            return String.format(titlePattern, position + 1);
         }
 
         /**

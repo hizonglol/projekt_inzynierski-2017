@@ -1,3 +1,8 @@
+## 0.9.2 - 2016-11-27
+### Changed
+~ poprawiony b³¹d z niew³aœciwym przysy³aniem odpowiedzi no_answer, kiedy po zmianie widoku no_answer siê nie wysy³a³o
+~ drobne poprawki z bezpieczeñstem odczytu i zapisu
+
 ## 0.9.1 - 2016-11-27
 ### Changed
 ~ poprawione warunki dla sprawdzania wersji aplikacji w SecurityCheckActivity
