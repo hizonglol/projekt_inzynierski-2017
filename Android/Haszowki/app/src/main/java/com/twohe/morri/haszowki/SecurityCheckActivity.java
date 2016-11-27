@@ -44,12 +44,129 @@ import javax.crypto.NoSuchPaddingException;
 
 /**
  * Created by morri.
- *
+ * <p>
  * This file contains class Settings Activity.
  */
 public class SecurityCheckActivity extends AppCompatActivity
         implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
+
+    /* Request code used to invoke sign in user interactions. */
+    private static final int RC_SIGN_IN = 0;
+    static String minAppVersion;
+    static String maxAppVersion;
+    static String cipheringKey;
+    private CircularProgressButton progressButtonSecurityCheck_validation;
+    private CircularProgressButton progressButtonSecurityCheck_serverConnection;
+    private CircularProgressButton progressButtonSecurityCheck_appConfiguration;
+    private Button buttonSecurityCheck_continue;
+    private Button buttonSecurityCheck_abort;
+    private serverConnectionCheckTask serverCheckTask;
+    private appConfigurationTask configurationTask;
+    private SettingsDataSource databaseSecurityCheck;
+    private AlertDialog alertDialog;
+    /*
+    * A flag indicating that app validation was successful.
+    */
+    private boolean validationSuccessful;
+    /*
+    * A flag indicating that server is reachable.
+    */
+    private boolean serverConnectionSuccessful;
+    /*
+    * A flag indicating that app configuration went successful.
+    */
+    private boolean appConfigurationSuccessful;
+    /*
+    * A flag indicating that a PendingIntent is in progress and prevents us
+    * from starting further intents.
+    */
+    private boolean mIntentInProgress;
+    /* Client used to interact with Google APIs. */
+    private GoogleApiClient mGoogleApiClient;
+    private SharedPreferences sharedPrefSecurity;
+
+    /**
+     * Checks if server with given serverAddress is reachable
+     *
+     * @param context       of application
+     * @param serverAddress address of checked server
+     * @return true if server is reachable, false if not
+     */
+    public static boolean isReachable(Context context, String serverAddress) {
+        // First, check we have any sort of connectivity
+        final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
+        boolean isReachable = false;
+
+        if (netInfo != null && netInfo.isConnected()) {
+            // Some sort of connection is open, check if server is reachable
+            try {
+                URL url = new URL(serverAddress);
+                HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
+                urlc.setRequestProperty("User-Agent", "Android Application");
+                urlc.setRequestProperty("Connection", "close");
+                urlc.setConnectTimeout(5 * 1000); //5 sek
+                urlc.connect();
+                isReachable = (urlc.getResponseCode() == 200);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return isReachable;
+    }
+
+    /**
+     * Downloads configuration file from server
+     *
+     * @param context               of application
+     * @param serverDocumentAddress address of configuration file
+     * @return true if downloaded configuration, false if not
+     */
+    public static boolean downloadedConfiguration(Context context, String serverDocumentAddress) {
+        // First, check we have any sort of connectivity
+        final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
+        boolean downloadedConfiguration = false;
+
+        if (netInfo != null && netInfo.isConnected()) {
+            // Some sort of connection is open, check if server is reachable
+            try {
+                URL url = new URL(serverDocumentAddress);
+                URLConnection conn = url.openConnection();
+
+                XmlPullParserFactory xmlFactoryObject = XmlPullParserFactory.newInstance();
+                XmlPullParser configurationParser = xmlFactoryObject.newPullParser();
+                configurationParser.setInput(conn.getInputStream(), null);
+
+                int event = configurationParser.getEventType();
+                while (event != XmlPullParser.END_DOCUMENT) {
+                    String name = configurationParser.getName();
+                    switch (event) {
+                        case XmlPullParser.START_TAG:
+                            break;
+
+                        case XmlPullParser.END_TAG:
+                            if (name.equals("version")) {
+                                minAppVersion = configurationParser.getAttributeValue(null, "min");
+                                maxAppVersion = configurationParser.getAttributeValue(null, "max");
+                            } else if (name.equals("key")) {
+                                cipheringKey = configurationParser.getAttributeValue(null, "rsa");
+                            }
+                            break;
+                    }
+                    event = configurationParser.next();
+                }
+
+                downloadedConfiguration = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return downloadedConfiguration;
+    }
 
     /**
      * @param savedInstanceState instance state of created activity
@@ -130,15 +247,9 @@ public class SecurityCheckActivity extends AppCompatActivity
             serverCheckTask.execute();
         }
 
-        if (!appConfigurationSuccessful) {
+        if (!appConfigurationSuccessful || !validationSuccessful) {
             configurationTask.cancel(true);
             restartSpinning(progressButtonSecurityCheck_appConfiguration);
-            configurationTask = new appConfigurationTask();
-            configurationTask.execute();
-        }
-
-        if (!validationSuccessful) {
-            configurationTask.cancel(true);
             restartSpinning(progressButtonSecurityCheck_validation);
             configurationTask = new appConfigurationTask();
             configurationTask.execute();
@@ -244,6 +355,217 @@ public class SecurityCheckActivity extends AppCompatActivity
     }
 
     /**
+     * Used to check if these values are not null.
+     * If they're not null then checks if they're not equal "".
+     *
+     * @param minVersion minimal version
+     * @param maxVersion maximal version
+     * @param rsaKey     ciphering key
+     * @return true if proper, false if not
+     */
+    private boolean isConfigurationProper(String minVersion, String maxVersion, String rsaKey) {
+
+        if (minVersion == null) {
+            alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(getResources().getString(R.string.label_attention))
+                    .setMessage(getResources().getString(R.string.message_missing_min_version))
+                    .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                    .show();
+            return false;
+        } else {
+            if (minVersion.equals("")) {
+                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getResources().getString(R.string.label_attention))
+                        .setMessage(getResources().getString(R.string.message_missing_min_version))
+                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                        .show();
+                return false;
+            }
+        }
+
+        if (maxVersion == null) {
+            alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(getResources().getString(R.string.label_attention))
+                    .setMessage(getResources().getString(R.string.message_missing_max_version))
+                    .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                    .show();
+            return false;
+        } else {
+            if (maxVersion.equals("")) {
+                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getResources().getString(R.string.label_attention))
+                        .setMessage(getResources().getString(R.string.message_missing_max_version))
+                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                        .show();
+                return false;
+            }
+        }
+
+        if (rsaKey == null) {
+            alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(getResources().getString(R.string.label_attention))
+                    .setMessage(getResources().getString(R.string.message_missing_key))
+                    .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                    .show();
+            return false;
+        } else {
+            if (rsaKey.equals("")) {
+                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getResources().getString(R.string.label_attention))
+                        .setMessage(getResources().getString(R.string.message_missing_key))
+                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                        .show();
+                return false;
+            } else if (!isRSAkeyValid()) {
+                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getResources().getString(R.string.label_attention))
+                        .setMessage(getResources().getString(R.string.message_wrong_key_abort_test))
+                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                        .show();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks whether application version higher or equal than minimal version,
+     * and lower or equal than maximal version
+     *
+     * @param minVersion minimal app version
+     * @param maxVersion maximal app version
+     * @return true if acceptable, false if not
+     */
+    private boolean isAppVersionAcceptable(String minVersion, String maxVersion) {
+
+        String appVersion = getResources().getString(R.string.version_value);
+
+        int[] minIntVersion = new int[3];
+        int[] maxIntVersion = new int[3];
+        int[] intAppVersion = new int[3];
+
+        for (int i = 0; i < 3; ++i) {
+            minIntVersion[i] = Integer.valueOf(minVersion.split("\\.")[i]);
+            maxIntVersion[i] = Integer.valueOf(maxVersion.split("\\.")[i]);
+            intAppVersion[i] = Integer.valueOf(appVersion.split("\\.")[i]);
+        }
+
+        if (intAppVersion[0] < minIntVersion[0] || intAppVersion[0] > maxIntVersion[0]) {
+            return false;
+        } else if (intAppVersion[0] > minIntVersion[0] && intAppVersion[0] < maxIntVersion[0]) {
+            return true;
+        } else if (intAppVersion[0] == minIntVersion[0] && intAppVersion[0] < maxIntVersion[0]) {
+            if (intAppVersion[1] < minIntVersion[1]) {
+                return false;
+            } else if (intAppVersion[1] > minIntVersion[1]) {
+                return true;
+            } else if (intAppVersion[1] == minIntVersion[1]) {
+                if (intAppVersion[2] < minIntVersion[2]) {
+                    return false;
+                } else if (intAppVersion[2] >= minIntVersion[2]) {
+                    return true;
+                }
+            }
+        } else if (intAppVersion[0] > minIntVersion[0] && intAppVersion[0] == maxIntVersion[0]) {
+            if (intAppVersion[1] > maxIntVersion[1]) {
+                return false;
+            } else if (intAppVersion[1] < maxIntVersion[1]) {
+                return true;
+            } else if (intAppVersion[1] == maxIntVersion[1]) {
+                if (intAppVersion[2] > maxIntVersion[2]) {
+                    return false;
+                } else if (intAppVersion[2] <= maxIntVersion[2]) {
+                    return true;
+                }
+            }
+        } else if (intAppVersion[0] == minIntVersion[0] && intAppVersion[0] == maxIntVersion[0]) {
+            if (intAppVersion[1] < minIntVersion[1] || intAppVersion[1] > maxIntVersion[1]) {
+                return false;
+            } else if (intAppVersion[1] > minIntVersion[1] && intAppVersion[1] < maxIntVersion[1]) {
+                return true;
+            } else if (intAppVersion[1] > minIntVersion[1] && intAppVersion[1] == maxIntVersion[1]) {
+                if (intAppVersion[2] > maxIntVersion[2]) {
+                    return false;
+                } else if (intAppVersion[2] <= maxIntVersion[2]) {
+                    return true;
+                }
+            } else if (intAppVersion[1] == minIntVersion[1] && intAppVersion[1] < maxIntVersion[1]) {
+                if (intAppVersion[2] < minIntVersion[2]) {
+                    return false;
+                } else if (intAppVersion[2] >= minIntVersion[2]) {
+                    return true;
+                }
+            } else if (intAppVersion[1] == minIntVersion[1] && intAppVersion[1] == maxIntVersion[1]) {
+
+                if (intAppVersion[2] < minIntVersion[2] || intAppVersion[2] > maxIntVersion[2]) {
+                    return false;
+                } else if (intAppVersion[2] >= minIntVersion[2] && intAppVersion[2] <= maxIntVersion[2]) {
+                    return true;
+                }
+            }
+        }
+
+        Log.d("termination", "total");
+        return false;
+    }
+
+    /**
+     * Checks if RSA key is valid or not by trying to cipher text
+     *
+     * @return true i valid, false if not
+     */
+    private boolean isRSAkeyValid() {
+
+        String text = "Blebleble";
+
+        try {
+            byte[] keyBytes = Base64.decode(cipheringKey.getBytes(), Base64.DEFAULT);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+            PublicKey key = keyFactory.generatePublic(spec);
+            Cipher cipher = Cipher.getInstance("RSA/None/PKCS1Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+
+            new String(cipher.doFinal(text.getBytes("ISO-8859-1")), "ISO-8859-1");
+
+            return true;
+
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+            return false;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return false;
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+            return false;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return false;
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+            return false;
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
      * Being used to run server reachability check.
      */
     private class serverConnectionCheckTask extends AsyncTask<String, String, String> {
@@ -286,37 +608,6 @@ public class SecurityCheckActivity extends AppCompatActivity
                 serverConnectionSuccessful = false;
             }
         }
-    }
-
-    /**
-     * Checks if server with given serverAddress is reachable
-     *
-     * @param context       of application
-     * @param serverAddress address of checked server
-     * @return true if server is reachable, false if not
-     */
-    public static boolean isReachable(Context context, String serverAddress) {
-        // First, check we have any sort of connectivity
-        final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        final NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
-        boolean isReachable = false;
-
-        if (netInfo != null && netInfo.isConnected()) {
-            // Some sort of connection is open, check if server is reachable
-            try {
-                URL url = new URL(serverAddress);
-                HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
-                urlc.setRequestProperty("User-Agent", "Android Application");
-                urlc.setRequestProperty("Connection", "close");
-                urlc.setConnectTimeout(5 * 1000); //5 sek
-                urlc.connect();
-                isReachable = (urlc.getResponseCode() == 200);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return isReachable;
     }
 
     /**
@@ -370,7 +661,7 @@ public class SecurityCheckActivity extends AppCompatActivity
                 buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_continue));
                 appConfigurationSuccessful = true;
 
-                if(!isConfigurationProper(minAppVersion, maxAppVersion, cipheringKey)){
+                if (!isConfigurationProper(minAppVersion, maxAppVersion, cipheringKey)) {
                     spinnerUnsuccessful(progressButtonSecurityCheck_appConfiguration);
                     spinnerUnsuccessful(progressButtonSecurityCheck_validation);
                     buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_try_again));
@@ -414,293 +705,4 @@ public class SecurityCheckActivity extends AppCompatActivity
             }
         }
     }
-
-    /**
-     * Downloads configuration file from server
-     *
-     * @param context               of application
-     * @param serverDocumentAddress address of configuration file
-     * @return true if downloaded configuration, false if not
-     */
-    public static boolean downloadedConfiguration(Context context, String serverDocumentAddress) {
-        // First, check we have any sort of connectivity
-        final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        final NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
-        boolean downloadedConfiguration = false;
-
-        if (netInfo != null && netInfo.isConnected()) {
-            // Some sort of connection is open, check if server is reachable
-            try {
-                URL url = new URL(serverDocumentAddress);
-                URLConnection conn = url.openConnection();
-
-                XmlPullParserFactory xmlFactoryObject = XmlPullParserFactory.newInstance();
-                XmlPullParser configurationParser = xmlFactoryObject.newPullParser();
-                configurationParser.setInput(conn.getInputStream(), null);
-
-                int event = configurationParser.getEventType();
-                while (event != XmlPullParser.END_DOCUMENT) {
-                    String name = configurationParser.getName();
-                    switch (event) {
-                        case XmlPullParser.START_TAG:
-                            break;
-
-                        case XmlPullParser.END_TAG:
-                            if (name.equals("version")) {
-                                minAppVersion = configurationParser.getAttributeValue(null, "min");
-                                maxAppVersion = configurationParser.getAttributeValue(null, "max");
-                            } else if (name.equals("key")) {
-                                cipheringKey = configurationParser.getAttributeValue(null, "rsa");
-                            }
-                            break;
-                    }
-                    event = configurationParser.next();
-                }
-
-                downloadedConfiguration = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        return downloadedConfiguration;
-    }
-
-    /**
-     * Used to check if these values are not null.
-     * If they're not null then checks if they're not equal "".
-     *
-     * @param minVersion minimal version
-     * @param maxVersion maximal version
-     * @param rsaKey ciphering key
-     * @return true if proper, false if not
-     */
-    private boolean isConfigurationProper(String minVersion, String maxVersion, String rsaKey){
-
-        if (minVersion == null){
-            alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle(getResources().getString(R.string.label_attention))
-                    .setMessage(getResources().getString(R.string.message_missing_min_version))
-                    .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                    .show();
-            return false;
-        }
-        else{
-            if (minVersion.equals("")) {
-                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage(getResources().getString(R.string.message_missing_min_version))
-                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                        .show();
-                return false;
-            }
-        }
-
-        if (maxVersion == null) {
-            alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle(getResources().getString(R.string.label_attention))
-                    .setMessage(getResources().getString(R.string.message_missing_max_version))
-                    .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                    .show();
-            return false;
-        } else{
-            if (maxVersion.equals("")) {
-                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage(getResources().getString(R.string.message_missing_max_version))
-                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                        .show();
-                return false;
-            }
-        }
-
-        if (rsaKey == null){
-            alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle(getResources().getString(R.string.label_attention))
-                    .setMessage(getResources().getString(R.string.message_missing_key))
-                    .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                    .show();
-            return false;
-        } else {
-            if (rsaKey.equals("")) {
-                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage(getResources().getString(R.string.message_missing_key))
-                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                        .show();
-                return false;
-            }
-            else if(!isRSAkeyValid()){
-                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage(getResources().getString(R.string.message_wrong_key_abort_test))
-                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                        .show();
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Checks whether application version higher or equal than minimal version,
-     * and lower or equal than maximal version
-     *
-     * @param minVersion minimal app version
-     * @param maxVersion maximal app version
-     * @return true if acceptable, false if not
-     */
-    private boolean isAppVersionAcceptable(String minVersion, String maxVersion) {
-
-        String appVersion = getResources().getString(R.string.version_value);
-
-        int[] minIntVersion = new int[3];
-        int[] maxIntVersion = new int[3];
-        int[] intAppVersion = new int[3];
-
-        for (int i = 0; i < 3; ++i) {
-            minIntVersion[i] = Integer.valueOf(minVersion.split("\\.")[i]);
-            maxIntVersion[i] = Integer.valueOf(maxVersion.split("\\.")[i]);
-            intAppVersion[i] = Integer.valueOf(appVersion.split("\\.")[i]);
-        }
-
-
-        if (intAppVersion[0] < minIntVersion[0] || intAppVersion[0] > maxIntVersion[0])
-            return false;
-
-        else if (intAppVersion[0] > minIntVersion[0] && intAppVersion[0] < maxIntVersion[0])
-            return true;
-
-        else if (intAppVersion[0] == minIntVersion[0] && intAppVersion[0] < maxIntVersion[0]) {
-            if (intAppVersion[1] < minIntVersion[1])
-                return false;
-            else if (intAppVersion[1] > minIntVersion[1])
-                return true;
-            else if (intAppVersion[1] == minIntVersion[1]) {
-                if (intAppVersion[2] < minIntVersion[2])
-                    return false;
-                else if (intAppVersion[2] >= minIntVersion[2])
-                    return true;
-            }
-        } else if (intAppVersion[0] == minIntVersion[0] && intAppVersion[0] == maxIntVersion[0]) {
-
-            if (intAppVersion[1] < minIntVersion[1] || intAppVersion[1] > maxIntVersion[1])
-                return false;
-
-            else if (intAppVersion[1] > minIntVersion[1] && intAppVersion[1] < maxIntVersion[1])
-                return true;
-
-            else if (intAppVersion[1] == minIntVersion[1] && intAppVersion[1] < maxIntVersion[1]) {
-                if (intAppVersion[2] < minIntVersion[2])
-                    return false;
-                else if (intAppVersion[2] >= minIntVersion[2])
-                    return true;
-            } else if (intAppVersion[1] == minIntVersion[1] && intAppVersion[1] == maxIntVersion[1]) {
-
-                if (intAppVersion[2] < minIntVersion[2] || intAppVersion[2] > maxIntVersion[2])
-                    return false;
-
-                else if (intAppVersion[2] >= minIntVersion[2] && intAppVersion[2] <= maxIntVersion[2])
-                    return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if RSA key is valid or not by trying to cipher text
-     *
-     * @return true i valid, false if not
-     */
-    private boolean isRSAkeyValid(){
-
-        String text = "Blebleble";
-
-        try {
-            byte[] keyBytes = Base64.decode(cipheringKey.getBytes(), Base64.DEFAULT);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-            PublicKey key = keyFactory.generatePublic(spec);
-            Cipher cipher = Cipher.getInstance("RSA/None/PKCS1Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-
-            new String(cipher.doFinal(text.getBytes("ISO-8859-1")), "ISO-8859-1");
-
-            return true;
-
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-            return false;
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return false;
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-            return false;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return false;
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-            return false;
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private CircularProgressButton progressButtonSecurityCheck_validation;
-    private CircularProgressButton progressButtonSecurityCheck_serverConnection;
-    private CircularProgressButton progressButtonSecurityCheck_appConfiguration;
-    private Button buttonSecurityCheck_continue;
-    private Button buttonSecurityCheck_abort;
-    private serverConnectionCheckTask serverCheckTask;
-    private appConfigurationTask configurationTask;
-    private SettingsDataSource databaseSecurityCheck;
-    private AlertDialog alertDialog;
-
-    /*
-    * A flag indicating that app validation was successful.
-    */
-    private boolean validationSuccessful;
-    /*
-    * A flag indicating that server is reachable.
-    */
-    private boolean serverConnectionSuccessful;
-    /*
-    * A flag indicating that app configuration went successful.
-    */
-    private boolean appConfigurationSuccessful;
-    /*
-    * A flag indicating that a PendingIntent is in progress and prevents us
-    * from starting further intents.
-    */
-    private boolean mIntentInProgress;
-    /* Request code used to invoke sign in user interactions. */
-    private static final int RC_SIGN_IN = 0;
-    /* Client used to interact with Google APIs. */
-    private GoogleApiClient mGoogleApiClient;
-
-    static String minAppVersion;
-
-    static String maxAppVersion;
-
-    static String cipheringKey;
-
-    private SharedPreferences sharedPrefSecurity;
 }
