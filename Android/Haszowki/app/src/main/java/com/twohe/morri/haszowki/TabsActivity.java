@@ -730,6 +730,8 @@ public class TabsActivity extends AppCompatActivity {
          */
         private void sendToServer(View rootView, int question, String answerNo, String timestamp) {
 
+            Log.d("server", "sent");
+
             if (isOnline()) {
                 DownloadWebpageTask task = new DownloadWebpageTask();
                 task.configure(rootView, question);
@@ -748,6 +750,8 @@ public class TabsActivity extends AppCompatActivity {
          * @param timestamp Current timestamp
          */
         private void sendToServer(Fragment fragment, int question, String answerNo, String timestamp) {
+
+            Log.d("serverHidden", "sent");
 
             if (isOnline()) {
                 DownloadWebpageTaskInvisible task = new DownloadWebpageTaskInvisible();

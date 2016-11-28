@@ -28,18 +28,19 @@
 
 %\maketitle
 
-	\chapter{Przegląd zagadnień}
+	\chapter{Wstęp}
 
 	Tematem pracy jest stworzenie systemu na platformę Android umożliwiającego pisanie testów na wykładach akademickich i zautomatyzowane przetworzenie wyników testów. W skład systemu planowo mają wejść: aplikacja na system Android oraz aplikacja serwerowa, z którą aplikacja połączy się wysyłając wybrane przez użytkownika odpowiedzi.\\
+	
+	\chapter{Analiza problemu}
 	
 	Na rynku istnieją już aplikacje częściowo odpowiadające tematowi pracy inżynierskiej. Ich funkcjonalność spełnia pewne aspekty jakimi są: wybór odpowiedzi, przesyłanie odpowiedzi do serwera oraz pobieranie treści z serwera na aplikację. Najlepszym przykładem jest aplikacja nazywająca się Quizowanie \footnote{https://play.google.com/store/apps/details?id=se.feomedia.quizkampen.pl.lite}. Aplikacja ta pozwala na pobieranie i wyświetlenie pytań z serwera, wyświetlenie możliwych odpowiedzi jako przycisków dla użytkownika oraz wysłanie odpowiedzi do serwera i zweryfikowanie ich. Jej kod źródłowy jest jednak zamknięty co sprawia, że jest nieprzydatny przy tworzeniu systemu będącego tematem tej pracy.
 	
 	Inne aplikacje, które można wymienić to English Grammar Test\footnote{https://play.google.com/store/apps/details?id=english.grammar.test.app} lub też sameQuizy\footnote{https://play.google.com/store/apps/details?id=pl.filing.samequizy}. Ich wartość ogranicza się jednak do rozwiązań dotyczących wyglądu interfejsu aplikacji. Nie ma możliwości w legalny sposób uzyskać kodu źródłowego lub opisów rozwiązań w tych aplikacjach z racji ich komercyjnego zastosowania.
 	\\
-	W przypadku aplikacji serwerowej jest wiele możliwych technologii, które można zastosować przy jej tworzeniu. Pierwszym etapem był wybór protokołu komunikacyjnego jaki zostanie użyty między aplikacją androidową, a serwerem. Możliwe protokoły to np. TCP, UDP, POP, SMTP, HTTP czy FTP. Wybrany został protokół HTTP z powodu tego, że sieć WiFi na Politechnice Wrocławskiej ma odblokowaną komunikację na portach 80 oraz 8080 oraz prawdopodobnie na tych wymienionych portach sprawdzane są też użyte protokoły i ich zgodność z HTTP. Innego rodzaju protokół wykluczyłby użycie systemu w połączeniu z politechniczną siecią WiFi co znacząco obniżyłoby jego zastosowanie.
+	W przypadku aplikacji serwerowej jest wiele możliwych technologii, które można zastosować przy jej tworzeniu. Pierwszym etapem był wybór protokołu komunikacyjnego jaki zostanie użyty między aplikacją androidową, a serwerem. Możliwe protokoły to np. TCP, UDP, POP, SMTP, HTTP czy FTP. 
 	
-	Kolejnym etapem był wybór odpowiedniego odpowiedniego serwera web do obsługi zapytań przesłanych z aplikacji mobilnej. Możliwe aplikacje serwerowe jakie można wykorzystać to: Apache, nginx, lighttpd, OpenLiteSpeed. Początkowe wersje aplikacji mobilnej komunikują się z serwerem Apache\footnote{https://httpd.apache.org/} jednak docelowo ma zostać do tego użyty nginx\footnote{https://www.nginx.com/}. Z racji tego, że większość serwerów obsługuje FastCGI pozwalających na napisanie programu obsługującego zapytania w wielu popularnych językach, to przy wyborze serwera kierowano się jego wydajnością obsługi zapytań przychodzących. Wykorzystano tutaj Linux Web Server Performance Benchmark\footnote{https://www.rootusers.com/linux-web-server-performance-benchmark-2016-results/} z 2016.
-	
+	Kolejnym etapem był wybór odpowiedniego serwera web do obsługi zapytań przesłanych z aplikacji mobilnej. Możliwe aplikacje serwerowe jakie można wykorzystać to: Apache, nginx, lighttpd, OpenLiteSpeed. Początkowe wersje aplikacji mobilnej komunikują się z serwerem Apache\footnote{https://httpd.apache.org/} jednak docelowo ma zostać do tego użyty nginx\footnote{https://www.nginx.com/}. Z racji tego, że większość serwerów obsługuje FastCGI pozwalających na napisanie programu obsługującego zapytania w wielu popularnych językach, to przy wyborze serwera kierowano się jego wydajnością obsługi zapytań przychodzących. Wykorzystano tutaj Linux Web Server Performance Benchmark\footnote{https://www.rootusers.com/linux-web-server-performance-benchmark-2016-results/} z 2016.
 	
 	\begin{center}
 		\begin{figure}[ht]
@@ -49,17 +50,19 @@
 		\end{figure}
 	\end{center}
 	
+	Należało też wybrać środowisko w jakim aplikacja mobilna powinna powstać. W tym przypadku do wyboru jest Android Studio\footnote{https://developer.android.com/studio/index.html} oraz Qt\footnote{https://www.qt.io/}. Oba środowiska oferują duże wsparcie ze strony społeczności programistycznej oraz szeroki zestaw narzędzi. Oba pozwalają na tworzenie interfejsu użytkownika w XML oraz udostępniają klasy obiektów przydatne do wizualizowania i przetwarzania danych. Android Studio jest jednak najbardziej popularny oraz posiada najszerszą gamę narzędzi. Pozwala na dołączanie bibliotek z repozytoriów Git lub też bibliotek za pomocą wbudowanego narzędzia Maven\footnote{https://maven.apache.org/}, bieżące sprawdzanie kompatybilności użytych bibliotek z wersjami systemu Android na które aplikacja powstaje oraz tworzenie maszyn wirtualnych do testowania napisanych aplikacji.
 	
-	Należało też wybrać środowisko w jakim aplikacja mobilna powinna powstać. W tym przypadku do wyboru jest Android Studio\footnote{https://developer.android.com/studio/index.html} oraz Qt\footnote{https://www.qt.io/}. Oba środowiska oferują duże wsparcie ze strony społeczności programistycznej oraz szeroki zestaw narzędzi. Oba pozwalają na tworzenie interfejsu użytkownika w XML oraz udostępniają klasy obiektów przydatne do wizualizowania i przetwarzania danych. Wybrany został jednak Android Studio z racji jego największej popularności oraz najszerszej gamy narzędzi wchodzących w skład tego środowiska. Pozwala na dołączanie bibliotek z repozytoriów Git lub też bibliotek za pomocą wbudowanego narzędzia Maven\footnote{https://maven.apache.org/}, bieżące sprawdzanie kompatybilności użytych bibliotek z wersjami systemu Android na które aplikacja powstaje oraz tworzenie maszyn wirtualnych do testowania napisanych aplikacji.
-	\\
+	\chapter{Implementacja}
+	
+	% tutaj należy to zredagować na nowo
+	
 	Zważywszy na powyżej przedstawione informacje system do rozwiązywania testów musi być napisany od podstaw. Nie znaleziono przykładów otwartych systemów na tyle użytecznych, żeby można było użyć ich przy tworzeniu systemu. Systemy takie jak Quizowanie mają zamknięty kod i można się nimi sugerować jedynie w kwestii tworzenia interfejsu użytkownika.
 	
 	W trakcie pracy nad systemem do rozwiązywania testów wymagania co do tego systemu zostały doprecyzowane. Aplikacja mobilna musi być przyjazna dla użytkownika i intuicyjna. Użytkownik dalej ma możliwość pisania testów na papierze dlatego forma elektroniczna musi być wystarczająco zachęcająca. Ponadto musi też być niezawodna. Nie powinna tracić przetwarzanych w niej istotnych informacji lub wyłączać się w trakcie rozpoczęcia pisania testu. Aplikacja musi się też w niezawodny sposób łączyć z serwerem w celu przesłania odpowiedzi użytkownika lub też pozwolić na ponowne ich wysłanie po utracie połączenia. Kopie zapasowe testów muszą też być zapisywane w pamięci wewnętrznej telefonu, a ich zawartość zaszyfrowana chroniąc wrażliwe dane przed ingerencją osób nieupoważnionych. Aplikacja powinna też być weryfikowalna przez serwer, żeby nie dopuścić do wysyłania odpowiedzi aplikacji zmodyfikowanych przez osoby trzecie. Musi też informować użytkownika odpowiednimi komunikatami wyświetlanymi na ekranie o zaistniałych problemach na każdym etapie użytkowania, żeby użytkownik wiedział w jaki sposób reagować na nieprzewidziane sytuacje.
 	
 	Aplikacja serwerowa musi być w stanie obsługiwać sprawnie wysoki ruch, w którym przybywa średnio 10 zapytań na sekundę dochodzących nawet do 100 na sekundę przy 100 osobowej grupie użytkowników piszących na aplikacji test. Docelowo powinna jednak być w stanie obsłużyć nawet 300-400 użytkowników, żeby można było ją zastosować w każdej możliwej grupie studentów na Politechnice Wrocławskiej. Serwer musi też być w stanie weryfikować łączące się aplikacje, tak aby nie przesyłać wrażliwych informacji do nieupoważnionych osób. Jego struktura musi być możliwie prosta, żeby przyszłe modyfikacje były mało uciążliwe dla użytkownika całego systemu.
-	\\
 	
-	\chapter{Stopień zaawansowania prac}
+	Wybrany został protokół HTTP z powodu tego, że sieć WiFi na Politechnice Wrocławskiej ma odblokowaną komunikację na portach 80 oraz 8080 oraz prawdopodobnie na tych wymienionych portach sprawdzane są też użyte protokoły i ich zgodność z HTTP. Innego rodzaju protokół wykluczyłby użycie systemu w połączeniu z politechniczną siecią WiFi co znacząco obniżyłoby jego zastosowanie.
 	
 	Aplikacja mobilna przechowuje dane użytkownika takie jak: Imię, Nazwisko, numer indeksu oraz nazwa przedmiotu na którym wykonywany jest test. Umożliwia też zmianę adresu serwera, na który przysyłane są odpowiedzi z testu. Dane te zmienia się w ustawieniach aplikacji. W menu głównym pozwala na wprowadzenie rzędu i miejsca, na którym użytkownik siedzi podczas testu, wektora wag służącego do obliczania grupy oraz ID testu jaki jest przeprowadzany. Zostało też zaimplementowane udogodnienie dla użytkownika w postaci skanera kodów QR umożliwiającego zautomatyzowane wczytanie wektora wag, ID testu i wyliczenie grupy użytkownika. Do skanowania kodów QR została wykorzystana biblioteka zxing\footnote{https://github.com/zxing/zxing} (Zebra Crossing). Po przejściu do testu wyświetlany jest ekran konfiguracyjny aplikacji gdzie użytkownik jest informowany o operacjach przeprowadzanych przed rozpoczęciem testu. Na obecnym etapie prac aplikacja sprawdza osiągalność serwera, do którego wysyła odpowiedzi oraz pobiera plik konfiguracyjny zawierający takie dane jak minimalna i maksymalna wersja aplikacji dopuszczona do testu oraz klucz szyfrowania danych w plikach testu przechowywanych na telefonie użytkownika. Po przejściu do testu wyświetlana jest zakładka pytania, a na niej: nr grupy w jakiej użytkownik się znajduje, nr pytania, przyciski do wysłania odpowiedzi "tak", "nie", "nie wiem"; przyciski do dodania pytania i do podsumowania testu oraz unikalny identyfikator sesji wygenerowany dla aktualnej sesji testowej otwartej na telefonie. Dodanie pytania wymusza przejście do następnego pytania a UI użytkownika pozwala na przesuwanie ekranu w celu dostania się do innych pytań. Podsumowanie testu wyświetla ilość poprawnie przesłanych odpowiedzi "tak", "nie" oraz "nie wiem" do serwera, oraz ilość odpowiedzi zapisanych w pliku testowym. W razie różnicy w odpowiedziach przesłanych do serwera a zapisanych w pliku aplikacja wyświetla odpowiednie ostrzeżenie sugerujące użytkownikowi powrót do testu i ponowne przesłanie odpowiedzi. Na ekranie podsumowania wyświetlany jest przycisk pozwalający powrót do testu oraz przycisk kończący test powodujący powrót do menu głównego aplikacji.
 	
@@ -69,9 +72,9 @@
 	
 	Do tworzenia plików konfiguracyjnych stworzony został konfigurator. Tworzy on dokument XML zawierający klucz szyfrowania i zakres dopuszczalnych wersji aplikacji, oraz tworzy on plik przechowujący klucz do deszyfrowania.
 	
-	\chapter{Elementy aplikacji}
+	\section{Elementy aplikacji}
 	
-		\section{Widoki aplikacji}
+		\subsection{Widoki aplikacji}
 		
 		Wygląd aplikacji stanowi ważny element aplikacji. W początkowych fazach projektu rozmieszczenie elementów na ekranie telefonu komórkowego jak też ich estetyka wielokrotnie była zmieniana. Potrzebne było wypracowanie przejrzystego oraz przyjaznego dla studenta interfejsu aplikacji. W trakcie tworzenia aplikacji zauważono, że istotnym elementem jest zachowanie kompatybilności z różnymi wersjami systemu Android realizując jednolite i przewidywalne zachowanie się interfejsu aplikacji.
 		Na przykład nie można było zastosować kolorowania przycisków korzystając z metody setColorFilter obecnej we wszystkich wersjach systemu od Android 4.0 do Android 7.0. Wywołanie tej metody w systemach Android 4.0 do 4.4 powodowało zakolorowanie przycisku w sposób ujawniający się dopiero po odtworzeniu widoku. W systemach Android 5.0 i wyższych powodowało natychmiastową zmianę koloru przycisku.
@@ -123,7 +126,7 @@
 			
 		\end{itemize}
 		
-		\section{Interaktywne elementy na widokach}
+		\subsection{Interaktywne elementy na widokach}
 		
 		W widoku ustawień po kliknięciu na pole do edycji  nazwy testu zastosowano rozwijaną listę z proponowanymi nazwami testów.	W widoku głównym zastosowano podobną listę, która generuje propozycje na podstawie wybranej wcześniej nazwy przedmiotu. Celem było zminimalizowanie błędów popełnianych przez studentów przed testem przy konfigurowaniu aplikacji.
 		
@@ -145,40 +148,44 @@
 		
 		tutaj będą obrazki pokazujące przykładowo wybraną odpowiedź\\
 		
-		\section{Powiadomienia}
+		\subsection{Powiadomienia}
 		
-		Istotnym elementem aplikacji okazały się być powiadomienia pozwalające na zrozumienie użytkownikowi wydarzeń występujących w aplikacji. Dzięki wypracowaniu zestawu chmurek oraz monitów użytkownik jest informowany o powodzeniu w edycji ustawień aplikacji, błędach występujących przy konfigurowaniu testu oraz różnych innych zdarzeniach takich jak utrata połączenia z serwerem czy też brak poprawnego testu, na który użytkownik chce wysyłać odpowiedzi.
+		Istotnym elementem aplikacji okazały się być powiadomienia pozwalające na zrozumienie użytkownikowi zdarzeń występujących w aplikacji. Dzięki wypracowaniu zestawu chmurek oraz monitów użytkownik jest informowany o powodzeniu w edycji ustawień aplikacji, błędach występujących przy konfigurowaniu testu oraz różnych innych zdarzeniach takich jak utrata połączenia z serwerem czy też brak poprawnego testu, na który użytkownik chciał wysyłać odpowiedzi.
 		
+		\subsection{Komunikacja internetowa}
+		
+		Aplikacja komunikuje się z serwerem poprzez protokół HTTP. Odpowiedzi są wysyłane na zasadzie pobierania nagłówka pliku konfiguracyjnego XML z odpowiedziami umieszczonymi w query string. Kod otrzymany po wykonaniu zapytania jest następnie interpretowany, a jego wartość decyduje o powiadomieniu użytkownika o poprawnym lub niepoprawnym wysłaniu odpowiedzi do serwera.
 	
-		\section{Szyfrowanie plików}
+		\subsection{Szyfrowanie plików}
 	
-		Początkowo pliki były szyfrowane algorytmem DES z kluczem generowanym na podstawie łańcucha znaków. Szyfrowało to tekst w dość niezadowalający sposób ujawniając regularności w zakodowanym tekście. Ponadto klucz szyfrowania można było uzyskać po zdekompilowaniu aplikacji. Pierwszym ulepszeniem zaimplementowanym w aplikacji było zastosowanie metody "security by obscurity", gdzie klucz szyfrowania zmieniał się w trakcie działania programu. W ten sposób sprawa jego uzyskania została utrudniona.
-		W dalszym etapie wykorzystano szyfrowanie algorytmem RSA. Klucz publiczny jest wykorzystywany w aplikacji do szyfrowania odpowiedzi i zapisywania ich do pliku testu. Uzyskano w ten sposób zadowalający nieregularny wygląd odpowiedzi w pliku testu. Aplikacja została też zmodyfikowana w taki sposób, że klucz publiczny jest pobierany w pliku konfiguracyjnym z serwera pozbywając się niebezpiecznej metody z kluczem bezpośrednio zapisanym w aplikacji.
+		Początkowo pliki były szyfrowane algorytmem DES z kluczem przechowywanym w aplikacji. Było to jednak rozwiązanie niebezpieczne, ponieważ klucz szyfrowania można było uzyskać po zdekompilowaniu aplikacji. Pierwszym ulepszeniem zaimplementowanym w aplikacji było zastosowanie metody "security by obscurity", gdzie klucz szyfrowania zmieniał się w trakcie działania programu. W ten sposób sprawa jego uzyskania została utrudniona. Następnie w aplikacji zaimplementowano pobieranie dokumentu XML z ustawieniami testu. W tym dokumencie znajdował się klucz szyfrowania wykorzystywany później w algorytmie DES. W dalszym etapie wykorzystano szyfrowanie algorytmem RSA, którym zastąpiono algorytm DES, a klucz w dokumencie XML został zamieniony na 4096 bitowy klucz publiczny algorytmu RSA.
 	
-		\section{Skaner QR}
+		\subsection{Skaner QR}
 		
-		W aplikacji wykorzystano również skaner kodów QR. Jak wcześniej o tym wspomniano, wykorzystano do tego bibliotekę zxing. Pozwala ona nie tylko na skanowanie kodów QR ale również kodów kreskowych, kodów Aztec i innych. Skaner skanuje kod QR wyświetlany na rzutniku  automatyczne wpisując w aplikacji kodu testu, wektor wag. Po operacji wczytywania wymusza wyliczenie nowego numeru grupy. Ułatwia to pracę z aplikacją potencjalnemu użytkownikowi oraz pozwala na zmniejszenie prawdopodobieństwa popełnienia błędu przez użytkownika przy wyliczaniu grupy na teście.
+		W aplikacji wykorzystano również skaner kodów QR. Jak wcześniej o tym wspomniano, wykorzystano do tego bibliotekę zxing. Pozwala ona nie tylko na skanowanie kodów QR ale również kodów kreskowych, kodów Aztec i innych. Skaner skanuje kod QR wyświetlany na ekranie przez rzutnik automatyczne zapisując w aplikacji kodu testu i wektor wag. Po operacji skanowania wymusza wyliczenie nowego numeru grupy. Ułatwia to pracę z aplikacją potencjalnemu użytkownikowi oraz pozwala na zmniejszenie prawdopodobieństwa popełnienia błędu przez użytkownika przy wyliczaniu grupy na teście.
 		
-		\section{Baza danych}
+		\subsection{Baza danych}
 		
-		Do długotrwałego przechowywania danych w aplikacji wykorzystano bazę danych MySQL. W tym celu stworzono klasę imitującą bazę danych MySQL oraz klasę imitującą interfejs dostępowy do tej klasy.
+		Do długotrwałego przechowywania danych w aplikacji wykorzystano bazę danych MySQL. W tym celu stworzono klasę imitującą bazę danych MySQL oraz klasę imitującą interfejs dostępowy do tej klasy. Interfejs został następnie wykorzystany do zapisywania informacji zawartych w widoku ustawień. Służy dodatkowo jako narzędzie do rozprowadzania informacji po innych widokach aplikacji.
 		
-		\section{Odrzucanie połączeń w trakcie testu}
+		\subsection{Odrzucanie połączeń w trakcie testu}
 		
-		W trakcie testowania aplikacji na grupie studentów pojawiła się potrzeba automatycznego odrzucania połączeń. W tym celu stworzono klasę na bazie wbudowanej BroadcastReceiver, która to odrzuca wszystkie przychodzące połączenia o ile użytkownik jest w trakcie pisania testu.
+		W trakcie testowania aplikacji na grupie studentów pojawiła się potrzeba automatycznego odrzucania przychodzących połączeń telefonicznych. W tym celu stworzono klasę na bazie wbudowanej BroadcastReceiver, która to odrzuca wszystkie przychodzące połączenia jeśli użytkownik jest w trakcie pisania testu.
 		
-	\chapter{Elementy serwera}
+	\section{Programy dodatkowe}
 		
-		\section{Generator konfiguracji}
+		\subsection{Generator konfiguracji}
 		
-		Generator został napisany w języku Java w wersji pozwalającej uruchomienie go tylko w linii poleceń. W parametrach wywołania tego programu podaje się kod testu, minimalną wersję aplikacji oraz maksymalną wersję aplikacji dopuszczoną do testu. Program generuje dwa pliki. Pierwszy jest dokumentem XML zawierającym minimalną wersję, maksymalną wersję oraz klucz publiczny RSA do szyfrowania odpowiedzi. Drugi plik zawiera klucz prywatny służący do rozszyfrowywania odpowiedzi w pliku z zaszyfrowanymi odpowiedziami na telefonie Android.
+		Generator został napisany w języku Java w wersji pozwalającej uruchomienie go tylko w linii poleceń. W parametrach wywołania tego programu podaje się kod testu, minimalną wersję aplikacji oraz maksymalną wersję aplikacji dopuszczoną do testu. Program generuje dwa pliki. Pierwszy jest dokumentem XML zawierającym klucz publiczny RSA plus dodatkowe parametry testu przeznaczone dla aplikacji Android. Drugi plik zawiera klucz prywatny RSA służący do rozszyfrowywania odpowiedzi zaszyfrowanych wcześniej kluczem publicznym.
 		
-		\section{Deszyfrator}
+		\subsection{Deszyfrator}
 		
-		Deszyfrator również został napisany w języku Java i umożliwia uruchomienie jedynie w linii poleceń. W parametrach wywołania wprowadza się nazwę pliku z kluczem prywatnym, nazwę pliku z zaszyfrowanymi odpowiedziami i opcjonalnie nazwę pliku wyjściowego. Jeśli zostanie podana nazwa pliku wyjściowego to w nim zostaną zapisane rozszyfrowane odpowiedzi. Bez wybrania nazwy pliku wyjściowego deszyfrator będzie kierować dane na strumień wyjściowy.
+		Deszyfrator również został napisany w języku Java i umożliwia uruchomienie jedynie w linii poleceń. Początkowa wersja deszyfratora korzystała z algorytmu DES, najpierw ze stałym kluczem zapisanym w aplikacji, potem z kluczem odczytywanym z pliku. Ostatecznie stosuje algorytm RSA, a klucz prywatny pobiera z pliku.
 		
-		\section{Generator kodów QR}
+
+	\chapter{Testowanie systemu}
+	
+	System został pomyślnie wykorzystany na Wydziale Mechanicznym, Automatyce i Robotyce na kursie Systemy Czasu Rzeczywistego i Sieci Komputerowe. Średnio z aplikacji korzystało około 90 osób na każdym z siedmiu wykonanych testów. Ponadto aplikacja została wykorzystana na testach na Wydziale Elektroniki, Automatyce i Robotyce na kursie SCR Systemy Operacyjne.
 		
-		Do generowania slajdów z pytaniami wykorzystano również bibliotekę do generowania kodów QR o nazwie libqrencode\footnote{https://github.com/fukuchi/libqrencode}. Jest to biblioteka napisana w języku C udostępniająca generator kodów oraz pliki nagłówkowe pozwalające na napisanie własnej aplikacji generującej kody QR, Aztec lub inne.
 			
 \end{document}
