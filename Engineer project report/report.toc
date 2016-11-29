@@ -1,0 +1,19 @@
+\contentsline {chapter}{\numberline {1}Wst\IeC {\k e}p}{2}
+\contentsline {chapter}{\numberline {2}Analiza problemu}{3}
+\contentsline {chapter}{\numberline {3}Implementacja}{5}
+\contentsline {section}{\numberline {3.1}Elementy aplikacji}{6}
+\contentsline {subsection}{\numberline {3.1.1}Widoki aplikacji}{6}
+\contentsline {subsection}{\numberline {3.1.2}Interaktywne elementy na widokach}{7}
+\contentsline {paragraph}{Rozwijane listy}{7}
+\contentsline {paragraph}{Zmiennokszta\IeC {\l }tne przyciski}{7}
+\contentsline {paragraph}{Przyciski zmieniaj\IeC {\k a}ce kolor}{7}
+\contentsline {subsection}{\numberline {3.1.3}Powiadomienia}{7}
+\contentsline {subsection}{\numberline {3.1.4}Komunikacja internetowa}{7}
+\contentsline {subsection}{\numberline {3.1.5}Szyfrowanie plik\IeC {\'o}w}{8}
+\contentsline {subsection}{\numberline {3.1.6}Skaner QR}{8}
+\contentsline {subsection}{\numberline {3.1.7}Baza danych}{8}
+\contentsline {subsection}{\numberline {3.1.8}Odrzucanie po\IeC {\l }\IeC {\k a}cze\IeC {\'n} w trakcie testu}{8}
+\contentsline {section}{\numberline {3.2}Programy dodatkowe}{8}
+\contentsline {subsection}{\numberline {3.2.1}Generator konfiguracji}{8}
+\contentsline {subsection}{\numberline {3.2.2}Deszyfrator}{8}
+\contentsline {chapter}{\numberline {4}Testowanie systemu}{9}
