@@ -1,0 +1,21 @@
+\BOOKMARK [0][-]{chapter.1}{Analiza problemu}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Systemy pisania test\363w w czasie rzeczywistym}{chapter.1}% 2
+\BOOKMARK [1][-]{section.1.2}{srodowisko tworzenia aplikacji na Android}{chapter.1}% 3
+\BOOKMARK [1][-]{section.1.3}{Komunikacja internetowa}{chapter.1}% 4
+\BOOKMARK [2][-]{subsection.1.3.1}{Protoko\233y}{section.1.3}% 5
+\BOOKMARK [2][-]{subsection.1.3.2}{Serwer HTTP}{section.1.3}% 6
+\BOOKMARK [2][-]{subsection.1.3.3}{Serwer aplikacji}{section.1.3}% 7
+\BOOKMARK [0][-]{chapter.2}{Implementacja}{}% 8
+\BOOKMARK [1][-]{section.2.1}{Elementy aplikacji}{chapter.2}% 9
+\BOOKMARK [2][-]{subsection.2.1.1}{Widoki aplikacji}{section.2.1}% 10
+\BOOKMARK [2][-]{subsection.2.1.2}{Interaktywne elementy na widokach}{section.2.1}% 11
+\BOOKMARK [2][-]{subsection.2.1.3}{Powiadomienia}{section.2.1}% 12
+\BOOKMARK [2][-]{subsection.2.1.4}{Komunikacja internetowa}{section.2.1}% 13
+\BOOKMARK [2][-]{subsection.2.1.5}{Szyfrowanie plik\363w}{section.2.1}% 14
+\BOOKMARK [2][-]{subsection.2.1.6}{Skaner QR}{section.2.1}% 15
+\BOOKMARK [2][-]{subsection.2.1.7}{Baza danych}{section.2.1}% 16
+\BOOKMARK [2][-]{subsection.2.1.8}{Odrzucanie po\233aczen w trakcie testu}{section.2.1}% 17
+\BOOKMARK [1][-]{section.2.2}{Programy dodatkowe}{chapter.2}% 18
+\BOOKMARK [2][-]{subsection.2.2.1}{Generator konfiguracji}{section.2.2}% 19
+\BOOKMARK [2][-]{subsection.2.2.2}{Deszyfrator}{section.2.2}% 20
+\BOOKMARK [0][-]{chapter.3}{Testowanie systemu}{}% 21

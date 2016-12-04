@@ -2,7 +2,7 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Haszówki</string>
-    <string name="version_value">0.9.2</string>
+    <string name="version_value">0.9.3</string>
     <string name="zero_value">0</string>
     <string name="six_zeros_value">000000</string>
     <string name="label_null">null</string>
@@ -17,7 +17,7 @@
     <string name="label_result">Wynik:</string>
     <string name="label_result_modulo">Grupa:</string>
     <string name="label_course_value">Nazwa przedmiotu:</string>
-    <string name="label_exam_id_value">ID testu:</string>
+    <string name="label_exam_id_value">Kod testu:</string>
 
 
     <!--*** BUTTON strings of MAIN ***-->
@@ -31,7 +31,7 @@
     <string name="message_do_you_want_to_quit_app">Czy na pewno chcesz wyjść z aplikacji?</string>
     <string name="message_scan_qr_code">Zeskanuj kod QR</string>
     <string name="message_type_course_name">Wprowadź nazwę przedmiotu!</string>
-    <string name="message_type_ID_name">Wprowadź ID testu!</string>
+    <string name="message_type_ID_name">Wprowadź kod testu!</string>
     <string name="message_type_seat">Podaj miejsce!</string>
     <string name="message_type_row">Podaj rząd!</string>
     <string name="message_invalid_seat">Nieprawidłowe miejsce!</string>

@@ -1,3 +1,13 @@
+## 0.9.3 - 2016-12-02
+### Changed
+~ "ID testu" zmieniony na "kod testu" we wszystkich stringach
+~ zmieniony sposób wysy³ania no_answer. Teraz wyœle siê przy przejœciu do podsumowania oraz po dodaniu pytania
+  (niezale¿nie na jakim pytaniu nast¹pi wciœniêcie "podsumowanie" lub "dodaj pytanie")
+~ dodana mapa, w której przechowywane s¹ informacje o tym czy dana odpowiedŸ zosta³a wys³ana czy nie
+~ jeœli odpowiedŸ serwera bêdzie sygnalizowaæ b³¹d lub zostanie przekroczony timeout to pole w mapie,
+  odpowiadaj¹ce odpowiedzi zostanie zresetowane
+~ dodany parametr session_ID2 do zapytañ GET/HEAD
+
 ## 0.9.2 - 2016-11-27
 ### Changed
 ~ poprawiony b³¹d z niew³aœciwym przysy³aniem odpowiedzi no_answer, kiedy po zmianie widoku no_answer siê nie wysy³a³o

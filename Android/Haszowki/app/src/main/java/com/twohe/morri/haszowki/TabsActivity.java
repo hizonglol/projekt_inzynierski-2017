@@ -88,6 +88,7 @@ public class TabsActivity extends AppCompatActivity {
     private ViewPager ViewPagerTabs;
     private AlertDialog alertDialog;
     private File fileTabs_toWrite;
+    List<Integer> answeredQuestions;
 
     /**
      * Creates layout.
@@ -101,6 +102,8 @@ public class TabsActivity extends AppCompatActivity {
         Log.d("On create", "TabsActivity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabs);
+
+        answeredQuestions = new ArrayList<Integer>();
 
         sharedPrefTabs = PreferenceManager.getDefaultSharedPreferences(this);
         cryptoPass = sharedPrefTabs.getString("Key", "");
@@ -140,6 +143,7 @@ public class TabsActivity extends AppCompatActivity {
         nie miala przyznanych uprawnien do internetu, a socket bylby zajety.
          */
         enableIncomingCallReceiver();
+
     }
 
     /**
@@ -256,21 +260,23 @@ public class TabsActivity extends AppCompatActivity {
      */
     public void addTab() {
         SectionsPagerAdapterTabs.addFragment();
+        answeredQuestions.add(-1);
     }
 
     /**
      * Generates random string containing characters safe for URL requests.
      * String is shortened to 4 characters and all characters are changed to lower case characters.
      *
+     * @param length length of string (has to be between 1 and 8)
      * @return shortened random string
      */
-    private String generateSessionID() {
+    private String generateSessionID(int length) {
         SecureRandom randomizer = new SecureRandom();
-        byte bytes[] = new byte[6];
+        byte bytes[] = new byte[10];
         randomizer.nextBytes(bytes);
         String base64 = Base64.encodeToString(bytes, Base64.URL_SAFE | Base64.NO_WRAP);
 
-        return base64.substring(0, 4).toLowerCase();
+        return base64.substring(0, length).toLowerCase();
     }
 
     /**
@@ -294,8 +300,12 @@ public class TabsActivity extends AppCompatActivity {
         SettingsDataSource databaseTabsTestFile = new SettingsDataSource(this);
         databaseTabsTestFile.open();
 
-        String sessionID = generateSessionID();
+        String sessionID = generateSessionID(4);
+        Log.d("string", sessionID);
         databaseTabsTestFile.createSetting("setting_sessionID", sessionID);
+        String sessionSecurityID = generateSessionID(8);
+        Log.d("string", sessionSecurityID);
+        databaseTabsTestFile.createSetting("setting_sessionSecurityID", sessionSecurityID);
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss", Locale.getDefault());
         Date now = new Date();
@@ -489,7 +499,6 @@ public class TabsActivity extends AppCompatActivity {
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static final String ARG_SECTION_ANSWER_FILE = "section_answer_file";
         private static final String ARG_SECTION_ANSWER_SERVER = "section_answer_server";
-        private static final String ARG_ANY_ANSWER_SENT = "section_any_answer_sent";
         private static final String DEBUG_TAG = "HttpExample";
         private String serverResponse = "";
         private Integer serverResponseCode = 404;
@@ -515,7 +524,6 @@ public class TabsActivity extends AppCompatActivity {
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             args.putInt(ARG_SECTION_ANSWER_FILE, 0);
             args.putInt(ARG_SECTION_ANSWER_SERVER, 0);
-            args.putBoolean(ARG_ANY_ANSWER_SENT, false);
             fragment.setArguments(args);
             return fragment;
         }
@@ -539,13 +547,24 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    ((TabsActivity) getActivity()).summariseTest();
-                    if ((getArguments().getInt(ARG_SECTION_NUMBER) % 16) == 0 && !getArguments().getBoolean(ARG_ANY_ANSWER_SENT)) {
-                        String timestamp = makeTimeStamp();
-                        if (saveToFile(rootView, 0, "no_answer", timestamp)) return;
-                        sendToServer(rootView, 0, "no_answer", timestamp);
-                        getArguments().putBoolean(ARG_ANY_ANSWER_SENT, true);
+                    int lastTabNumber = ((TabsActivity) getActivity()).guestionsAmount;
+
+                    List<Fragment> fragmentsToCheck = ((TabsActivity) getActivity()).SectionsPagerAdapterTabs.fragments;
+
+                    for (int i = 0; i < fragmentsToCheck.size() && i < lastTabNumber; ++i) {
+                        int answer = fragmentsToCheck.get(i).getArguments().getInt(ARG_SECTION_ANSWER_FILE);
+                        Integer whatAnswer = ((TabsActivity) getActivity()).answeredQuestions.get(i);
+
+                        if (answer == 0 && whatAnswer < 0) {
+                            String timestamp = makeTimeStamp();
+                            if (saveToFile(fragmentsToCheck.get(i), 0, "no_answer", timestamp))
+                                return;
+                            ((TabsActivity) getActivity()).answeredQuestions.set(i, 0);
+                            sendToServer(fragmentsToCheck.get(i), 0, "no_answer", timestamp);
+                        }
                     }
+
+                    ((TabsActivity) getActivity()).summariseTest();
                 }
             });
 
@@ -556,7 +575,7 @@ public class TabsActivity extends AppCompatActivity {
                     String timestamp = makeTimeStamp();
                     if (saveToFile(rootView, 1, "yes", timestamp)) return;
                     sendToServer(rootView, 1, "yes", timestamp);
-                    getArguments().putBoolean(ARG_ANY_ANSWER_SENT, true);
+                    ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, 0);
                 }
             });
 
@@ -567,7 +586,7 @@ public class TabsActivity extends AppCompatActivity {
                     String timestamp = makeTimeStamp();
                     if (saveToFile(rootView, 2, "no", timestamp)) return;
                     sendToServer(rootView, 2, "no", timestamp);
-                    getArguments().putBoolean(ARG_ANY_ANSWER_SENT, true);
+                    ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, 0);
                 }
             });
 
@@ -578,7 +597,7 @@ public class TabsActivity extends AppCompatActivity {
                     String timestamp = makeTimeStamp();
                     if (saveToFile(rootView, 3, "dunno", timestamp)) return;
                     sendToServer(rootView, 3, "dunno", timestamp);
-                    getArguments().putBoolean(ARG_ANY_ANSWER_SENT, true);
+                    ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, 0);
                 }
             });
 
@@ -590,14 +609,14 @@ public class TabsActivity extends AppCompatActivity {
 
                     for (int i = 0; i < fragmentsToCheck.size(); ++i) {
                         int answer = fragmentsToCheck.get(i).getArguments().getInt(ARG_SECTION_ANSWER_FILE);
-                        boolean ifAnyAnswerSent = fragmentsToCheck.get(i).getArguments().getBoolean(ARG_ANY_ANSWER_SENT);
+                        Integer whatAnswer = ((TabsActivity) getActivity()).answeredQuestions.get(i);
 
-                        if (answer == 0 && !ifAnyAnswerSent) {
+                        if (answer == 0 && whatAnswer < 0) {
                             String timestamp = makeTimeStamp();
                             if (saveToFile(fragmentsToCheck.get(i), 0, "no_answer", timestamp))
                                 return;
+                            ((TabsActivity) getActivity()).answeredQuestions.set(i, 0);
                             sendToServer(fragmentsToCheck.get(i), 0, "no_answer", timestamp);
-                            fragmentsToCheck.get(i).getArguments().putBoolean(ARG_ANY_ANSWER_SENT, true);
                         }
                     }
 
@@ -737,6 +756,7 @@ public class TabsActivity extends AppCompatActivity {
                 task.configure(rootView, question);
                 task.execute(createDataURL("to_server", answerNo, timestamp));
             } else {
+                ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, -1);
                 Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
             }
         }
@@ -758,6 +778,7 @@ public class TabsActivity extends AppCompatActivity {
                 task.configure(fragment, question);
                 task.execute(createDataURL("to_server", fragment, answerNo, timestamp));
             } else {
+                ((TabsActivity) getActivity()).answeredQuestions.set(fragment.getArguments().getInt(ARG_SECTION_NUMBER)-1, -1);
                 Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
             }
         }
@@ -818,6 +839,8 @@ public class TabsActivity extends AppCompatActivity {
             String group = databaseCreateDataURL.getSetting("setting_group");
             String question_no = String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER));
             String sessionID = databaseCreateDataURL.getSetting("setting_sessionID");
+            String sessionSecurityID = databaseCreateDataURL.getSetting("setting_sessionSecurityID");
+
 
             sbServerQuery.append("student_no=").append(studentNo).append(divider);
             sbServerQuery.append("course=").append(course).append(divider);
@@ -833,6 +856,7 @@ public class TabsActivity extends AppCompatActivity {
             sbServerQuery.append("session_id=").append(sessionID).append(divider);
             sbServerQuery.append("name=").append(name).append(divider);
             sbServerQuery.append("surname=").append(surname);
+            sbServerQuery.append("session_id2=").append(sessionSecurityID).append(divider);
 
             String sentUrl = sbServerQuery.toString();
             sentUrl = sentUrl.replace(" ", "");

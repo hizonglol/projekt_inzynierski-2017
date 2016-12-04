@@ -13,7 +13,7 @@
     <string name="button_yes">Yes</string>
     <string name="label_app">Haszowki</string>
     <string name="label_dunno_answers">DUNNO:</string>
-    <string name="label_exam_id_value">Test ID:</string>
+    <string name="label_exam_id_value">Test code:</string>
     <string name="label_group_number">Group nr:</string>
     <string name="label_hall_seat">Seat</string>
     <string name="label_hall_row">Row</string>
@@ -36,7 +36,7 @@
     <string name="label_weight">Weights vector:</string>
     <string name="label_yes_answers">YES:</string>
     <string name="six_zeros_value">000000</string>
-    <string name="version_value">0.9.2</string>
+    <string name="version_value">0.9.3</string>
     <string name="zero_value">0</string>
     <string name="message_your_test_file_was_created">Your test file has been created</string>
     <string name="message_you_quit_test">You have left application</string>
@@ -44,7 +44,7 @@
     <string name="message_type_course_name">Type course name!</string>
     <string name="message_type_row">Type row!</string>
     <string name="message_type_seat">Type seat!</string>
-    <string name="message_type_ID_name">Type test ID!</string>
+    <string name="message_type_ID_name">Type test code!</string>
     <string name="message_test_ended">Test finished</string>
     <string name="message_scan_qr_code">Scan QR code</string>
     <string name="message_no_internet_connection">No internet connection!</string>
