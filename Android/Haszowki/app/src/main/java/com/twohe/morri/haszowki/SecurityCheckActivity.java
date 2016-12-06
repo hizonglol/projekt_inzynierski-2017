@@ -34,6 +34,7 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -611,6 +612,22 @@ public class SecurityCheckActivity extends AppCompatActivity
     }
 
     /**
+     * Generates random string containing characters safe for URL requests.
+     * String is shortened to 4 characters and all characters are changed to lower case characters.
+     *
+     * @param length length of string (has to be between 1 and 8)
+     * @return shortened random string
+     */
+    private String generateSessionID(int length) {
+        SecureRandom randomizer = new SecureRandom();
+        byte bytes[] = new byte[10];
+        randomizer.nextBytes(bytes);
+        String base64 = Base64.encodeToString(bytes, Base64.URL_SAFE | Base64.NO_WRAP);
+
+        return base64.substring(0, length).toLowerCase();
+    }
+
+    /**
      * Being used to download app configuration.
      */
     private class appConfigurationTask extends AsyncTask<String, String, String> {
@@ -629,14 +646,23 @@ public class SecurityCheckActivity extends AppCompatActivity
             if (stringDbServerUrl.length() > 1) {
                 stringServerUrl = stringDbServerUrl;
             }
+            String sessionSecurityID = generateSessionID(8);
+            databaseSecurityCheck.createSetting("setting_sessionSecurityID", sessionSecurityID);
+
             stringServerUrl = stringServerUrl
                     .concat(databaseSecurityCheck.getSetting("setting_course"))
                     .concat("/")
                     .concat(databaseSecurityCheck.getSetting("setting_test_id"))
-                    .concat(".xml").toLowerCase();
+                    .concat(".xml")
+                    .toLowerCase();
+
             stringServerUrl = stringServerUrl.replace(" ", "");
 
-            Log.d("Adres z xml", stringDbServerUrl);
+            stringServerUrl = stringServerUrl.concat("?")
+                    .concat("session_id2").concat("=")
+                    .concat(databaseSecurityCheck.getSetting("setting_sessionSecurityID"));
+
+            Log.d("Adres z xml", stringServerUrl);
 
             if (downloadedConfiguration(getApplicationContext(), stringServerUrl))
                 return "success";

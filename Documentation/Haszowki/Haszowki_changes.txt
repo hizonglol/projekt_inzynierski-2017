@@ -1,3 +1,10 @@
+## 0.9.4 - 2016-12-06
+### Changed
+~ poprawiono b³¹d z niepoprawnym tworzeniem siê Query String
+~ przeniesiono tworzenie session_id2 do Security Check jako parametr pobierania pliku XML
+~ format nag³ówka pliku lokalnego zmieniony na:
+  course=... test_id=... session_id=... student_no=... group=... timestamp=... version=...
+
 ## 0.9.3 - 2016-12-02
 ### Changed
 ~ "ID testu" zmieniony na "kod testu" we wszystkich stringach

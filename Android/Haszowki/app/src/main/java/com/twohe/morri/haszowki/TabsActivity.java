@@ -301,11 +301,7 @@ public class TabsActivity extends AppCompatActivity {
         databaseTabsTestFile.open();
 
         String sessionID = generateSessionID(4);
-        Log.d("string", sessionID);
         databaseTabsTestFile.createSetting("setting_sessionID", sessionID);
-        String sessionSecurityID = generateSessionID(8);
-        Log.d("string", sessionSecurityID);
-        databaseTabsTestFile.createSetting("setting_sessionSecurityID", sessionSecurityID);
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss", Locale.getDefault());
         Date now = new Date();
@@ -324,15 +320,26 @@ public class TabsActivity extends AppCompatActivity {
 
             FileWriter writer = new FileWriter(fileTabs_toWrite, true);
             //naglowek pliku testu to: nazwa przedmiotu, kod testu, kod sesji, wersja aplikacji, stempel czasowy
+            writer.append("course=");
             writer.append(databaseTabsTestFile.getSetting("setting_course"));
             writer.append("\t");
+            writer.append("test_id=");
             writer.append(databaseTabsTestFile.getSetting("setting_test_id"));
             writer.append("\t");
+            writer.append("session_id=");
             writer.append(sessionID);
             writer.append("\t");
-            writer.append(getResources().getString(R.string.version_value));
+            writer.append("student_no=");
+            writer.append(databaseTabsTestFile.getSetting("setting_studentNo"));
             writer.append("\t");
+            writer.append("group=");
+            writer.append(databaseTabsTestFile.getSetting("setting_group"));
+            writer.append("\t");
+            writer.append("timestamp=");
             writer.append(formatter.format(now));
+            writer.append("\t");
+            writer.append("version=");
+            writer.append(getResources().getString(R.string.version_value));
             writer.append("\n====\n");
             writer.flush();
             writer.close();
@@ -855,8 +862,8 @@ public class TabsActivity extends AppCompatActivity {
             sbServerQuery.append("version=").append(getResources().getString(R.string.version_value)).append(divider);
             sbServerQuery.append("session_id=").append(sessionID).append(divider);
             sbServerQuery.append("name=").append(name).append(divider);
-            sbServerQuery.append("surname=").append(surname);
-            sbServerQuery.append("session_id2=").append(sessionSecurityID).append(divider);
+            sbServerQuery.append("surname=").append(surname).append(divider);
+            sbServerQuery.append("session_id2=").append(sessionSecurityID);
 
             String sentUrl = sbServerQuery.toString();
             sentUrl = sentUrl.replace(" ", "");
@@ -910,6 +917,7 @@ public class TabsActivity extends AppCompatActivity {
             String group = databaseCreateDataURL.getSetting("setting_group");
             String question_no = String.valueOf(fragment.getArguments().getInt(ARG_SECTION_NUMBER));
             String sessionID = databaseCreateDataURL.getSetting("setting_sessionID");
+            String sessionSecurityID = databaseCreateDataURL.getSetting("setting_sessionSecurityID");
 
             sbServerQuery.append("student_no=").append(studentNo).append(divider);
             sbServerQuery.append("course=").append(course).append(divider);
@@ -924,7 +932,8 @@ public class TabsActivity extends AppCompatActivity {
             sbServerQuery.append("version=").append(getResources().getString(R.string.version_value)).append(divider);
             sbServerQuery.append("session_id=").append(sessionID).append(divider);
             sbServerQuery.append("name=").append(name).append(divider);
-            sbServerQuery.append("surname=").append(surname);
+            sbServerQuery.append("surname=").append(surname).append(divider);
+            sbServerQuery.append("session_id2=").append(sessionSecurityID);
 
             String sentUrl = sbServerQuery.toString();
             sentUrl = sentUrl.replace(" ", "");
