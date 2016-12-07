@@ -13,18 +13,19 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Created by morri on 08.10.2016.
- *
+ * <p>
  * This class is used to decode files with RSA encrypted data.
  */
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Decrypter {
 
-    private static String VERSION_NUMBER = "0.9.0";
+    private static String VERSION_NUMBER = "0.9.1";
 
     private static boolean flagVersion = false;
     private static boolean flagInput = false;
@@ -50,7 +51,7 @@ public class Decrypter {
 
             return true;
         } catch (IOException e) {
-            System.err.println("Opening file problem");
+            System.err.println("Problem with opening config file");
             e.printStackTrace();
             return false;
         } catch (Exception e) {
@@ -93,30 +94,35 @@ public class Decrypter {
             //cipheredText = new String(cipher.doFinal(text.getBytes("ISO-8859-1")), "UTF-8");
 
         } catch (InvalidKeyException e) {
+            System.err.println("Invalid key");
             e.printStackTrace();
             return "";
         } catch (InvalidKeySpecException e) {
+            System.err.println("Invalid key spec");
             e.printStackTrace();
             return "";
         } catch (NoSuchProviderException e) {
+            System.err.println("BouncyCastle provider not found");
             e.printStackTrace();
             return "";
         } catch (UnsupportedEncodingException e) {
+            System.err.println("Text encoding is not supported");
             e.printStackTrace();
             return "";
         } catch (NoSuchAlgorithmException e) {
+            System.err.println("Unknown algorithm");
             e.printStackTrace();
             return "";
         } catch (BadPaddingException e) {
+            System.err.println("Bad padding in decrypted text");
             e.printStackTrace();
             return "";
         } catch (NoSuchPaddingException e) {
+            System.err.println("Unknown padding in decrypted text");
             e.printStackTrace();
             return "";
         } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-            return "";
-        } catch (ClassCastException e) {
+            System.err.println("Length of text to be decrypted is not valid");
             e.printStackTrace();
             return "";
         }
@@ -142,7 +148,31 @@ public class Decrypter {
 
             return records;
         } catch (Exception e) {
-            System.err.format("Exception occurred trying to read '%s'.", filename);
+            System.err.format("Exception occurred trying to read '%s' in readFile()", filename);
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Method that reads standard input and saves it into list of strings.
+     *
+     * @return list of strings containing header and answers in file
+     */
+    private static List<String> readInput() {
+
+        List<String> records = new ArrayList<>();
+        try {
+            Scanner scan = new Scanner(new BufferedInputStream(System.in));
+            scan.useDelimiter(Pattern.compile("\n====\n"));
+            while (scan.hasNext()) {
+                String logicalLine = scan.next();
+                records.add(logicalLine);
+            }
+
+            return records;
+        } catch (Exception e) {
+            System.err.format("Exception occurred trying to read input in readInput()");
             e.printStackTrace();
             return null;
         }
@@ -150,7 +180,8 @@ public class Decrypter {
 
     /**
      * Method that runs decryption for list of strings.
-     * It avoids header by iterating on list starting from second element.
+     * It reads header when config file name was not specified,
+     * and loads config file according to read value.
      *
      * @param cipheredLines list of strings containing header and answers
      * @return decoded text
@@ -158,11 +189,39 @@ public class Decrypter {
     private static List<String> runDecrypter(List<String> cipheredLines) {
         List<String> decodedText = new ArrayList<>();
 
+        try {
+            //If there was no config file set, we try to read config from header
+            if (!flagConfigFile) readConfigFile(readHeader(cipheredLines.get(0)));
+        } catch (IllegalArgumentException e) {
+            System.err.println("Problem with reading config file name from header");
+            e.printStackTrace();
+            return decodedText;
+        }
+
         for (int i = 1; i < cipheredLines.size(); ++i) {
             decodedText.add(decryptItRsa(cipheredLines.get(i)));
         }
 
         return decodedText;
+    }
+
+    /**
+     * Method that is parsing header.
+     * It seeks for the name of test in config file:
+     * test_id=[name of test]
+     *
+     * @return name of test as string
+     * @throws IllegalArgumentException that informs about invalid header
+     */
+    private static String readHeader(String header) throws IllegalArgumentException {
+
+        Pattern pattern = Pattern.compile("test_id=([-_a-zA-Z0-9]+)");
+        Matcher matcher = pattern.matcher(header);
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -255,7 +314,7 @@ public class Decrypter {
                             case 'o':
                                 flagOutput = true;
                                 ++i;
-                                if (i < args.length)
+                                if (i < args.length && args[i].length() > 2)
                                     outputFileName = args[i];
                                 else {
                                     flagOutput = false;
@@ -266,7 +325,7 @@ public class Decrypter {
                             case 'i':
                                 flagInput = true;
                                 ++i;
-                                if (i < args.length)
+                                if (i < args.length && args[i].length() > 2)
                                     inputFileName = args[i];
                                 else {
                                     flagInput = false;
@@ -277,7 +336,7 @@ public class Decrypter {
                             case 'c':
                                 flagConfigFile = true;
                                 ++i;
-                                if (i < args.length)
+                                if (i < args.length && args[i].length() > 2)
                                     configFileName = args[i];
                                 else {
                                     flagConfigFile = false;
@@ -311,7 +370,7 @@ public class Decrypter {
         try {
             decodeArguments(args);
         } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
             return false;
         }
 
@@ -333,11 +392,27 @@ public class Decrypter {
             return;
         }
 
-        if (flagInput && flagConfigFile) {
-            readConfigFile(configFileName);
+        if (flagInput) { //If there is input file we read from it.
+
+            //If config file was set then we read config from it.
+            if (flagConfigFile) readConfigFile(configFileName);
 
             List<String> input;
             input = readFile(inputFileName);
+            input = runDecrypter(input);
+
+            if (flagOutput) {
+                writeDecodedToFile(input);
+            } else {
+                writeDecodedToOutput(input);
+            }
+        } else { //If there is no input file then we read from console
+
+            //If config file was set then we read config from it.
+            if (flagConfigFile) readConfigFile(configFileName);
+
+            List<String> input;
+            input = readInput();
             input = runDecrypter(input);
 
             if (flagOutput) {
