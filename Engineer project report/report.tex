@@ -83,6 +83,23 @@
 	
 			\subsection{Serwer HTTP}
 			Pierwszym rodzajem systemu do obsługi zapytań aplikacji mobilnych jaki można wykorzystać to serwer HTTP połączony z FastCGI. Najpopularniejsze\footnote{https://w3techs.com/technologies/overview/web\_server/all} aplikacje, które współpracują z FastCGI to między innymi: Apache\footnote{https://httpd.apache.org/}, nginx\footnote{https://www.nginx.com/}, Microsoft-IIS\footnote{https://www.iis.net/}, OpenLiteSpeed\footnote{http://open.litespeedtech.com/mediawiki/}. Każdy z serwerów obsługuje FastCGI (FCGI) pozwalające na napisanie programu przyjmującego i przetwarzającego przychodzące zapytania sieciowe. Proces napisany z pomocą FCGI łączy się z serwerem FCGI, do którego przekierowywane są zapytania przyjmowane przez serwer HTTP. Tym różni się od interfejsu CGI, że programy FCGI nie są uruchamiane przy każdym zapytaniu i kończone po ich obsłużeniu, tylko istnieją cały czas jako wątki, Oczekują na zapytania, obsługują je i nie kończą swojego działania po ich obsłużeniu. Ten interfejs jest kompatybilny z wieloma językami programowania, np. C++, Python, Java. W ten sposób można stworzyć mało rozbudowane ale szybki system przetwarzający zapytania sieciowe.
+			Oprócz tego można też wykorzystać Serwer HTTP z CGI zamiast FCGI. W tym przypadku przy każdym zapytaniu uruchomi się interpreter skryptu mający wygenerować odpowiedź do zapytania\footnote{https://www.electricmonk.nl/docs/apache\_fastcgi\_python/apache\_fastcgi\_python.html}. W przypadku FCGI każdorazowe uruchamianie się interpretera nie zachodzi.
+			
+			\begin{center}
+				\begin{figure}[ht]
+					\centering
+					\includegraphics[scale=0.7]{flow_cgi.png}
+					\caption{Schemat działania CGI ze skryptem do generowania odpowiedzi napisanym w Python. Źródło: Apache, FastCGI and Python}
+				\end{figure}
+			\end{center}
+		
+			\begin{center}
+				\begin{figure}[ht]
+					\centering
+					\includegraphics[scale=0.7]{flow_fastcgi.png}
+					\caption{Schemat działania FCGI ze skryptem do generowania odpowiedzi napisanym w Python. Źródło: Apache, FastCGI and Python}
+				\end{figure}
+			\end{center}
 		
 			Wymienione serwery jednak różnią się między sobą wydajnością obsługiwania zapytań. Na podstawie Linux Web Server Performance Benchmark\footnote{https://www.rootusers.com/linux-web-server-performance-benchmark-2016-results/} można stwierdzić, że nginx oferuje największą szybkość obsługi zapytań.
 	
@@ -341,6 +358,10 @@
 			\subsection{Szyfrowanie plików}
 		
 			Początkowo pliki były szyfrowane algorytmem DES z kluczem przechowywanym w aplikacji. Było to jednak rozwiązanie niebezpieczne, ponieważ klucz szyfrowania można było uzyskać po zdekompilowaniu aplikacji. Pierwszym ulepszeniem zaimplementowanym w aplikacji było zastosowanie metody "security by obscurity", gdzie klucz szyfrowania zmieniał się w trakcie działania programu. W ten sposób sprawa jego uzyskania została utrudniona. Następnie w aplikacji zaimplementowano pobieranie dokumentu XML z ustawieniami testu. W tym dokumencie znajdował się klucz szyfrowania wykorzystywany później w algorytmie DES. W dalszym etapie wykorzystano szyfrowanie algorytmem RSA, którym zastąpiono algorytm DES, a klucz w dokumencie XML został zamieniony na 4096 bitowy klucz publiczny algorytmu RSA.
+			
+			\subsection{Zapisywanie plików na telefonie}
+			
+			Po szyfrowaniu odpowiedzi aplikacja musi je zapisać w pamięci telefonu w pliku tekstowym. Android nie umożliwia w prosty sposób pisania strumieniem bitowym do pliku. Zapisywanie i czytanie z plików opiera się na zapisywaniu i czytaniu stringów. Pojawiła się więc potrzeba zastosowania kodowania transportowego po to, żeby w trakcie operacji zapisu i odczytu dane nie mogły ulec uszkodzeniu. Wykorzystać do tego można base64, base16 (Hex) lub też kodowanie będące jednobajtowym kodowaniem znaków jak np. ISO-8859-1. Dzięki zastosowaniu jednego z powyższych metod kodowania bajtów można w bezpieczny sposób zapisywać i odczytywać ciągi bajtów będące zakodowanymi odpowiedziami.
 		
 			\subsection{Skaner QR}
 			
@@ -348,7 +369,7 @@
 			
 			\subsection{Baza danych}
 			
-			Do długotrwałego przechowywania danych w aplikacji wykorzystano bazę danych MySQL. W tym celu stworzono klasę imitującą bazę danych MySQL oraz klasę imitującą interfejs dostępowy do tej klasy. Interfejs został następnie wykorzystany do zapisywania informacji zawartych w widoku ustawień. Baza danych dodatkowo służy jako narzędzie do wymiany danych między widokami aplikacji. Baza danych służy do przechowywania danych użytkownika takich jak: imię, nazwisko, numer indeksu oraz inne parametry właściwe dla aktualnej sesji testu. 
+			Do długotrwałego przechowywania danych w aplikacji wykorzystano bazę danych MySQL. W tym celu stworzono klasę imitującą bazę danych MySQL oraz klasę imitującą interfejs dostępowy do tej klasy. Interfejs został następnie wykorzystany do zapisywania informacji zawartych w widoku ustawień. Baza danych dodatkowo służy jako narzędzie do wymiany danych między widokami aplikacji. Baza danych służy do przechowywania danych użytkownika takich jak: imię, nazwisko, numer indeksu oraz inne parametry właściwe dla aktualnej sesji testu. Przy tworzeniu bazy danych oparto się na przykładzie opisanym na portalu Vogella\footnote{http://www.vogella.com/tutorials/AndroidSQLite/article.html}.
 			
 			\subsection{Odrzucanie połączeń w trakcie testu}
 			
@@ -376,7 +397,7 @@
 			
 			\paragraph{Wykorzystanie obu form dostarczania odpowiedzi z testu:}
 			
-			\centering
+			\begin{center}
 			\trimbox{0cm 0cm 0cm -1cm}{
 				\begin{tikzpicture}
 					\begin{axis}[
@@ -406,13 +427,14 @@
 					\end{axis}
 				\end{tikzpicture}
 			}
+			\end{center}
 		
 		\end{absolutelynopagebreak}
 		
 		\begin{absolutelynopagebreak}
 			\paragraph{Ilość niepoprawnie wyliczonych grup przez studentów na testach:}
 			
-			\centering
+			\begin{center}
 			\trimbox{0cm 0cm 0cm -1cm}{
 				\begin{tikzpicture}
 				\begin{axis}[
@@ -437,13 +459,14 @@
 				\end{axis}
 				\end{tikzpicture}
 			}
+			\end{center}
 		
 		\end{absolutelynopagebreak}
 	
 		\begin{absolutelynopagebreak}
 			\paragraph{Ilość otrzymanych odpowiedzi na serwerze:}
 			
-			\centering
+			\begin{center}
 			\trimbox{0cm 0cm 0cm -1cm}{
 				\begin{tikzpicture}
 				\begin{axis}[
@@ -469,13 +492,14 @@
 				\end{axis}
 				\end{tikzpicture}
 			}
+			\end{center}
 			
 		\end{absolutelynopagebreak}
 	
 		\begin{absolutelynopagebreak}
 			\paragraph{Ilość otrzymywanych odpowiedzi na sekundę:}
 			
-			\centering
+			\begin{center}
 			\trimbox{0cm 0cm 0cm -1cm}{
 				\begin{tikzpicture}
 				\begin{axis}[
@@ -501,6 +525,7 @@
 				\end{axis}
 				\end{tikzpicture}
 			}
+			\end{center}
 			
 		\end{absolutelynopagebreak}
 	
@@ -515,9 +540,8 @@
 		\end{itemize}
 	
 		\subsection{Błędy popełniane przy wyliczaniu grup}
-		Statystyki błędów popełnianych przez studentów od 2012 roku:
+		Statystyki błędów popełnianych przez studentów AiR na Wydziale Mechanicznym od 2012 roku:
 		
-		\centering
 		\trimbox{0cm 0cm 0cm -1cm}{
 			\begin{tikzpicture}
 				\begin{axis}[
@@ -543,7 +567,41 @@
 			\end{tikzpicture}
 		}
 	
-		Aplikacja była testowana w okresie 2016-2017. Widać, że dzięki jej wykorzystaniu udało się zmniejszyć ilość popełnianych przez studentów błędów i wrócić do stanu z okresu 2012-2013.
+	
+		Ilość błędów w każdym roczniku jest sumą błędów popełnionych na wszystkich testach wykonanych w semestrze.
+		Każdy z testów ma 16 pytań.\\
+	
+		Statystyki błędów popełnianych przez studentów AiR na Wydziale Elektroniki od 2012 roku:
+	
+		
+		\trimbox{0cm 0cm 0cm -1cm}{
+			\begin{tikzpicture}
+			\begin{axis}[
+			ylabel=Źle obliczone grupy,
+			symbolic x coords={2012-2013, 2013-2014, 2014-2015, 2015-2016, 2016-2017},
+			x tick label style={
+				/pgf/number format/1000 sep=},
+			enlargelimits=0.15,
+			legend style={at={(0.5,-0.2)},
+				anchor=north,legend columns=-1},
+			ybar,
+			enlarge x limits = 0.1,
+			nodes near coords,
+			width=0.8\textwidth,
+			height=0.5\textwidth,
+			xtick=data,
+			xticklabels={2012-2013, 2013-2014, 2014-2015, 2015-2016, 2016-2017},
+			]
+			\addplot 
+			coordinates {(2012-2013,5) (2013-2014,6)
+				(2014-2015,6) (2015-2016,10) (2016-2017,1)};
+			\end{axis}
+			\end{tikzpicture}
+		}
+	
+		Ilość błędów w każdym roczniku jest sumą błędów z dwóch głównych testów wykonanych w semestrze. Oba testy mają 64 pytania.\\
+	
+		Aplikacja będąca tematem pracy inżynierskiej została wprowadzona w okresie 2016-2017. Widać, że dzięki jej wykorzystaniu udało się zauważalnie zmniejszyć ilość popełnianych przez studentów błędów. W przypadku AiR na W-10 ilość błędów popełnionych przez studentów spadła do poziomu z okresu 2012-2013. Zaś w AiR na W-4 udało się uzyskać mniejszą ilość błędów niż w jakimkolwiek poprzednim okresie.
 	
 			
 \end{document}
