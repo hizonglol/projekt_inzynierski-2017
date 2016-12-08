@@ -380,29 +380,28 @@
 			\trimbox{0cm 0cm 0cm -1cm}{
 				\begin{tikzpicture}
 					\begin{axis}[
-					x tick label style={
-						/pgf/number format/1000 sep=},
 					ylabel=Ilość studentów,
 					xlabel=Nr testu,
-					xtick={1,2,...,8},
+					symbolic x coords={1, 2, 3, 4, 5, 7, 8,},
+					x tick label style={
+						/pgf/number format/1000 sep=},
 					enlargelimits=0.15,
 					legend style={at={(0.5,-0.2)},
 						anchor=north,legend columns=-1},
-					ybar=5pt,% configures `bar shift'
-					bar width=9pt,
+					ybar,
+					enlarge x limits = 0.1,
 					nodes near coords,
 					width=0.8\textwidth,
+					height=0.5\textwidth,
 					]
-					% papier
-					\addplot 
+					\addplot
 					coordinates {(1,35) (2,30)
 						(3,28) (4,31) (5,32)
-						(6,0) (7,30) (8,21)};
-					% aplikacja
-					\addplot 
+						(7,30) (8,21)};
+					\addplot
 					coordinates {(1,77) (2,85)
 						(3,86) (4,85) (5,82)
-						(6,0) (7,81) (8,81)};
+						(7,81) (8,81)};
 					\legend{Papier + e-mail, Aplikacja}
 					\end{axis}
 				\end{tikzpicture}
@@ -417,25 +416,24 @@
 			\trimbox{0cm 0cm 0cm -1cm}{
 				\begin{tikzpicture}
 				\begin{axis}[
-				x tick label style={
-					/pgf/number format/1000 sep=},
 				ylabel=Ilość błędnych grup,
 				xlabel=Nr testu,
-				xtick={1,2,...,8},
+				symbolic x coords={1, 2, 3, 4, 5, 7, 8,},
+				x tick label style={
+					/pgf/number format/1000 sep=},
 				enlargelimits=0.15,
 				legend style={at={(0.5,-0.2)},
 					anchor=north,legend columns=-1},
-				ybar=5pt,% configures `bar shift'
-				bar width=9pt,
+				ybar,
+				enlarge x limits = 0.1,
 				nodes near coords,
 				width=0.8\textwidth,
-				height=0.5\textwidth
+				height=0.5\textwidth,
 				]
-				% papier
 				\addplot 
 				coordinates {(1,2) (2,0)
 					(3,2) (4,0) (5,1)
-					(6,0) (7,1) (8,1)};
+					(7,1) (8,1)};
 				\end{axis}
 				\end{tikzpicture}
 			}
@@ -449,25 +447,25 @@
 			\trimbox{0cm 0cm 0cm -1cm}{
 				\begin{tikzpicture}
 				\begin{axis}[
-				x tick label style={
-					/pgf/number format/1000 sep=},
 				ylabel=Ilość odpowiedzi,
 				xlabel=Nr testu,
-				xtick={1,2,...,8},
+				symbolic x coords={1, 2, 3, 4, 5, 7, 8,},
+				x tick label style={
+					/pgf/number format/1000 sep=},
 				enlargelimits=0.15,
 				legend style={at={(0.5,-0.2)},
 					anchor=north,legend columns=-1},
-				ybar=5pt,% configures `bar shift'
-				bar width=9pt,
+				ybar,
+				enlarge x limits = 0.1,
 				nodes near coords,
 				width=0.8\textwidth,
-				height=0.5\textwidth
+				height=0.5\textwidth,
 				]
 				% papier
 				\addplot 
 				coordinates {(1,1305) (2,1541)
 					(3,1629) (4,1624) (5,1588)
-					(6,0) (7,1665) (8,1744)};
+					(7,1665) (8,1744)};
 				\end{axis}
 				\end{tikzpicture}
 			}
@@ -481,25 +479,25 @@
 			\trimbox{0cm 0cm 0cm -1cm}{
 				\begin{tikzpicture}
 				\begin{axis}[
-				x tick label style={
-					/pgf/number format/1000 sep=},
 				ylabel=Ilość otrzymywanych odpowiedzi na sekundę,
 				xlabel=Nr testu,
-				xtick={1,2,...,8},
+				symbolic x coords={1, 2, 3, 4, 5, 7, 8,},
+				x tick label style={
+					/pgf/number format/1000 sep=},
 				enlargelimits=0.15,
 				legend style={at={(0.5,-0.2)},
 					anchor=north,legend columns=-1},
-				ybar=5pt,% configures `bar shift'
-				bar width=9pt,
+				ybar,
+				enlarge x limits = 0.1,
 				nodes near coords,
 				width=0.8\textwidth,
-				height=0.5\textwidth
+				height=0.5\textwidth,
 				]
 				% papier
 				\addplot 
 				coordinates {(1,10) (2,13)
 					(3,11) (4,16) (5,12)
-					(6,0) (7,15) (8,11)};
+					(7,15) (8,11)};
 				\end{axis}
 				\end{tikzpicture}
 			}
@@ -515,5 +513,37 @@
 			\item ilość otrzymanych odpowiedzi: 5856
 			\item ilość otrzymywanych odpowiedzi na sekundę: 29
 		\end{itemize}
+	
+		\subsection{Błędy popełniane przy wyliczaniu grup}
+		Statystyki błędów popełnianych przez studentów od 2012 roku:
+		
+		\centering
+		\trimbox{0cm 0cm 0cm -1cm}{
+			\begin{tikzpicture}
+				\begin{axis}[
+				ylabel=Źle obliczone grupy,
+				symbolic x coords={2012-2013, 2013-2014, 2014-2015, 2015-2016, 2016-2017},
+				x tick label style={
+					/pgf/number format/1000 sep=},
+				enlargelimits=0.15,
+				legend style={at={(0.5,-0.2)},
+					anchor=north,legend columns=-1},
+				ybar,
+				enlarge x limits = 0.1,
+				nodes near coords,
+				width=0.8\textwidth,
+				height=0.5\textwidth,
+				xtick=data,
+				xticklabels={2012-2013, 2013-2014, 2014-2015, 2015-2016, 2016-2017},
+				]
+				\addplot 
+				coordinates {(2012-2013,7) (2013-2014,24)
+					(2014-2015,22) (2015-2016,14) (2016-2017,7)};
+				\end{axis}
+			\end{tikzpicture}
+		}
+	
+		Aplikacja była testowana w okresie 2016-2017. Widać, że dzięki jej wykorzystaniu udało się zmniejszyć ilość popełnianych przez studentów błędów i wrócić do stanu z okresu 2012-2013.
+	
 			
 \end{document}
