@@ -1,15 +1,19 @@
-\newcommand{\etalchar}[1]{$^{#1}$}
-\begin{thebibliography}{LSS{\etalchar{+}}99}
+\begin{thebibliography}{13}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[AB16]{quizowanie}
+\bibitem[AB(2016)]{quizwanie}
 FEO~Media AB.
-\newblock {Quizowanie}.
+\newblock {Quizwanie}.
 \newblock
-  \url{https://play.google.com/store/apps/details?id=se.feomedia.quizkampen.pl.lite&hl=pl},
+  \url{https://play.google.com/store/apps/details?id=se.feomedia.quizkampen.pl.lite},
   2016.
 \newblock [Online; accessed 11-December-2016].
 
-\bibitem[Boe09]{fcgi}
+\bibitem[Boender(2009)]{fcgi}
 Ferry Boender.
 \newblock {Apache, FastCGI and Python}.
 \newblock
@@ -17,30 +21,36 @@ Ferry Boender.
   2009.
 \newblock [Online; accessed 11-December-2016].
 
-\bibitem[Dmy14]{circularprogressbutton}
+\bibitem[Dmytro(2014)]{circularprogressbutton}
 Danylyk Dmytro.
 \newblock {Circular Progress Button}.
 \newblock \url{https://github.com/flavioarfaria/circular-progress-button},
   2014.
 \newblock [Online; accessed 11-December-2016].
 
-\bibitem[Fil16]{samequizy}
+\bibitem[Filing(2016)]{samequizy}
 Filing.
 \newblock {sameQuizy}.
 \newblock
-  \url{https://play.google.com/store/apps/details?id=pl.filing.samequizy&hl=pl},
+  \url{https://play.google.com/store/apps/details?id=pl.filing.samequizy},
   2016.
 \newblock [Online; accessed 11-December-2016].
 
-\bibitem[Jar16]{webserverbenchmark}
+\bibitem[Ftylitakis(2016)]{zxing}
+Nikolaos Ftylitakis.
+\newblock {ZXing}.
+\newblock \url{https://github.com/zxing/zxing}, 2016.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[Jarrod(2016)]{webserverbenchmark}
 Jarrod.
-\newblock {Linux Web Server Performance Benchmark}.
+\newblock {Linux Web Server Performance Benchmark – 2016 Results}.
 \newblock
   \url{https://www.rootusers.com/linux-web-server-performance-benchmark-2016-results/},
   2016.
 \newblock [Online; accessed 11-December-2016].
 
-\bibitem[Kha15]{javaserverscomparison}
+\bibitem[Kharkovski(2015)]{javaserverscomparison}
 Roman Kharkovski.
 \newblock {Lightweight Java servers and developer view on the App Server}.
 \newblock
@@ -48,7 +58,7 @@ Roman Kharkovski.
   2015.
 \newblock [Online; accessed 11-December-2016].
 
-\bibitem[Lar11]{callreject}
+\bibitem[Larsen(2011)]{callreject}
 Finn Larsen.
 \newblock {How to Reject a call programatically in android}.
 \newblock
@@ -56,22 +66,14 @@ Finn Larsen.
   2011.
 \newblock [Online; accessed 11-December-2016].
 
-\bibitem[LSS{\etalchar{+}}99]{protocols}
+\bibitem[Lew et~al.(1999)Lew, Spanier, Stevenson, Ford, and Systems]{protocols}
 H.~Kim Lew, Steve Spanier, Tim Stevenson, Merilee Ford, and Inc~Cisco Systems.
 \newblock {Internetworking Technologies Handbook}.
 \newblock \url{http://www.net130.com/tutorial/other/Internet%20Overview.pdf},
   1999.
 \newblock [Online; accessed 11-December-2016].
 
-\bibitem[Sev16]{englishgrammar}
-SevenLynx.
-\newblock {English Grammar Test}.
-\newblock
-  \url{https://play.google.com/store/apps/details?id=english.grammar.test.app},
-  2016.
-\newblock [Online; accessed 11-December-2016].
-
-\bibitem[ST16]{mostpopularjavaservers}
+\bibitem[Salnikov-Tarnovski(2016)]{mostpopularjavaservers}
 Nikita Salnikov-Tarnovski.
 \newblock {Most popular Java application servers: 2016 edition}.
 \newblock
@@ -79,23 +81,25 @@ Nikita Salnikov-Tarnovski.
   2016.
 \newblock [Online; accessed 11-December-2016].
 
-\bibitem[Vog16]{sqlitedatabase}
+\bibitem[SevenLynx(2016)]{englishgrammar}
+SevenLynx.
+\newblock {English Grammar Test}.
+\newblock
+  \url{https://play.google.com/store/apps/details?id=english.grammar.test.app},
+  2016.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[Vogel(2016)]{sqlitedatabase}
 Lars Vogel.
 \newblock {Android SQLite database and content provider - Tutorial}.
 \newblock \url{http://www.vogella.com/tutorials/AndroidSQLite/article.html},
   2016.
 \newblock [Online; accessed 11-December-2016].
 
-\bibitem[w3t16]{httpserversusage}
-w3techs.
+\bibitem[W3Techs(2016)]{httpserversusage}
+W3Techs.
 \newblock {Usage of web servers for websites}.
 \newblock \url{https://w3techs.com/technologies/overview/web_server/all}, 2016.
-\newblock [Online; accessed 11-December-2016].
-
-\bibitem[Wav16]{zxing}
-Denso Wave.
-\newblock {ZXing}.
-\newblock \url{https://github.com/zxing/zxing}, 2016.
 \newblock [Online; accessed 11-December-2016].
 
 \end{thebibliography}

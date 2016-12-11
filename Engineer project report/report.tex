@@ -1,8 +1,9 @@
 \documentclass[eng]{mgr}
 
-\usepackage[left=3cm,right=3cm,top=1cm,bottom=2cm]{geometry}
+\usepackage{polski}
 \usepackage[utf8]{inputenc}
-\usepackage{polski, graphicx, float, caption, subcaption, pgfplots, adjustbox, cite, url}
+\usepackage[T1]{fontenc} 
+\usepackage{graphicx, float, caption, subcaption, pgfplots, adjustbox, cite, url}
 
 \newenvironment{absolutelynopagebreak}
 {\par\nobreak\vfil\penalty0\vfilneg
@@ -29,37 +30,37 @@
 
 	\chapter*{Wstęp}
 	
-	Tematem pracy jest stworzenie systemu na platformę Android umożliwiającego pisanie testów na wykładach akademickich i zautomatyzowane przetworzenie wyników testów. W skład systemu wchodzą: aplikacja na system Android oraz aplikacja serwerowa. Aplikacje na systemach Android mają łączyć się z serwerem i przesyłać informacje o wykonanych testach, serwer ma przetwarzać dane i magazynować je. System ma być niezawodny.
+	Tematem pracy jest stworzenie systemu na platformę Android umożliwiającego pisanie testów na wykładach akademickich i zautomatyzowane przetworzenie wyników testów. W skład systemu wchodzą: aplikacja na system Android oraz aplikacja serwerowa. Aplikacje na systemach Android mają łączyć się z serwerem i przesyłać informacje o wykonanych testach, a serwer ma przetwarzać otrzymane informacje i je magazynować. System ma być niezawodny pozwalając na bezpieczne wykonywanie testów.
 
 	
 	\chapter{Analiza problemu}
 	
 		\section{Systemy pisania testów w czasie rzeczywistym}
-		Na rynku istnieją już aplikacje częściowo odpowiadające tematowi pracy inżynierskiej. Ich funkcjonalność spełnia pewne aspekty pożądanego systemu jakimi są: wybór odpowiedzi do pytań na ekranie telefonu, przesyłanie odpowiedzi do serwera oraz pobieranie informacji z serwera na aplikację. Najlepszym przykładem jest aplikacja nazywająca się Quizowanie \cite{quizowanie}. Aplikacja ta pozwala na pobieranie i wyświetlenie pytań z serwera, wyświetlenie możliwych odpowiedzi jako przycisków dla użytkownika oraz wysłanie odpowiedzi do serwera i zweryfikowanie ich. Quizowanie jest aplikacją nastawioną na współzawodnictwo pomiędzy użytkownikami, którzy wspólnie odpowiadają na te same pytania zdobywając przy tym punkty. Kod źródłowy tej aplikacji jest zamknięty.
+		Na rynku istnieją już aplikacje częściowo odpowiadające tematowi pracy inżynierskiej. Ich funkcjonalność spełnia pewne aspekty pożądanego systemu jakimi są: wybór odpowiedzi do pytań na ekranie telefonu, przesyłanie odpowiedzi do serwera oraz pobieranie informacji z serwera na aplikację. Najlepszym przykładem jest aplikacja nazywająca się Quizwanie \cite{quizwanie}. Aplikacja ta pozwala na pobieranie i wyświetlenie pytań z serwera, wyświetlenie możliwych odpowiedzi jako przycisków dla użytkownika oraz wysłanie odpowiedzi do serwera i zweryfikowanie ich. Quizwanie jest aplikacją nastawioną na współzawodnictwo pomiędzy użytkownikami, którzy wspólnie odpowiadają na te same pytania zdobywając przy tym punkty. Kod źródłowy tej aplikacji jest zamknięty.
 	
-		Inne aplikacje, które można wymienić to English Grammar Test \cite{englishgrammar} lub też sameQuizy \cite{samequizy}. English Grammar Test jest aplikacją bardzo rozbudowaną i ukierunkowaną na prostą naukę języka Angielskiego. Schematy odpowiadania na pytania, wybór odpowiedzi oraz poruszanie się po menu aplikacji są zbliżone do tych, jakie występują w aplikacji Quizowanie. W sameQuizy użytkownik, tak jak w poprzednich aplikacjach, w prosty sposób poprzez naciskanie przycisków wybiera odpowiedzi na zadane na ekranie aplikacji pytania. Kod źródłowy obu tych aplikacji jest zamknięty.
+		Inne aplikacje, które można wymienić to English Grammar Test \cite{englishgrammar} lub też sameQuizy \cite{samequizy}. English Grammar Test jest aplikacją bardzo rozbudowaną i ukierunkowaną na prostą naukę języka Angielskiego. Schematy odpowiadania na pytania, wybór odpowiedzi oraz poruszanie się po menu aplikacji są zbliżone do tych, jakie występują w aplikacji Quizwanie. W sameQuizy użytkownik, tak jak w poprzednich aplikacjach, w prosty sposób poprzez naciskanie przycisków wybiera odpowiedzi na zadane na ekranie aplikacji pytania. Kod źródłowy obu tych aplikacji jest zamknięty.
 		
-		Każda z trzech aplikacji wyróżnia się jednak innym podejściem przy tworzeniu interfejsu użytkownika. English Grammar Test ma prosty i czytelny wygląd. Interfejs aplikacji sameQuizy oprócz wyświetlania pytań i propozycji odpowiedzi, urozmaicony jest wieloma obrazami przyciągającymi wzrok. Interfejs aplikacji Quizowanie ma interfejs pośredni pomiędzy tym jaki można zobaczyć w English Grammar Test i sameQuizy.
+		Każda z trzech aplikacji wyróżnia się jednak innym podejściem przy tworzeniu interfejsu użytkownika. English Grammar Test ma prosty i czytelny wygląd. Interfejs aplikacji sameQuizy oprócz wyświetlania pytań i propozycji odpowiedzi, urozmaicony jest wieloma obrazami przyciągającymi wzrok. Interfejs aplikacji Quizwanie ma interfejs pośredni pomiędzy tym jaki można zobaczyć w English Grammar Test i sameQuizy.
 		
 		Interfejs odpowiada zastosowaniu aplikacji. Aplikacje ukierunkowane na rozrywkę mają kolorowy, zwracający uwagę wygląd. Aplikacje ukierunkowane na naukę mają interfejs prosty i czytelny, a te przeznaczone do gier i rywalizacji mają interfejs bardziej urozmaicony, ale w stopniu takim, który nie pogarsza czytelności treści wyświetlanych na ekranie.
 		
 		\begin{figure}[ht]
 			\centering
-			\begin{subfigure}{.3\textwidth}
+			\begin{subfigure}{.32\textwidth}
 				\centering
-				\includegraphics[width=.7\linewidth]{Quizowanie.png}
-				\caption{Quizowanie}
+				\includegraphics[width=.9\linewidth]{Quizwanie.png}
+				\caption{Quizwanie}
 				\label{fig:quizowanie}
 			\end{subfigure}
-			\begin{subfigure}{.3\textwidth}
+			\begin{subfigure}{.32\textwidth}
 				\centering
-				\includegraphics[width=.7\linewidth]{sameQuizy.png}
+				\includegraphics[width=.9\linewidth]{sameQuizy.png}
 				\caption{sameQuizy}
 				\label{fig:same_quizy}
 			\end{subfigure}
-			\begin{subfigure}{.3\textwidth}
+			\begin{subfigure}{.32\textwidth}
 				\centering
-				\includegraphics[width=.7\linewidth]{English_Grammar_Test.png}
+				\includegraphics[width=.9\linewidth]{English_Grammar_Test.png}
 				\caption{English Grammar Test}
 				\label{fig:english_grammar_test}
 			\end{subfigure}
@@ -89,7 +90,7 @@
 			\begin{center}
 				\begin{figure}[ht]
 					\centering
-					\includegraphics[scale=0.7]{flow_cgi.png}
+					\includegraphics[scale=0.8]{flow_cgi.png}
 					\caption{Schemat działania CGI ze skryptem do generowania odpowiedzi napisanym w Python. \cite{fcgi}}
 				\end{figure}
 			\end{center}
@@ -97,7 +98,7 @@
 			\begin{center}
 				\begin{figure}[ht]
 					\centering
-					\includegraphics[scale=0.7]{flow_fastcgi.png}
+					\includegraphics[scale=0.8]{flow_fastcgi.png}
 					\caption{Schemat działania FCGI ze skryptem do generowania odpowiedzi napisanym w Python. \cite{fcgi}}
 				\end{figure}
 			\end{center}
@@ -108,7 +109,7 @@
 				\begin{figure}[ht]
 					\centering
 					\includegraphics[scale=0.35]{web-server-performance-benchmark-1-cpu-core-1.jpg}
-					\caption{Ilość obsługiwanych zapytań przy danej ilości otwartych połączeń. \cite{webserverbenchmark}}
+					\caption{Ilość obsługiwanych zapytań przy danej ilości otwartych połączeń na 1 rdzeń CPU. \cite{webserverbenchmark}}
 				\end{figure}
 			\end{center}
 
@@ -116,14 +117,14 @@
 				\begin{figure}[ht]
 					\centering
 					\includegraphics[scale=0.35]{web-server-performance-benchmark-2-cpu-cores-2.jpg}
-					\caption{Ilość obsługiwanych zapytań przy danej ilości otwartych połączeń. \cite{webserverbenchmark}}
+					\caption{Ilość obsługiwanych zapytań przy danej ilości otwartych połączeń na 2 rdzenie CPU. \cite{webserverbenchmark}}
 				\end{figure}
 			\end{center}
 		
 			\subsection{Serwer aplikacji}
 			Drugim rodzajem systemu jaki można wykorzystać to serwer aplikacji działający na protokole HTTP. Najpopularniejsze aplikacje \cite{mostpopularjavaservers} to: Tomcat, WildFly (dawny JBoss) oraz Jetty. Za ich pomocą można napisać aplikację np. w języku Java lub C++, która później służy do obsługi zapytań sieciowych. W ten sposób można stworzyć zaawansowane serwery sieciowe odpowiadające potrzebom implementowanego systemu.
 		
-			Porównanie wyżej wymienionych serwerów aplikacji można znaleźć w artykule Lightweight Java servers and developer view on the App Server.
+			Porównanie wyżej wymienionych serwerów aplikacji można znaleźć w artykule Lightweight Java servers and developer view on the App Server \cite{javaserverscomparison}.
 		
 			\begin{center}
 				\begin{figure}[ht]
@@ -136,8 +137,8 @@
 			\begin{center}
 				\begin{figure}[ht]
 					\centering
-					\includegraphics[scale=0.7]{flow_jas.png}
-					\caption{Schemat działania serwera aplikacji.}
+					\includegraphics[scale=0.8]{flow_jas.png}
+					\caption{Schemat działania serwera aplikacji z 1 aplikacją.}
 				\end{figure}
 			\end{center}
 	
@@ -205,7 +206,7 @@
 	
 	\chapter{Implementacja}
 	
-	Biorąc pod uwagę przeprowadzoną analizę problemu zdecydowano, że system do rozwiązywania testów musi być napisany od podstaw. Nie znaleziono przykładów otwartych systemów na tyle użytecznych, żeby można było użyć ich przy tworzeniu systemu. Systemy takie jak Quizowanie mają zamknięty kod i można się nimi sugerować jedynie w kwestii tworzenia interfejsu użytkownika.
+	Biorąc pod uwagę przeprowadzoną analizę problemu zdecydowano, że system do rozwiązywania testów musi być napisany od podstaw. Nie znaleziono przykładów otwartych systemów na tyle użytecznych, żeby można było użyć ich przy tworzeniu systemu. Systemy takie jak Quizwanie mają zamknięty kod i można się nimi sugerować jedynie w kwestii tworzenia interfejsu użytkownika.
 	
 		\section{Elementy aplikacji}
 	
@@ -398,15 +399,16 @@
 
 	\chapter{Praktyczne wykorzystanie systemu}
 	
-	System został pomyślnie wykorzystany na Wydziale Mechanicznym (W-10), kierunku Automatyce i Robotyce na kursie Systemy Czasu Rzeczywistego i Sieci Komputerowe (SCRSK). Średnio z aplikacji korzystało około 90 osób na każdym z siedmiu wykonanych testów. Ponadto aplikacja została wykorzystana na testach na Wydziale Elektroniki (W-4), kierunku Automatyce i Robotyce na kursie SCR Systemy Operacyjne.
+	System został pomyślnie wykorzystany na Wydziale Mechanicznym (W-10), kierunku Automatyce i Robotyce na kursie Systemy Czasu Rzeczywistego i Sieci Komputerowe (SCRSK). Średnio z aplikacji korzystało około 90 osób na każdym z siedmiu wykonanych testów. Ponadto aplikacja została wykorzystana na testach na Wydziale Elektroniki (W-4), kierunku Automatyce i Robotyce na kursie SCR Systemy Operacyjne. Te testy także zakończyły się sukcesem.
 	
 		\section{Wdrożenie aplikacji}
 		
-		Przygotowywanie aplikacji zostało rozpoczęte w lipcu 2016 roku. Tak duże wyprzedzenie wynikało z możliwości przetestowania aplikacji na wykładach jako platformy testowej, sprawdzenia jej przydatności i w ten sposób zweryfikowania idei takiego systemu. Pierwszy test odbył się 4 listopada 2016 roku.
+		Przygotowywanie aplikacji zostało rozpoczęte w lipcu 2016 roku. Tak duże wyprzedzenie wynikało z możliwości przetestowania aplikacji na wykładach jako platformy testowej, sprawdzenia jej przydatności i w ten sposób zweryfikowania idei takiego systemu. Pierwszy test odbył się 4 listopada 2016 roku. W sumie z aplikacji skorzystano na dziesięciu testach i na każdym z nich nie wystąpiły problemy. Przed użyciem aplikacji system został dokładnie przetestowany. Została sprawdzona odporność interfejsu aplikacji na błędy jakie może popełnić użytkownik, bezpieczeństwo wrażliwych danych przechowywanych na telefonach oraz stabilność działania całego systemu.
 
-		\section{Statystyki użycia aplikacji}
+		\section{Statystyki pisania testów}
 			
 		Studenci w trakcie testów mieli do wyboru dwie formy pisania testów. Pierwszą było pisanie testu za pomocą telefonu z systemem Android i zainstalowaną aplikacją. Drugą było pisanie testów na papierze i dostarczanie ich do wykładowcy drogą e-mailową.\\
+		
 		Wykorzystanie obu form dostarczania odpowiedzi z testu wyglądają następująco:
 			
 		\begin{center}
@@ -442,15 +444,15 @@
 			\end{tikzpicture}
 		\end{center}
 	
-		O możliwości pisania testów studenci zostali powiadomieni 2 dni przed wykonaniem 1 testu na Wydziale Mechanicznym. Stąd można zaobserwować wzrost ilości użytkowników aplikacji na 2 teście, między innymi kosztem papierowej formy pisania testu. W dalszych testach można zaobserwować powolny spadek użytkowników aplikacji jak i formy papierowej. Wynika to z rezygnacji studentów z pisania testów cząstkowych w celu przystąpienia do testu końcowego będącego alternatywnym sposobem zaliczenia kursu.
-	
 		gdzie:
 		\begin{itemize}
 			\item od m1 do m9 - testy wykonane na Wydziale Mechanicznym
 			\item e1n - test wykonany na Wydziale Elektroniki w tygodniu nieparzystym
 			\item e1p - test wykonany na Wydziale Elektroniki w tygodniu parzystym
 		\end{itemize}
-
+	
+		O możliwości pisania testów studenci zostali powiadomieni 2 dni przed wykonaniem 1 testu na Wydziale Mechanicznym. Stąd można zaobserwować wzrost ilości użytkowników aplikacji na 2 teście, między innymi kosztem papierowej formy pisania testu. W dalszych testach można zaobserwować powolny spadek użytkowników aplikacji jak i formy papierowej. Wynika to z rezygnacji studentów z pisania testów cząstkowych w celu przystąpienia do testu końcowego będącego alternatywnym sposobem zaliczenia kursu.\\
+	
 		Suma wszystkich otrzymanych zapytań na serwerze dla każdego z testów wygląda następująco:
 		
 		\begin{center}
@@ -469,7 +471,7 @@
 			ybar,
 			enlarge x limits = 0.1,
 			nodes near coords,
-			width=\textwidth,
+			width=0.98\textwidth,
 			height=0.5\textwidth,
 			]
 			% papier
@@ -481,12 +483,12 @@
 			\end{axis}
 			\end{tikzpicture}
 		\end{center}
+		
+		Na wykresie można zauważyć jak zmienia się obłożenie serwera w trakcie rozwijania aplikacji Android. Wraz z dokładaniem kolejnych pakietów informacji przesyłanych do serwera w zauważalny sposób zwiększa się sumaryczna ich ilość otrzymana na serwerze. Porównując ostatni test na Wydziale Mechanicznym do pierwszego testu wykonanego na Wydziale Mechanicznym zauważono wzrost o 27\% sumarycznej ilości odpowiedzi.\\
+		
+		Średnia szczytowa ilość odpowiedzi w trakcie pisania testów oscylowała między 10 a 16 odpowiedziami na sekundę. Najwyższa zarejestrowana wartość szczytowa to było 29 odpowiedzi na sekundę. Po wprowadzeniu informowania serwera o braku wybranej odpowiedzi przez studenta szczytowa ilość odpowiedzi wzrosła średnio o 3 odpowiedzi na sekundę.\\
 	
-		Średnia szczytowa ilość odpowiedzi w trakcie pisania testów oscylowała między 10 a 16 odpowiedziami na sekundę. Najwyższa zarejestrowana wartość szczytowa to było 29 odpowiedzi na sekundę.\\
-		Na wykresie można zauważyć jak zmienia się obłożenie serwera w trakcie rozwijania aplikacji Android. Wraz z dokładaniem kolejnych pakietów informacji przesyłanych do serwera w zauważalny sposób zwiększa się sumaryczna ich ilość otrzymana na serwerze. Porównując ostatni test do pierwszego testu wykonanego na Wydziale Mechanicznym zauważono wzrost o 27\% sumarycznej ilości odpowiedzi.\\
-		Dodatkowo po wprowadzeniu informowania serwera o braku wybranej odpowiedzi przez studenta szczytowa ilość odpowiedzi wzrosła średnio o 3 odpowiedzi na sekundę.
-	
-		Statystyki błędów popełnianych przez studentów na Wydziale Mechanicznym oraz Wydziale Elektroniki na przestrzeni lat wyglądają następująco:
+		Statystyki błędów popełnianych przez studentów przy wyliczaniu swoich grup na testach na Wydziale Mechanicznym oraz Wydziale Elektroniki na przestrzeni ostatnich 6 lat wyglądają następująco:
 		
 		\trimbox{0cm -0.5cm 0cm -0.5cm}{
 			\begin{tabular}{|c|c|c|c|c|c|}
@@ -500,20 +502,20 @@
 			\end{tabular}
 		}
 	
-		Każdemu rocznikowi odpowiada suma wszystkich jednostkowych błędów popełnionych w trakcie semestru. Na każdy semestr Elektroniki składa się od 8 do 9 testów 16 pytaniowych. W przypadku Mechanicznego każdy semestr odpowiada dwóm testom 64 pytaniowym.
+		Każdemu rocznikowi odpowiada suma wszystkich jednostkowych błędów popełnionych w trakcie semestru. Na każdy semestr Wydziału Elektroniki składa się od 8 do 9 testów 16 pytaniowych. W przypadku Wydziału Mechanicznego każdy semestr odpowiada dwóm testom 64 pytaniowym.
 		
 		Można zauważyć, że dzięki wykorzystaniu aplikacji udało się zauważalnie zmniejszyć ilość błędów popełnianych przez studentów. W przypadku AiR na W-10 ilość błędów spadła do poziomu z okresu 2012-2013. Zaś w przypadku AiR na W-4 udało się uzyskać mniejszą ilość błędów niż w jakimkolwiek poprzednim okresie.
 		
 	\chapter{Podsumowanie}
 	
-	W tej pracy stworzono system pozwalający na wykonywanie testów na aplikacjach Android. Aplikacje komunikują się z serwerem przez Internet przesyłając wszystkie informacje o wykonanych testach.
+	W tej pracy stworzono system pozwalający na wykonywanie testów na aplikacjach Android. Aplikacje komunikują się z serwerem przez Internet przesyłając wszystkie informacje o przebiegu wykonywanych testów. Aplikacja na system Android ma zrozumiały dla użytkownika interfejs. Komunikuje się korzystając z protokołu HTTP przez Internet z serwerem. Pozwala na przesyłanie odpowiedzi "tak", "nie", "nie wiem" podczas rozwiązywania testu. Te odpowiedzi następnie są rejestrowane na serwerze pozwalając na ich późniejsze przetworzenie. Na telefonach z aplikacją dodatkowo są przechowywane zaszyfrowane pliki z kopią zapasową przebiegu testu zabezpieczając się przed ich utratą przy wysyłaniu ich na serwer lub przed uszkodzeniem danych zarejestrowanych na serwerze. Dodatkowe programy takie jak Deszyfrator oraz Generator Konfiguracji pozwalają na rozszyfrowywanie plików z telefonów komórkowych, oraz na konfigurowanie testów na serwerze, tak aby możliwe było ich wykonywanie.\\
 	
-	Aplikacja jest stabilna i niezawodna. Znacząco ułatwia pisanie testu wyliczając dla użytkownika wszystkie potrzebne informacje.
+	Aplikacja jest stabilna i niezawodna. Wprowadzenie aplikacji do użycia zakończyło się sukcesem. Na żadnym z dziesięciu testów, na których była wykorzystywana nie wystąpiły problemy, przy około 80 osobowej ilości użytkowników na każdym z testów. Można stwierdzić przewagę tego systemu nad papierowym rozwiązywaniem testów. Jest on wygodniejszy dla studentów oraz prowadzącego kurs. Znacząco ułatwia pisanie testu wyliczając dla użytkownika wszystkie potrzebne informacje. Pozwala w prosty sposób wykonywać testy z mniejszym prawdopodobieństwem popełnienia błędów przez użytkownika. A co najważniejsze pozwala na zaoszczędzenie dużej ilości czasu przez prowadzącego kurs przy sprawdzaniu wyników testów.\\
 	
-	Pisanie systemu tej wielkości w znacznym stopniu zależy od odpowiedniego wyspecyfikowania elementów takiego systemu. Ich początkowy opis decyduje o strukturze oprogramowania systemu w etapie weryfikacji i wdrażania.
+	Pisanie systemu tej wielkości w znacznym stopniu zależy od odpowiedniego wyspecyfikowania elementów takiego systemu. Wszystkie najważniejsze wymagania co do programu powinny być ustalone na samym początku tworzenia projektu. Ich początkowy opis w dużej mierze decyduje o strukturze oprogramowania systemu w etapie weryfikacji i wdrażania.  Specyfikacja musi też przewidzieć wszystkie krytyczne sytuacje jakie mogą w systemie wystąpić. Jak najwcześniejsze ich wykrycie pozwala w prostszy sposób się przed nimi zabezpieczyć. System przed wykorzystaniem w praktyce musi być wcześniej odpowiednio przetestowany, a założenia zweryfikowane żeby potwierdzić ich poprawność oraz poprawność ich implementacji. Należy też mieć odpowiedni zapas czasu na wprowadzenie poprawek do błędów znalezionych w trakcie przetestowania przed jego praktycznym wykorzystaniem.
 			
 	\addcontentsline{toc}{chapter}{Bibliografia}
-	\bibliographystyle{alpha}
+	\bibliographystyle{plainnat}
 	\bibliography{bibliography}
 			
 \end{document}
