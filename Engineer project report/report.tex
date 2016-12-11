@@ -2,7 +2,7 @@
 
 \usepackage[left=3cm,right=3cm,top=1cm,bottom=2cm]{geometry}
 \usepackage[utf8]{inputenc}
-\usepackage{polski, graphicx, float, caption, subcaption, pgfplots, adjustbox}
+\usepackage{polski, graphicx, float, caption, subcaption, pgfplots, adjustbox, cite, url}
 
 \newenvironment{absolutelynopagebreak}
 {\par\nobreak\vfil\penalty0\vfilneg
@@ -35,9 +35,9 @@
 	\chapter{Analiza problemu}
 	
 		\section{Systemy pisania testów w czasie rzeczywistym}
-		Na rynku istnieją już aplikacje częściowo odpowiadające tematowi pracy inżynierskiej. Ich funkcjonalność spełnia pewne aspekty pożądanego systemu jakimi są: wybór odpowiedzi do pytań na ekranie telefonu, przesyłanie odpowiedzi do serwera oraz pobieranie informacji z serwera na aplikację. Najlepszym przykładem jest aplikacja nazywająca się Quizowanie\footnote{https://play.google.com/store/apps/details?id=se.feomedia.quizkampen.pl.lite}. Aplikacja ta pozwala na pobieranie i wyświetlenie pytań z serwera, wyświetlenie możliwych odpowiedzi jako przycisków dla użytkownika oraz wysłanie odpowiedzi do serwera i zweryfikowanie ich. Quizowanie jest aplikacją nastawioną na współzawodnictwo pomiędzy użytkownikami, którzy wspólnie odpowiadają na te same pytania zdobywając przy tym punkty. Kod źródłowy tej aplikacji jest zamknięty.
+		Na rynku istnieją już aplikacje częściowo odpowiadające tematowi pracy inżynierskiej. Ich funkcjonalność spełnia pewne aspekty pożądanego systemu jakimi są: wybór odpowiedzi do pytań na ekranie telefonu, przesyłanie odpowiedzi do serwera oraz pobieranie informacji z serwera na aplikację. Najlepszym przykładem jest aplikacja nazywająca się Quizowanie \cite{quizowanie}. Aplikacja ta pozwala na pobieranie i wyświetlenie pytań z serwera, wyświetlenie możliwych odpowiedzi jako przycisków dla użytkownika oraz wysłanie odpowiedzi do serwera i zweryfikowanie ich. Quizowanie jest aplikacją nastawioną na współzawodnictwo pomiędzy użytkownikami, którzy wspólnie odpowiadają na te same pytania zdobywając przy tym punkty. Kod źródłowy tej aplikacji jest zamknięty.
 	
-		Inne aplikacje, które można wymienić to English Grammar Test\footnote{https://play.google.com/store/apps/details?id=english.grammar.test.app} lub też sameQuizy\footnote{https://play.google.com/store/apps/details?id=pl.filing.samequizy}. English Grammar Test jest aplikacją bardzo rozbudowaną i ukierunkowaną na prostą naukę języka Angielskiego. Schematy odpowiadania na pytania, wybór odpowiedzi oraz poruszanie się po menu aplikacji są zbliżone do tych, jakie występują w aplikacji Quizowanie. W sameQuizy użytkownik, tak jak w poprzednich aplikacjach, w prosty sposób poprzez naciskanie przycisków wybiera odpowiedzi na zadane na ekranie aplikacji pytania. Kod źródłowy obu tych aplikacji jest zamknięty.
+		Inne aplikacje, które można wymienić to English Grammar Test \cite{englishgrammar} lub też sameQuizy \cite{samequizy}. English Grammar Test jest aplikacją bardzo rozbudowaną i ukierunkowaną na prostą naukę języka Angielskiego. Schematy odpowiadania na pytania, wybór odpowiedzi oraz poruszanie się po menu aplikacji są zbliżone do tych, jakie występują w aplikacji Quizowanie. W sameQuizy użytkownik, tak jak w poprzednich aplikacjach, w prosty sposób poprzez naciskanie przycisków wybiera odpowiedzi na zadane na ekranie aplikacji pytania. Kod źródłowy obu tych aplikacji jest zamknięty.
 		
 		Każda z trzech aplikacji wyróżnia się jednak innym podejściem przy tworzeniu interfejsu użytkownika. English Grammar Test ma prosty i czytelny wygląd. Interfejs aplikacji sameQuizy oprócz wyświetlania pytań i propozycji odpowiedzi, urozmaicony jest wieloma obrazami przyciągającymi wzrok. Interfejs aplikacji Quizowanie ma interfejs pośredni pomiędzy tym jaki można zobaczyć w English Grammar Test i sameQuizy.
 		
@@ -68,10 +68,10 @@
 		\end{figure}
 	
 		\section{Środowisko tworzenia aplikacji na Android}
-		Środowiska, w jakich można tworzyć aplikacje mobilne to Android Studio\footnote{https://developer.android.com/studio/index.html} oraz Qt\footnote{https://www.qt.io/}. Oba środowiska oferują duże wsparcie ze strony społeczności programistycznej oraz szeroki zestaw narzędzi.
+		Środowiska, w jakich można tworzyć aplikacje mobilne to Android Studio oraz Qt. Oba środowiska oferują duże wsparcie ze strony społeczności programistycznej oraz szeroki zestaw narzędzi.
 		
 			\subsection{Android Studio}
-			Środowisko to jest oparte na IntelliJ IDEA\footnote{https://www.jetbrains.com/idea/}. Dedykowane jest tworzeniu aplikacji na systemy Android. Do budowania aplikacji wykorzystywany jest Gradle\footnote{https://gradle.org/}. Biblioteki mogą być dodawane ręcznie lub za pomocą menadżera Maven\footnote{https://maven.apache.org/}. Wbudowane jest wiele narzędzi do testowania pisanych aplikacji, integrowania ich z repozytoriami Git. Środowisko to pozwala także na wprowadzanie zmian w uruchomionej aplikacji bez konieczności jej ponownego budowania. W tym środowisku można tworzyć aplikacje w języku Java ale także C++ za pomocą Android NDK\footnote{https://developer.android.com/ndk/index.html}. Aplikacje można pisać w Javie lub C++. Interfejs aplikacji tworzony jest w XML. Aplikacje stworzone w tym środowisku nie będą przenośne na inne systemy operacyjne niż Android.
+			Środowisko to jest oparte na IntelliJ IDEA. Dedykowane jest tworzeniu aplikacji na systemy Android. Do budowania aplikacji wykorzystywany jest Gradle. Biblioteki mogą być dodawane ręcznie lub za pomocą menadżera Maven. Wbudowane jest wiele narzędzi do testowania pisanych aplikacji, integrowania ich z repozytoriami Git. Środowisko to pozwala także na wprowadzanie zmian w uruchomionej aplikacji bez konieczności jej ponownego budowania. W tym środowisku można tworzyć aplikacje w języku Java ale także C++ za pomocą Android NDK. Aplikacje można pisać w Javie lub C++. Interfejs aplikacji tworzony jest w XML. Aplikacje stworzone w tym środowisku nie będą przenośne na inne systemy operacyjne niż Android.
 			
 			\subsection{Qt Creator}
 			Środowisko to jest multiplatformowe. Można na nim tworzyć aplikacje na systemy Symbian, Maemo, MeeGo oraz Android. Bazowo nie jest to środowisko tak rozbudowane jak Android Studio, pozwala jednak na integrację wielu dodatkowych narzędzi. Pozwala na pisanie aplikacji w takich językach jak Python, Ruby, Perl, Java i C++. Interfejs tworzony jest w oparciu o QML, języku opartym na JavaScript, składnią zbliżonym do XML. Aplikacje stworzone w tym środowisku są łatwo przenośne na inne systemy operacyjne. Posiada większość odpowiedników klas występujących w Android Studio, potrzebnych do pisania aplikacji na systemy operacyjne Android.
@@ -80,17 +80,17 @@
 		Komunikacja internetowa jest kluczowym zagadnieniem występującym w tej pracy. Z racji tego, że użytkownikami systemu są prowadzący kursów i studenci, a zaliczenie kursów przez studentów w dużej mierze zależy od poprawności działania komunikacji sieciowej, musi ona być zrealizowana w sposób bezpieczny i niezawodny.
 		
 			\subsection{Protokoły}
-			Przy tworzeniu systemu gdzie występuje komunikacja serwer-klient przez Internet jest wiele możliwych protokołów, które można użyć. Są to np. TCP, UDP, POP, SMTP, HTTP czy FTP. Wybór protokołu wpływa znacząco na sposób komunikacji pomiędzy klientem a serwerem. Każdy z protokołów różni się sposobem przesyłania danych oraz ich bezpieczeństwem. Protokoły bezpołączeniowe jak UDP nie pozwalają na bezpieczne przesyłanie danych, ponieważ nie ma informacji o ich poprawnym dotarciu do odbiorcy. Protokoły jak TCP, HTTP są protokołami połączeniowymi. W ich przypadku nadawca otrzymuje informację o poprawności przesyłu danych do odbiorcy. Każdy z protokołów domyślnie też korzysta z różnych portów do przesyłu danych. HTTP standardowo korzysta z portu 80, POP z kolei korzysta z portu 110, a FTP z portów 20 i 21.
+			Przy tworzeniu systemu gdzie występuje komunikacja serwer-klient przez Internet jest wiele możliwych protokołów, które można użyć. Są to np. TCP, UDP, POP, SMTP, HTTP czy FTP \cite{protocols}. Wybór protokołu wpływa znacząco na sposób komunikacji pomiędzy klientem a serwerem. Każdy z protokołów różni się sposobem przesyłania danych oraz ich bezpieczeństwem. Protokoły bezpołączeniowe jak UDP nie pozwalają na bezpieczne przesyłanie danych, ponieważ nie ma informacji o ich poprawnym dotarciu do odbiorcy. Protokoły jak TCP, HTTP są protokołami połączeniowymi. W ich przypadku nadawca otrzymuje informację o poprawności przesyłu danych do odbiorcy. Każdy z protokołów domyślnie też korzysta z różnych portów do przesyłu danych. HTTP standardowo korzysta z portu 80, POP z kolei korzysta z portu 110, a FTP z portów 20 i 21.
 	
 			\subsection{Serwer HTTP}
-			Pierwszym rodzajem systemu do obsługi zapytań aplikacji mobilnych jaki można wykorzystać to serwer HTTP połączony z FastCGI. Najpopularniejsze\footnote{https://w3techs.com/technologies/overview/web\_server/all} aplikacje, które współpracują z FastCGI to między innymi: Apache\footnote{https://httpd.apache.org/}, nginx\footnote{https://www.nginx.com/}, Microsoft-IIS\footnote{https://www.iis.net/}, OpenLiteSpeed\footnote{http://open.litespeedtech.com/mediawiki/}. Każdy z serwerów obsługuje FastCGI (FCGI) pozwalające na napisanie programu przyjmującego i przetwarzającego przychodzące zapytania sieciowe. Proces napisany z pomocą FCGI łączy się z serwerem FCGI, do którego przekierowywane są zapytania przyjmowane przez serwer HTTP. Tym różni się od interfejsu CGI, że programy FCGI nie są uruchamiane przy każdym zapytaniu i kończone po ich obsłużeniu, tylko istnieją cały czas jako wątki, Oczekują na zapytania, obsługują je i nie kończą swojego działania po ich obsłużeniu. Ten interfejs jest kompatybilny z wieloma językami programowania, np. C++, Python, Java. W ten sposób można stworzyć mało rozbudowane ale szybki system przetwarzający zapytania sieciowe.
-			Oprócz tego można też wykorzystać Serwer HTTP z CGI zamiast FCGI. W tym przypadku przy każdym zapytaniu uruchomi się interpreter skryptu mający wygenerować odpowiedź do zapytania\footnote{https://www.electricmonk.nl/docs/apache\_fastcgi\_python/apache\_fastcgi\_python.html}. W przypadku FCGI każdorazowe uruchamianie się interpretera nie zachodzi.
+			Pierwszym rodzajem systemu do obsługi zapytań aplikacji mobilnych jaki można wykorzystać to serwer HTTP połączony z FastCGI \cite{fcgi}. Najpopularniejsze aplikacje \cite{httpserversusage}, które współpracują z FastCGI to między innymi: Apache, nginx, Microsoft-IIS, OpenLiteSpeed. Każdy z serwerów obsługuje FastCGI (FCGI) pozwalające na napisanie programu przyjmującego i przetwarzającego przychodzące zapytania sieciowe. Proces napisany z pomocą FCGI łączy się z serwerem FCGI, do którego przekierowywane są zapytania przyjmowane przez serwer HTTP. Tym różni się od interfejsu CGI, że programy FCGI nie są uruchamiane przy każdym zapytaniu i kończone po ich obsłużeniu, tylko istnieją cały czas jako wątki, Oczekują na zapytania, obsługują je i nie kończą swojego działania po ich obsłużeniu. Ten interfejs jest kompatybilny z wieloma językami programowania, np. C++, Python, Java. W ten sposób można stworzyć mało rozbudowane ale szybki system przetwarzający zapytania sieciowe.
+			Oprócz tego można też wykorzystać Serwer HTTP z CGI zamiast FCGI. W tym przypadku przy każdym zapytaniu uruchomi się interpreter skryptu mający wygenerować odpowiedź do zapytania. W przypadku FCGI każdorazowe uruchamianie się interpretera nie zachodzi.
 			
 			\begin{center}
 				\begin{figure}[ht]
 					\centering
 					\includegraphics[scale=0.7]{flow_cgi.png}
-					\caption{Schemat działania CGI ze skryptem do generowania odpowiedzi napisanym w Python. Źródło: Apache, FastCGI and Python}
+					\caption{Schemat działania CGI ze skryptem do generowania odpowiedzi napisanym w Python. \cite{fcgi}}
 				\end{figure}
 			\end{center}
 		
@@ -98,17 +98,17 @@
 				\begin{figure}[ht]
 					\centering
 					\includegraphics[scale=0.7]{flow_fastcgi.png}
-					\caption{Schemat działania FCGI ze skryptem do generowania odpowiedzi napisanym w Python. Źródło: Apache, FastCGI and Python}
+					\caption{Schemat działania FCGI ze skryptem do generowania odpowiedzi napisanym w Python. \cite{fcgi}}
 				\end{figure}
 			\end{center}
 		
-			Wymienione serwery jednak różnią się między sobą wydajnością obsługiwania zapytań. Na podstawie Linux Web Server Performance Benchmark\footnote{https://www.rootusers.com/linux-web-server-performance-benchmark-2016-results/} można stwierdzić, że nginx oferuje największą szybkość obsługi zapytań.
+			Wymienione serwery jednak różnią się między sobą wydajnością obsługiwania zapytań. Na podstawie Linux Web Server Performance Benchmark \cite{webserverbenchmark} można stwierdzić, że nginx oferuje największą szybkość obsługi zapytań.
 	
 			\begin{center}
 				\begin{figure}[ht]
 					\centering
 					\includegraphics[scale=0.35]{web-server-performance-benchmark-1-cpu-core-1.jpg}
-					\caption{Ilość obsługiwanych zapytań przy danej ilości otwartych połączeń. Źródło: Linux Web Server Performance Benchmark}
+					\caption{Ilość obsługiwanych zapytań przy danej ilości otwartych połączeń. \cite{webserverbenchmark}}
 				\end{figure}
 			\end{center}
 
@@ -116,20 +116,20 @@
 				\begin{figure}[ht]
 					\centering
 					\includegraphics[scale=0.35]{web-server-performance-benchmark-2-cpu-cores-2.jpg}
-					\caption{Ilość obsługiwanych zapytań przy danej ilości otwartych połączeń. Źródło: Linux Web Server Performance Benchmark}
+					\caption{Ilość obsługiwanych zapytań przy danej ilości otwartych połączeń. \cite{webserverbenchmark}}
 				\end{figure}
 			\end{center}
 		
 			\subsection{Serwer aplikacji}
-			Drugim rodzajem systemu jaki można wykorzystać to serwer aplikacji działający na protokole HTTP. Najpopularniejsze\footnote{https://plumbr.eu/uncategorized/most-popular-java-ee-servers-2016-edition} aplikacje to: Tomcat\footnote{https://tomcat.apache.org/}, WildFly\footnote{http://wildfly.org/} (dawny JBoss) oraz Jetty\footnote{https://eclipse.org/jetty/}. Za ich pomocą można napisać aplikację np. w języku Java lub C++, która później służy do obsługi zapytań sieciowych. W ten sposób można stworzyć zaawansowane serwery sieciowe odpowiadające potrzebom implementowanego systemu.
+			Drugim rodzajem systemu jaki można wykorzystać to serwer aplikacji działający na protokole HTTP. Najpopularniejsze aplikacje \cite{mostpopularjavaservers} to: Tomcat, WildFly (dawny JBoss) oraz Jetty. Za ich pomocą można napisać aplikację np. w języku Java lub C++, która później służy do obsługi zapytań sieciowych. W ten sposób można stworzyć zaawansowane serwery sieciowe odpowiadające potrzebom implementowanego systemu.
 		
-			Porównanie wyżej wymienionych serwerów aplikacji można znaleźć w artykule Lightweight Java servers and developer view on the App Server\footnote{https://advantage.ibm.com/2015/09/22/lightweight-java-servers-and-developer-view-on-the-app-server-update/}.
+			Porównanie wyżej wymienionych serwerów aplikacji można znaleźć w artykule Lightweight Java servers and developer view on the App Server.
 		
 			\begin{center}
 				\begin{figure}[ht]
 					\centering
 					\includegraphics[scale=0.55]{weblogic-jboss-wildfly-websphere-liberty-tomee-tomcat-glassfish-comparison1.png}
-					\caption{Porównanie popularnych serwerów aplikacji. Źródło: Lightweight Java servers and developer view on the App}
+					\caption{Porównanie popularnych serwerów aplikacji. \cite{javaserverscomparison}}
 				\end{figure}
 			\end{center}
 		
@@ -286,7 +286,7 @@
 				zostały utworzone w widoku ustawień i widoku głównym. W widoku ustawień po kliknięciu na pole do edycji nazwy testu otwiera się okienko z przesuwalną listą, z której można wybrać nazwę kursu. W widoku głównym taka sama wizualnie lista wyświetla propozycje ID testu wygenerowane na podstawie nazwy kursu.
 		
 				\paragraph{Zmiennokształtne przyciski}
-				służą do sygnalizowania asynchronicznych operacji zachodzących w trakcie konfiguracji i weryfikacji aplikacji. Za podstawę służy Android Circular Progress Button\footnote{https://github.com/flavioarfaria/circular-progress-button}, który został umieszczony na widoku ustawień. Przycisk ten w aplikacji zmienia swój kolor oraz wygląd sygnalizując:
+				służą do sygnalizowania asynchronicznych operacji zachodzących w trakcie konfiguracji i weryfikacji aplikacji. Za podstawę służy Circular Progress Button \cite{circularprogressbutton}, który został umieszczony na widoku ustawień. Przycisk ten w aplikacji zmienia swój kolor oraz wygląd sygnalizując:
 				\begin{itemize}
 					\item bezczynność - niebieski pusty przycisk
 					\item przetwarzanie operacji - wirujące kółko
@@ -374,15 +374,15 @@
 		
 			\subsection{Skaner QR}
 			
-			W aplikacji wykorzystano również skaner kodów QR. Wykorzystano do tego bibliotekę zxing\footnote{https://github.com/zxing/zxing} (Zebra Crossing). Pozwala ona nie tylko na skanowanie kodów QR ale również kodów kreskowych, kodów Aztec i innych. Skaner skanuje kod QR wyświetlany na ekranie przez rzutnik, automatyczne zapisując w aplikacji kodu testu i wektor wag. Po operacji skanowania wymusza wyliczenie nowego numeru grupy. Ułatwia to pracę z aplikacją potencjalnemu użytkownikowi oraz pozwala na zmniejszenie prawdopodobieństwa popełnienia błędu przez użytkownika przy wyliczaniu grupy na teście.
+			W aplikacji wykorzystano również skaner kodów QR. Wykorzystano do tego bibliotekę zxing (Zebra Crossing) \cite{zxing}. Pozwala ona nie tylko na skanowanie kodów QR ale również kodów kreskowych, kodów Aztec i innych. Skaner skanuje kod QR wyświetlany na ekranie przez rzutnik, automatyczne zapisując w aplikacji kodu testu i wektor wag. Po operacji skanowania wymusza wyliczenie nowego numeru grupy. Ułatwia to pracę z aplikacją potencjalnemu użytkownikowi oraz pozwala na zmniejszenie prawdopodobieństwa popełnienia błędu przez użytkownika przy wyliczaniu grupy na teście.
 			
 			\subsection{Baza danych}
 			
-			Do długotrwałego przechowywania danych w aplikacji wykorzystano bazę danych MySQL. W tym celu stworzono klasę imitującą bazę danych MySQL oraz klasę imitującą interfejs dostępowy do tej klasy. Interfejs został następnie wykorzystany do zapisywania informacji zawartych w widoku ustawień. Baza danych dodatkowo służy jako narzędzie do wymiany danych między widokami aplikacji. Baza danych służy do przechowywania danych użytkownika takich jak: imię, nazwisko, numer indeksu oraz inne parametry właściwe dla aktualnej sesji testu. Przy tworzeniu bazy danych oparto się na przykładzie opisanym na portalu Vogella\footnote{http://www.vogella.com/tutorials/AndroidSQLite/article.html}.
+			Do długotrwałego przechowywania danych w aplikacji wykorzystano bazę danych MySQL. W tym celu stworzono klasę imitującą bazę danych MySQL oraz klasę imitującą interfejs dostępowy do tej klasy. Interfejs został następnie wykorzystany do zapisywania informacji zawartych w widoku ustawień. Baza danych dodatkowo służy jako narzędzie do wymiany danych między widokami aplikacji. Baza danych służy do przechowywania danych użytkownika takich jak: imię, nazwisko, numer indeksu oraz inne parametry właściwe dla aktualnej sesji testu. Przy tworzeniu bazy danych oparto się na przykładzie opisanym na portalu Vogella \cite{sqlitedatabase}.
 			
 			\subsection{Odrzucanie połączeń w trakcie testu}
 			
-			W trakcie testowania aplikacji na grupie studentów pojawiła się potrzeba automatycznego odrzucania przychodzących połączeń telefonicznych. W tym celu stworzono klasę na bazie wbudowanej BroadcastReceiver, która to odrzuca wszystkie przychodzące połączenia jeśli użytkownik jest w trakcie pisania testu. Do odrzucania połączeń wykorzystano kod z portalu Stack Overflow\footnote{https://stackoverflow.com/questions/7347871/how-to-reject-a-call-programatically-in-android}.
+			W trakcie testowania aplikacji na grupie studentów pojawiła się potrzeba automatycznego odrzucania przychodzących połączeń telefonicznych. W tym celu stworzono klasę na bazie wbudowanej BroadcastReceiver, która to odrzuca wszystkie przychodzące połączenia jeśli użytkownik jest w trakcie pisania testu. Do odrzucania połączeń wykorzystano kod z portalu Stack Overflow \cite{callreject}.
 			
 		\section{Programy dodatkowe}
 		
@@ -511,5 +511,9 @@
 	Aplikacja jest stabilna i niezawodna. Znacząco ułatwia pisanie testu wyliczając dla użytkownika wszystkie potrzebne informacje.
 	
 	Pisanie systemu tej wielkości w znacznym stopniu zależy od odpowiedniego wyspecyfikowania elementów takiego systemu. Ich początkowy opis decyduje o strukturze oprogramowania systemu w etapie weryfikacji i wdrażania.
+			
+	\addcontentsline{toc}{chapter}{Bibliografia}
+	\bibliographystyle{alpha}
+	\bibliography{bibliography}
 			
 \end{document}

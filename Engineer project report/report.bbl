@@ -1,0 +1,101 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{LSS{\etalchar{+}}99}
+
+\bibitem[AB16]{quizowanie}
+FEO~Media AB.
+\newblock {Quizowanie}.
+\newblock
+  \url{https://play.google.com/store/apps/details?id=se.feomedia.quizkampen.pl.lite&hl=pl},
+  2016.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[Boe09]{fcgi}
+Ferry Boender.
+\newblock {Apache, FastCGI and Python}.
+\newblock
+  \url{https://www.electricmonk.nl/docs/apache_fastcgi_python/apache_fastcgi_python.html},
+  2009.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[Dmy14]{circularprogressbutton}
+Danylyk Dmytro.
+\newblock {Circular Progress Button}.
+\newblock \url{https://github.com/flavioarfaria/circular-progress-button},
+  2014.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[Fil16]{samequizy}
+Filing.
+\newblock {sameQuizy}.
+\newblock
+  \url{https://play.google.com/store/apps/details?id=pl.filing.samequizy&hl=pl},
+  2016.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[Jar16]{webserverbenchmark}
+Jarrod.
+\newblock {Linux Web Server Performance Benchmark}.
+\newblock
+  \url{https://www.rootusers.com/linux-web-server-performance-benchmark-2016-results/},
+  2016.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[Kha15]{javaserverscomparison}
+Roman Kharkovski.
+\newblock {Lightweight Java servers and developer view on the App Server}.
+\newblock
+  \url{https://advantage.ibm.com/2015/09/22/lightweight-java-servers-and-developer-view-on-the-app-server-update/},
+  2015.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[Lar11]{callreject}
+Finn Larsen.
+\newblock {How to Reject a call programatically in android}.
+\newblock
+  \url{https://stackoverflow.com/questions/7347871/how-to-reject-a-call-programatically-in-android},
+  2011.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[LSS{\etalchar{+}}99]{protocols}
+H.~Kim Lew, Steve Spanier, Tim Stevenson, Merilee Ford, and Inc~Cisco Systems.
+\newblock {Internetworking Technologies Handbook}.
+\newblock \url{http://www.net130.com/tutorial/other/Internet%20Overview.pdf},
+  1999.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[Sev16]{englishgrammar}
+SevenLynx.
+\newblock {English Grammar Test}.
+\newblock
+  \url{https://play.google.com/store/apps/details?id=english.grammar.test.app},
+  2016.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[ST16]{mostpopularjavaservers}
+Nikita Salnikov-Tarnovski.
+\newblock {Most popular Java application servers: 2016 edition}.
+\newblock
+  \url{https://plumbr.eu/uncategorized/most-popular-java-ee-servers-2016-edition},
+  2016.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[Vog16]{sqlitedatabase}
+Lars Vogel.
+\newblock {Android SQLite database and content provider - Tutorial}.
+\newblock \url{http://www.vogella.com/tutorials/AndroidSQLite/article.html},
+  2016.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[w3t16]{httpserversusage}
+w3techs.
+\newblock {Usage of web servers for websites}.
+\newblock \url{https://w3techs.com/technologies/overview/web_server/all}, 2016.
+\newblock [Online; accessed 11-December-2016].
+
+\bibitem[Wav16]{zxing}
+Denso Wave.
+\newblock {ZXing}.
+\newblock \url{https://github.com/zxing/zxing}, 2016.
+\newblock [Online; accessed 11-December-2016].
+
+\end{thebibliography}
