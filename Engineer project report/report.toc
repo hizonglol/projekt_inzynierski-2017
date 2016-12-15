@@ -2,16 +2,17 @@
 \contentsline {section}{\numberline {1.1}Systemy pisania test\IeC {\'o}w w czasie rzeczywistym}{5}
 \contentsline {section}{\numberline {1.2}\IeC {\'S}rodowisko tworzenia aplikacji na Android}{5}
 \contentsline {subsection}{\numberline {1.2.1}Android Studio}{6}
-\contentsline {subsection}{\numberline {1.2.2}Qt Creator}{6}
-\contentsline {section}{\numberline {1.3}Komunikacja internetowa}{6}
+\contentsline {subsection}{\numberline {1.2.2}\IeC {\'S}rodowiska multiplatformowe}{6}
+\contentsline {section}{\numberline {1.3}Komunikacja internetowa}{7}
 \contentsline {subsection}{\numberline {1.3.1}Protoko\IeC {\l }y}{7}
-\contentsline {subsection}{\numberline {1.3.2}Serwer HTTP}{7}
-\contentsline {subsection}{\numberline {1.3.3}Serwer aplikacji}{8}
+\contentsline {subsection}{\numberline {1.3.2}Serwer HTTP}{8}
+\contentsline {subsection}{\numberline {1.3.3}Serwer aplikacji}{11}
+\contentsline {subsection}{\numberline {1.3.4}Dedykowany serwer sieciowy}{12}
 \contentsline {chapter}{\numberline {2}Specyfikacja}{13}
 \contentsline {section}{\numberline {2.1}Oryginalna specyfikacja}{13}
 \contentsline {subsection}{\numberline {2.1.1}Aplikacja mobilna}{13}
 \contentsline {subsection}{\numberline {2.1.2}Aplikacja serwerowa}{13}
-\contentsline {subsection}{\numberline {2.1.3}Dodatkowe programy}{13}
+\contentsline {subsection}{\numberline {2.1.3}Dodatkowe programy}{14}
 \contentsline {section}{\numberline {2.2}Dodatki i zmiany}{14}
 \contentsline {subsection}{\numberline {2.2.1}Aplikacja mobilna}{14}
 \contentsline {subsection}{\numberline {2.2.2}Aplikacja serwerowa}{14}
@@ -32,7 +33,7 @@
 \contentsline {subsection}{\numberline {3.1.9}Odrzucanie po\IeC {\l }\IeC {\k a}cze\IeC {\'n} w trakcie testu}{21}
 \contentsline {section}{\numberline {3.2}Programy dodatkowe}{21}
 \contentsline {subsection}{\numberline {3.2.1}Generator konfiguracji}{21}
-\contentsline {subsection}{\numberline {3.2.2}Deszyfrator}{21}
+\contentsline {subsection}{\numberline {3.2.2}Deszyfrator}{22}
 \contentsline {subsection}{\numberline {3.2.3}Parser log\IeC {\'o}w}{22}
 \contentsline {chapter}{\numberline {4}Praktyczne wykorzystanie systemu}{23}
 \contentsline {section}{\numberline {4.1}Wdro\IeC {\.z}enie aplikacji}{23}
