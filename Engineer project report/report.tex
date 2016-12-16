@@ -17,7 +17,7 @@
 
 \author{Filip Malinowski}
 
-\supervisor{dr Witold Paluszyński, K-8}
+\supervisor{doc dr inż. Witold Paluszyński}
 
 \field{Automatyka i Robotyka (AIR)}
 \specialisation{Robotyka (ARR)}
@@ -30,7 +30,7 @@
 
 	\chapter*{Wstęp}
 	
-	Tematem pracy jest stworzenie systemu na platformę Android umożliwiającego pisanie testów na wykładach akademickich i zautomatyzowane przetworzenie wyników testów. W skład systemu wchodzą: aplikacja na system Android oraz aplikacja serwerowa. Aplikacje na systemach Android mają łączyć się z serwerem i przesyłać informacje o wykonanych testach, a serwer ma przetwarzać otrzymane informacje i je magazynować. System ma być niezawodny pozwalając na bezpieczne wykonywanie testów. Interfejs aplikacji na system Android ma być czytelny, a obsługa serwera możliwie prosta.
+	Tematem pracy jest stworzenie systemu na platformę Android umożliwiającego pisanie testów na wykładach akademickich i zautomatyzowane przetworzenie wyników testów. W skład systemu wchodzą: aplikacja na system Android oraz aplikacja serwerowa. Aplikacje na systemach Android mają łączyć się z serwerem i przesyłać informacje o wykonanych testach, a serwer ma przetwarzać otrzymane informacje i je magazynować. System ma być niezawodny pozwalając na bezpieczne wykonywanie testów. Interfejs aplikacji na system Android ma być czytelny, a dostęp do danych zapisywanych przez serwer maksymalnie uproszczony.
 
 	
 	\chapter{Analiza problemu}
@@ -80,19 +80,19 @@
 				Można na nim tworzyć aplikacje na systemy Symbian, Maemo, MeeGo oraz Android. Bazowo nie jest to środowisko tak rozbudowane jak Android Studio, pozwala jednak na integrację wielu dodatkowych narzędzi. Pozwala na pisanie aplikacji w takich językach jak Python, Ruby, Perl, Java i C++. Interfejs tworzony jest w oparciu o QML, języku opartym na JavaScript, składnią zbliżonym do XML. Aplikacje stworzone w tym środowisku są łatwo przenośne na inne systemy operacyjne. Posiada większość odpowiedników klas występujących w Android Studio, potrzebnych do pisania aplikacji na systemy operacyjne Android.
 				
 				\item \textbf{Apache Cordova}\\
-				Za pomocą tego środowiska można tworzyć aplikacje na systemy Android, iOS, Windows Phone, BlackBerry i Ubuntu. Opiera się na CSS3, HTML5 oraz JavaScript.
+				Za pomocą tego środowiska można tworzyć aplikacje na systemy Android, iOS, Windows Phone, BlackBerry i Ubuntu. Pisanie aplikacji w tym środowisku opiera się na CSS3, HTML5 oraz JavaScript.
 				
 				\item \textbf{Appcelerator Titanium}\\
-				Pozwala na tworzenie aplikacji na systemy Android, iOS oraz Windows Phone. Aplikacje w tym środowisku tworzone są za pomocą Titanium code, opartym na JavaScript. Pozwala na dołączanie kodu napisanego w Java, Objective C lub Swift.
+				Pozwala na tworzenie aplikacji na systemy Android, iOS oraz Windows Phone. Aplikacje w tym środowisku tworzone są za pomocą Titanium code, wywodzącym się z JavaScript. Pozwala na dołączanie kodu napisanego w Java, Objective C lub Swift.
 				
 				\item \textbf{Xamarin}\\
 				Środowisko pozwalające na pisanie aplikacji Android, iOS oraz Windows Phone. Środowisko to jest częścią Microsoft Visual Studio. Pozwala na pisanie aplikacji w języku C\#.
 				
 				\item \textbf{Corona SDK}\\
-				Środowisko ukierunkowane na pisanie mobilnych gier 2D. Pozwala także na pisanie aplikacji mobilnych. W tym środowisku można tworzyć aplikacje na systemy Android, iOS, Windows Phone, Kindle oraz systemy desktopowe Windows oraz macOS (OS X).
+				Środowisko ukierunkowane na pisanie mobilnych gier 2D. Pozwala także na pisanie aplikacji mobilnych. W tym środowisku można tworzyć aplikacje na systemy Android, iOS, Windows Phone, Kindle oraz systemy Windows oraz macOS (OS X) na komputery stacjonarne. Aplikacje za pomocą tego środowiska pisane są w języku Lua.
 				
 				\item \textbf{Cocos2d-x}\\
-				Pozwala na pisanie aplikacji na systemy Android, iOS, Linux, macOS, Windows oraz Windows Phone. Do tworzenia aplikacji wykorzystuje C++, Lua i JavaScript.
+				Pozwala na pisanie aplikacji na systemy Android, iOS, Linux, macOS, Windows oraz Windows Phone. Do tworzenia aplikacji w tym środowisku wykorzystuje się C++, Lua i JavaScript.
 				
 				\item \textbf{Unity}\\
 				Środowisko dedykowane do pisania gier mobilnych 2D oraz 3D. Aplikacje w tym środowisku pisane są w języku Java wraz z Android SDK.
@@ -109,14 +109,14 @@
 			Przy tworzeniu systemu gdzie występuje komunikacja serwer-klient przez Internet jest wiele możliwych protokołów, które można użyć. Są to np. TCP, UDP, POP, SMTP, HTTP czy FTP \cite{protocols}. Wybór protokołu wpływa znacząco na sposób komunikacji pomiędzy klientem a serwerem. Każdy z protokołów różni się sposobem przesyłania danych oraz ich bezpieczeństwem. Protokoły bezpołączeniowe jak UDP nie pozwalają na bezpieczne przesyłanie danych, ponieważ nie ma informacji o ich poprawnym dotarciu do odbiorcy. Protokoły jak TCP, HTTP są protokołami połączeniowymi. W ich przypadku nadawca otrzymuje informację o poprawności przesyłu danych do odbiorcy. Każdy z protokołów domyślnie też korzysta z różnych portów do przesyłu danych. HTTP standardowo korzysta z portu 80, POP z kolei korzysta z portu 110, a FTP z portów 20 i 21.
 	
 			\subsection{Serwer HTTP}
-			Pierwszym rodzajem systemu do obsługi zapytań aplikacji mobilnych jaki można wykorzystać to serwer HTTP połączony z FastCGI \cite{fcgi} lub CGI. Najpopularniejsze aplikacje \cite{httpserversusage} to między innymi: Apache, nginx, Microsoft-IIS, OpenLiteSpeed. Każdy z serwerów obsługuje FastCGI (FCGI) oraz CGI pozwalające na napisanie programu przyjmującego i przetwarzającego przychodzące zapytania sieciowe.\\
+			Do obsługi zapytań aplikacji mobilnych można wykorzystać serwer HTTP połączony z FastCGI \cite{fcgi} lub CGI. Najpopularniejsze aplikacje \cite{httpserversusage} to między innymi: Apache, nginx, Microsoft-IIS, OpenLiteSpeed. Każdy z serwerów obsługuje FastCGI (FCGI) oraz CGI pozwalające na napisanie programu przyjmującego i przetwarzającego przychodzące zapytania sieciowe.\\
 			
 			Pierwszym rodzajem serwera jaki można wykorzystać to serwer HTTP połączony z serwerem FCGI. Proces napisany z pomocą biblioteki do FCGI łączy się z serwerem FCGI, do którego przekierowywane są zapytania przyjmowane przez serwer HTTP. Programy FCGI istnieją cały czas jako wątki, oczekują na zapytania, obsługują je i po ich obsłużeniu oczekują na następne zapytania. Ten interfejs jest kompatybilny z wieloma językami programowania, np. C++, Python, Java. W ten sposób można stworzyć mało rozbudowany ale szybki system przetwarzający zapytania sieciowe.
 			
 			\begin{center}
 				\begin{figure}[H]
 					\centering
-					\includegraphics[scale=0.8]{flow_fastcgi.png}
+					\includegraphics[scale=0.72]{flow_fastcgi.png}
 					\caption{Schemat działania FCGI ze skryptem do generowania odpowiedzi napisanym w Python. \cite{fcgi}}
 				\end{figure}
 			\end{center}
@@ -126,12 +126,10 @@
 			\begin{center}
 				\begin{figure}[H]
 					\centering
-					\includegraphics[scale=0.8]{flow_cgi.png}
+					\includegraphics[scale=0.72]{flow_cgi.png}
 					\caption{Schemat działania CGI ze skryptem do generowania odpowiedzi napisanym w Python. \cite{fcgi}}
 				\end{figure}
 			\end{center}
-		
-			\pagebreak
 		
 			Wymienione serwery jednak różnią się między sobą wydajnością obsługiwania zapytań. Na podstawie Linux Web Server Performance Benchmark \cite{webserverbenchmark} można stwierdzić, że nginx oferuje największą szybkość obsługi zapytań.
 	
@@ -152,7 +150,7 @@
 			\end{center}
 		
 			\subsection{Serwer aplikacji}
-			Drugim rodzajem systemu jaki można wykorzystać to serwer aplikacji działający na protokole HTTP. Najpopularniejsze aplikacje \cite{mostpopularjavaservers} to: Tomcat, WildFly (dawny JBoss) oraz Jetty. Za ich pomocą można napisać aplikację np. w języku Java lub C++, która później służy do obsługi zapytań sieciowych. Jest to system modularny. Wykorzystując już istniejący serwer aplikacji obsługujący aplikacje w konkretnej konfiguracji serwera działające na danym adresie i porcie, można dodać kolejną aplikację rozszerzając w ten sposób funkcjonalność serwera. Dzięki temu można stworzyć zaawansowane serwery sieciowe odpowiadające potrzebom systemu będącego tematem tej pracy.
+			Drugim rodzajem systemu jaki można wykorzystać to serwer aplikacji działający na protokole HTTP. Najpopularniejsze aplikacje \cite{mostpopularjavaservers} to: Tomcat, WildFly (dawny JBoss) oraz Jetty. Za ich pomocą można napisać aplikację np. w języku Java lub C++, która później służy do obsługi zapytań sieciowych. Jest to system modularny. Wykorzystując już istniejący serwer aplikacji obsługujący aplikacje w konkretnej konfiguracji serwera działające na danym adresie i porcie, można dodać kolejną aplikację rozszerzając w ten sposób funkcjonalność serwera. Dzięki temu można stworzyć zaawansowane i rozbudowane serwery sieciowe.
 			
 			\begin{center}
 				\begin{figure}[H]
@@ -162,20 +160,18 @@
 				\end{figure}
 			\end{center}
 		
-			\pagebreak
-		
 			Porównanie wyżej wymienionych serwerów aplikacji można znaleźć w artykule Lightweight Java servers and developer view on the App Server \cite{javaserverscomparison}.
 		
 			\begin{center}
 				\begin{figure}[H]
 					\centering
-					\includegraphics[scale=0.55]{weblogic-jboss-wildfly-websphere-liberty-tomee-tomcat-glassfish-comparison1.png}
+					\includegraphics[scale=0.6]{weblogic-jboss-wildfly-websphere-liberty-tomee-tomcat-glassfish-comparison1.png}
 					\caption{Ogólne porównanie popularnych serwerów aplikacji. \cite{javaserverscomparison}}
 				\end{figure}
 			\end{center}
 		
 			\subsection{Dedykowany serwer sieciowy}
-			Trzecim rodzajem systemu jaki można wykorzystać do obsługi zapytań sieciowych jest dedykowany serwer sieciowy. Jego główną zaletą jest to, że stworzony w ten sposób system może realizować wszystkie wymagania użytkownika. Tworzenie go w porównaniu do dwóch wymienionych wyżej systemów jest najbardziej pracochłonne ponieważ wszystkie elementy systemu należy stworzyć od podstaw. Tego rodzaju serwer nie ma ograniczeń co do tego w jakim języku programowania ma powstać. Wszystko zależy od specyfikacji podanej przez użytkownika.
+			Trzecim rodzajem systemu jaki można wykorzystać do obsługi zapytań sieciowych to jest dedykowany serwer sieciowy. Jego główną zaletą jest to, że stworzony w ten sposób system może realizować wszystkie wymagania użytkownika. Tworzenie go w porównaniu do dwóch wymienionych wyżej systemów jest najbardziej pracochłonne ponieważ wszystkie elementy systemu należy napisać od podstaw. Tego rodzaju serwer nie ma ograniczeń co do tego w jakim języku programowania miałby powstać. Wszystko zależy od specyfikacji podanej przez użytkownika.
 			
 	
 	\chapter{Specyfikacja}
@@ -211,7 +207,6 @@
 			\subsection{Dodatkowe programy}
 			\begin{itemize}
 				\item deszyfrator plików z odpowiedziami tworzonych przez aplikację mobilną
-				\item weryfikacja parametrów testu otrzymywanych z serwera
 			\end{itemize}
 		
 		\section{Dodatki i zmiany}
@@ -225,6 +220,7 @@
 			Dodatki to:
 			\begin{itemize}
 				\item odrzucanie połączeń przychodzących do użytkownika w trakcie testu
+				\item weryfikacja parametrów testu otrzymywanych z serwera
 				\item trwałe przechowywanie parametrów użytkownika takich jak imię, nazwisko, itd., w aplikacji
 				\item wyświetlanie informacji dla użytkownika o procesach zachodzących w aplikacji
 				\item nadanie aplikacji cyfrowego podpisu
@@ -258,11 +254,23 @@
 	Biorąc pod uwagę przeprowadzoną analizę problemu zdecydowano, że system do rozwiązywania testów musi być napisany od podstaw. Nie znaleziono przykładów otwartych systemów na tyle użytecznych, żeby można było użyć ich przy tworzeniu systemu. Systemy takie jak Quizwanie mają zamknięty kod i można się nimi sugerować jedynie w kwestii tworzenia interfejsu użytkownika.
 	
 		\section{Elementy aplikacji}
+		
+			\subsection{Logiczne elementy interfejsu}
+			
+			Interfejs aplikacji można podzielić na jego logiczne elementy. Te elementy realizują podstawową funkcjonalność aplikacji. Są to:
+			\begin{itemize}
+				\item główny ekran startowy + obliczanie nr grupy i czytanie kodów QR
+				\item dane permanentne wydzielone, ustawiane na innym ekranie, i pamiętane w bazie danych
+				\item dodawanie pytań, odpowiadanie na nie i przesuwanie pomiędzy pytaniami
+			\end{itemize}
+			Na podstawie tych elementów stworzony został interfejs aplikacji spełniający wyżej wymienione logiczne elementy interfejsu.
 	
-			\subsection{Widoki aplikacji}
+			\subsection{Interfejs aplikacji}
 		
 			Wygląd aplikacji stanowi ważny element aplikacji. W początkowych fazach projektu rozmieszczenie elementów na ekranie telefonu komórkowego jak też ich estetyka wielokrotnie była zmieniana. Potrzebne było wypracowanie przejrzystego oraz przyjaznego dla studenta interfejsu aplikacji. W trakcie tworzenia aplikacji zauważono, że istotnym elementem jest zachowanie kompatybilności z różnymi wersjami systemu Android realizując jednolite i przewidywalne zachowanie się interfejsu.
 			Na przykład nie można było zastosować kolorowania przycisków korzystając z metody setColorFilter obecnej we wszystkich wersjach systemu od Android 4.0 do Android 7.0. Efekt wywołania tej metody w systemach Android 4.0 do 4.4 był inny od efektu uzyskiwanego w systemach Android 5.0 i wyższych. Powodowało to brak kompatybilności pomiędzy tymi wersjami.\\
+		
+			\pagebreak
 		
 			Widoki jakie zostały zaimplementowane w aplikacji to:
 			\begin{itemize}
@@ -371,10 +379,12 @@
 					\label{fig:wyglad_aplikacji_3}
 				\end{figure}
 				
+				\begin{absolutelynopagebreak}
 				\paragraph{Przyciski zmieniające kolor}
 				umieszczone są na kartach z odpowiedziami w aplikacji. Sygnalizują swoimi kolorami stan przetwarzania odpowiedzi użytkownika. Biały przycisk informuje o braku wybranej do tej pory odpowiedzi. Szary przycisk sygnalizuje poprawnie zapisaną odpowiedź do pliku testowego. Niebieski przycisk sygnalizuje poprawnie wysłaną odpowiedź na serwer.
 				Jeżeli operacja zapisywania do pliku się nie powiedzie to przycisk pozostaje biały.
 				Jeżeli operacja wysyłania do serwera się nie powiedzie to przycisk pozostaje szary. Użytkownik wtedy wie, że jego aktualna odpowiedź przechowywana jest jedynie lokalnie.\\
+				\end{absolutelynopagebreak}
 				
 				\begin{figure}[ht]
 					\centering
@@ -414,7 +424,7 @@
 			
 			Z tego powodu, że w niezabezpieczonej sieci WiFi Politechniki Wrocławskiej odblokowane są jedynie porty służące do obsługi poczty i protokołu HTTP to do komunikacji internetowej wykorzystano protokół HTTP. Odpowiedzi są wysyłane na zasadzie pobierania nagłówka pliku konfiguracyjnego XML z odpowiedziami umieszczonymi w query string. Kod otrzymany po wykonaniu zapytania jest następnie interpretowany, a jego wartość decyduje o powiadomieniu użytkownika o poprawnym lub niepoprawnym wysłaniu odpowiedzi do serwera.\\
 			
-			Po stronie serwera wybrano najprostszy model przetwarzania danych, który jednocześnie spełnia postawione systemowi założenia. Wszystkie informacje o przesłanych odpowiedziach są zapisywane w logu serwera. Log następnie jest przetwarzany za pomocą skryptów i odczytywane z niego są informacje o przebiegu testów wszystkich użytkowników.
+			Po stronie serwera wybrano najprostszy model przetwarzania danych, który jednocześnie spełnia postawione systemowi założenia. Wszystkie informacje o przesłanych odpowiedziach są zapisywane w logu serwera. Log następnie jest przetwarzany za pomocą skryptów i ogólnodostępnych narzędzi dzięki czemu odczytywane z niego są informacje o przebiegu testów wszystkich użytkowników.
 		
 			\subsection{Szyfrowanie plików}
 		
@@ -435,6 +445,19 @@
 			\subsection{Odrzucanie połączeń w trakcie testu}
 			
 			W trakcie testowania aplikacji na grupie studentów pojawiła się potrzeba automatycznego odrzucania przychodzących połączeń telefonicznych. W tym celu stworzono klasę na bazie wbudowanej BroadcastReceiver, która to odrzuca wszystkie przychodzące połączenia jeśli użytkownik jest w trakcie pisania testu. Do odrzucania połączeń wykorzystano kod z portalu Stack Overflow \cite{callreject}.
+			
+			\subsection{Walidacja aplikacji}
+			
+			W trakcie tworzenia aplikacji zaistniała potrzeba sprawdzenia czy aplikacja nie jest podrobiona. Aplikacja po skompilowaniu jest podpisywana cyfrowo, a każde jej rozpakowanie powoduje utratę podpisu cyfrowego. Dodatkowo w trakcie działania serwer ma sprawdzać autentyczność klienta. Schemat działania walidacji wygląda następująco:
+			\begin{itemize}
+				\item serwer generuje i wysyła klucz do klienta (aplikacji mobilnej)
+				\item aplikacja żąda weryfikacji z Google Play Services przesyłając w żądaniu klucz wygenerowany na serwerze
+				\item Android SafetyNet sprawdza czy oprogramowanie systemu klienta nie jest zmodyfikowane i przechodzi przez Compatibility Test Suite
+				\item klient otrzymuje podpisaną cyfrowo odpowiedź (atestację) informującą o pozytywnej lub negatywnej weryfikacji (weryfikowana jest suma kontrolna aplikacji oraz jej podpis cyfrowy)
+				\item atestacja jest przesyłana do serwera, a wraz z nią klucz oraz podpis cyfrowy
+				\item serwer sprawdza podpis cyfrowy oraz klucz, następnie przesyła atestację do Google Play Services
+				\item Google Play Services informuje serwer o tym czy atestacja jest autentyczna
+			\end{itemize}
 			
 		\section{Programy dodatkowe}
 		
@@ -559,9 +582,9 @@
 		
 	\chapter{Podsumowanie}
 	
-	W tej pracy stworzono system pozwalający na wykonywanie testów na aplikacjach Android. Aplikacje komunikują się z serwerem przez Internet przesyłając wszystkie informacje o przebiegu wykonywanych testów. Aplikacja na system Android ma zrozumiały dla użytkownika interfejs. Komunikuje się korzystając z protokołu HTTP przez Internet z serwerem. Pozwala na przesyłanie odpowiedzi "tak", "nie", "nie wiem" podczas rozwiązywania testu. Te odpowiedzi następnie są rejestrowane na serwerze pozwalając na ich późniejsze przetworzenie. Na telefonach z aplikacją dodatkowo są przechowywane zaszyfrowane pliki z kopią zapasową przebiegu testu zabezpieczając się przed ich utratą przy wysyłaniu ich na serwer lub przed uszkodzeniem danych zarejestrowanych na serwerze. Dodatkowe programy takie jak Deszyfrator oraz Generator Konfiguracji pozwalają na rozszyfrowywanie plików z telefonów komórkowych, oraz na konfigurowanie testów na serwerze, tak aby możliwe było ich wykonywanie.\\
+	W tej pracy stworzono system pozwalający na wykonywanie testów na aplikacjach Android. Aplikacje komunikują się z serwerem przez Internet przesyłając wszystkie informacje o przebiegu wykonywanych testów. Aplikacja na system Android ma zrozumiały dla użytkownika interfejs. Komunikuje się korzystając z protokołu HTTP przez Internet z serwerem. Pozwala na przesyłanie odpowiedzi "tak", "nie", "nie wiem" podczas rozwiązywania testu. Te odpowiedzi następnie są rejestrowane na serwerze pozwalając na ich późniejsze przetworzenie. Na telefonach z aplikacją dodatkowo są przechowywane zaszyfrowane pliki z kopią zapasową przebiegu testu zabezpieczając się przed ich utratą przy wysyłaniu ich na serwer lub przed uszkodzeniem danych zarejestrowanych na serwerze. Stworzone zostały dodatkowe programy takie jak Deszyfrator pozwalający na rozszyfrowywanie plików z telefonów komórkowych, oraz Generator Konfiguracji tworzący konfigurujący serwer do pisania danych testów na aplikacjach mobilnych.\\
 	
-	Aplikacja jest stabilna i niezawodna. Wprowadzenie aplikacji do użycia zakończyło się sukcesem. Na żadnym z dziesięciu testów, na których była wykorzystywana nie wystąpiły problemy, przy około 80 osobowej ilości użytkowników na każdym z testów. Można stwierdzić przewagę tego systemu nad papierowym rozwiązywaniem testów. Jest on wygodniejszy dla studentów oraz prowadzącego kurs. Znacząco ułatwia pisanie testu wyliczając dla użytkownika wszystkie potrzebne informacje. Pozwala w prosty sposób wykonywać testy z mniejszym prawdopodobieństwem popełnienia błędów przez użytkownika. A co najważniejsze pozwala na zaoszczędzenie dużej ilości czasu przez prowadzącego kurs przy sprawdzaniu wyników testów.\\
+	Wprowadzenie aplikacji do użycia zakończyło się sukcesem. Aplikacja jest stabilna i niezawodna. Studenci piszący testy nie zgłaszali uwag dotyczących stabilności aplikacji. Dodatkowo na żadnym z dziesięciu testów, na których była wykorzystywana nie wystąpiły problemy z przetwarzaniem, przesyłem i zapisem danych, przy około 80 osobowej ilości użytkowników na każdym z testów. Można stwierdzić przewagę tego systemu nad papierowym rozwiązywaniem testów. Jest on wygodniejszy dla studentów oraz prowadzącego kurs. Znacząco ułatwia pisanie testu wyliczając dla użytkownika wszystkie potrzebne informacje. Pozwala w prosty sposób wykonywać testy z mniejszym prawdopodobieństwem popełnienia błędów przez użytkownika. A co najważniejsze pozwala na zaoszczędzenie dużej ilości czasu przez prowadzącego kurs przy sprawdzaniu wyników testów.\\
 	
 	Pisanie systemu tej wielkości w znacznym stopniu zależy od odpowiedniego wyspecyfikowania elementów takiego systemu. Wszystkie najważniejsze wymagania co do programu powinny być ustalone na samym początku tworzenia projektu. Ich początkowy opis w dużej mierze decyduje o strukturze oprogramowania systemu w etapie weryfikacji i wdrażania.  Specyfikacja musi też przewidzieć wszystkie krytyczne sytuacje jakie mogą w systemie wystąpić. Jak najwcześniejsze ich wykrycie pozwala w prostszy sposób się przed nimi zabezpieczyć. System przed wykorzystaniem w praktyce musi być wcześniej odpowiednio przetestowany, a założenia zweryfikowane żeby potwierdzić ich poprawność oraz poprawność ich implementacji. Należy też mieć odpowiedni zapas czasu na wprowadzenie poprawek do błędów znalezionych w trakcie przetestowania przed jego praktycznym wykorzystaniem.
 			
