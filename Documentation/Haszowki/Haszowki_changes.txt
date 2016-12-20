@@ -1,3 +1,13 @@
+## 0.9.5 - 2016-12-20
+### Added
++ po przejœciu do podsumowania do serwera wysy³ana jest historia aktualnego testu
+
+### Changed
+~ stempel czasowy w nag³ówku pliku odpowiada stemplowi czasowem wys³ania zapytania o XML
+  (stempel czasowy w nazwie pliku to dalej stempel odpowiadaj¹cy czasowi utworzenia tego pliku)
+~ przy pobieraniu XML zapytanie rozszerzone o wszystkie parametry jakie pojawiaj¹ siê na teœcie
+~ zmienione dzia³anie mapy bitowej z -1,0,1,2,3 na 0,1,2,3,4
+
 ## 0.9.4 - 2016-12-06
 ### Changed
 ~ poprawiono b³¹d z niepoprawnym tworzeniem siê Query String

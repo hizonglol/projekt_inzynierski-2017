@@ -260,7 +260,7 @@ public class TabsActivity extends AppCompatActivity {
      */
     public void addTab() {
         SectionsPagerAdapterTabs.addFragment();
-        answeredQuestions.add(-1);
+        answeredQuestions.add(0);
     }
 
     /**
@@ -336,7 +336,7 @@ public class TabsActivity extends AppCompatActivity {
             writer.append(databaseTabsTestFile.getSetting("setting_group"));
             writer.append("\t");
             writer.append("timestamp=");
-            writer.append(formatter.format(now));
+            writer.append(databaseTabsTestFile.getSetting("setting_XMLtimestamp"));
             writer.append("\t");
             writer.append("version=");
             writer.append(getResources().getString(R.string.version_value));
@@ -554,6 +554,8 @@ public class TabsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
+                    String timestamp = makeTimeStamp();
+
                     int lastTabNumber = ((TabsActivity) getActivity()).guestionsAmount;
 
                     List<Fragment> fragmentsToCheck = ((TabsActivity) getActivity()).SectionsPagerAdapterTabs.fragments;
@@ -562,14 +564,16 @@ public class TabsActivity extends AppCompatActivity {
                         int answer = fragmentsToCheck.get(i).getArguments().getInt(ARG_SECTION_ANSWER_FILE);
                         Integer whatAnswer = ((TabsActivity) getActivity()).answeredQuestions.get(i);
 
-                        if (answer == 0 && whatAnswer < 0) {
-                            String timestamp = makeTimeStamp();
+                        if (answer == 0 && whatAnswer < 1) {
                             if (saveToFile(fragmentsToCheck.get(i), 0, "no_answer", timestamp))
                                 return;
-                            ((TabsActivity) getActivity()).answeredQuestions.set(i, 0);
+                            ((TabsActivity) getActivity()).answeredQuestions.set(i, 1);
                             sendToServer(fragmentsToCheck.get(i), 0, "no_answer", timestamp);
                         }
                     }
+
+                    saveToFile(timestamp, ((TabsActivity) getActivity()).answeredQuestions);
+                    sendToServer(timestamp, ((TabsActivity) getActivity()).answeredQuestions);
 
                     ((TabsActivity) getActivity()).summariseTest();
                 }
@@ -582,7 +586,7 @@ public class TabsActivity extends AppCompatActivity {
                     String timestamp = makeTimeStamp();
                     if (saveToFile(rootView, 1, "yes", timestamp)) return;
                     sendToServer(rootView, 1, "yes", timestamp);
-                    ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, 0);
+                    ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, 2);
                 }
             });
 
@@ -593,7 +597,7 @@ public class TabsActivity extends AppCompatActivity {
                     String timestamp = makeTimeStamp();
                     if (saveToFile(rootView, 2, "no", timestamp)) return;
                     sendToServer(rootView, 2, "no", timestamp);
-                    ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, 0);
+                    ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, 3);
                 }
             });
 
@@ -604,7 +608,7 @@ public class TabsActivity extends AppCompatActivity {
                     String timestamp = makeTimeStamp();
                     if (saveToFile(rootView, 3, "dunno", timestamp)) return;
                     sendToServer(rootView, 3, "dunno", timestamp);
-                    ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, 0);
+                    ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, 4);
                 }
             });
 
@@ -618,11 +622,11 @@ public class TabsActivity extends AppCompatActivity {
                         int answer = fragmentsToCheck.get(i).getArguments().getInt(ARG_SECTION_ANSWER_FILE);
                         Integer whatAnswer = ((TabsActivity) getActivity()).answeredQuestions.get(i);
 
-                        if (answer == 0 && whatAnswer < 0) {
+                        if (answer == 0 && whatAnswer < 1) {
                             String timestamp = makeTimeStamp();
                             if (saveToFile(fragmentsToCheck.get(i), 0, "no_answer", timestamp))
                                 return;
-                            ((TabsActivity) getActivity()).answeredQuestions.set(i, 0);
+                            ((TabsActivity) getActivity()).answeredQuestions.set(i, 1);
                             sendToServer(fragmentsToCheck.get(i), 0, "no_answer", timestamp);
                         }
                     }
@@ -716,7 +720,7 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         /**
-         * Used to save an answer of correspondning fragment into test file.
+         * Used to save an answer of corresponding fragment into test file.
          * <p>
          * It also sets up ARG_SECTION_ANSWER_SERVER to 0 before sendToServer() is terminated.
          * If GET in sendToServer() will be terminated successfully then ARG_SECTION_ANSWER_SERVER
@@ -747,6 +751,25 @@ public class TabsActivity extends AppCompatActivity {
         }
 
         /**
+         * Used to save an answer of corresponding fragment into test file.
+         * <p>
+         * It also sets up ARG_SECTION_ANSWER_SERVER to 0 before sendToServer() is terminated.
+         * If GET in sendToServer() will be terminated successfully then ARG_SECTION_ANSWER_SERVER
+         * will be set to proper number.
+         *
+         * @param timestamp Current timestamp
+         * @param answeredQuestions List of history of answered questions
+         * @return false if everything went well, true if something bad happened
+         */
+        private boolean saveToFile(String timestamp, List<Integer> answeredQuestions) {
+
+            if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", timestamp, answeredQuestions))) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
          * Used to make a GET request on server for given answer on corresponding tab.
          *
          * @param rootView   Root view of corresponding tab
@@ -763,7 +786,7 @@ public class TabsActivity extends AppCompatActivity {
                 task.configure(rootView, question);
                 task.execute(createDataURL("to_server", answerNo, timestamp));
             } else {
-                ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, -1);
+                ((TabsActivity) getActivity()).answeredQuestions.set(getArguments().getInt(ARG_SECTION_NUMBER)-1, 0);
                 Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
             }
         }
@@ -785,7 +808,24 @@ public class TabsActivity extends AppCompatActivity {
                 task.configure(fragment, question);
                 task.execute(createDataURL("to_server", fragment, answerNo, timestamp));
             } else {
-                ((TabsActivity) getActivity()).answeredQuestions.set(fragment.getArguments().getInt(ARG_SECTION_NUMBER)-1, -1);
+                ((TabsActivity) getActivity()).answeredQuestions.set(fragment.getArguments().getInt(ARG_SECTION_NUMBER)-1, 0);
+                Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        /**
+         * Used to make a GET request on server for given answer on corresponding tab.
+         *
+         * @param timestamp Current timestamp
+         */
+        private void sendToServer(String timestamp, List<Integer> answeredQuestions) {
+
+            Log.d("server", "sent");
+
+            if (isOnline()) {
+                DownloadWebpageHistoryTask task = new DownloadWebpageHistoryTask();
+                task.execute(createDataURL("to_server", timestamp, answeredQuestions));
+            } else {
                 Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
             }
         }
@@ -810,7 +850,7 @@ public class TabsActivity extends AppCompatActivity {
          * @param mode      Determines if string has to be built for server or for file
          * @param answer    Type of answer
          * @param timestamp Current timestamp
-         * @return Built URL with all significant data
+         * @return          Built URL with all significant data
          */
         private String createDataURL(String mode, String answer, String timestamp) {
 
@@ -881,7 +921,7 @@ public class TabsActivity extends AppCompatActivity {
          * @param fragment  Fragment representing tab
          * @param answer    Type of answer
          * @param timestamp Current timestamp
-         * @return Built URL with all significant data
+         * @return          Built URL with all significant data
          */
         private String createDataURL(String mode, Fragment fragment, String answer, String timestamp) {
 
@@ -939,6 +979,80 @@ public class TabsActivity extends AppCompatActivity {
             sentUrl = sentUrl.replace(" ", "");
 
             databaseCreateDataURL.close();
+
+            return sentUrl;
+        }
+
+        /**
+         * Creates URL summary. Gives it in format for server or for file.
+         *
+         * @param mode              Determines if string has to be built for server or for file
+         * @param timestamp         Current timestamp
+         * @param answeredQuestions List showing history of answered questions
+         * @return                  Built URL with all significant data
+         */
+        private String createDataURL(String mode, String timestamp, List<Integer> answeredQuestions) {
+
+            SettingsDataSource databaseCreateDataURL = new SettingsDataSource(getActivity());
+            databaseCreateDataURL.open();
+
+            StringBuilder sbServerQuery = new StringBuilder();
+            String divider = "&";
+
+            if (mode.equals("to_server")) {
+                String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
+                String stringServerUrl = getResources().getString(R.string.server_address);
+                if (stringDbServerUrl.length() > 1) {
+                    stringServerUrl = stringDbServerUrl;
+                }
+                stringServerUrl = stringServerUrl
+                        .concat(databaseCreateDataURL.getSetting("setting_course"))
+                        .concat("/")
+                        .concat(databaseCreateDataURL.getSetting("setting_test_id"))
+                        .concat(".xml").toLowerCase();
+                stringServerUrl = stringServerUrl.replace(" ", "");
+                sbServerQuery.append(stringServerUrl).append("?");
+            }
+
+            StringBuilder answerHistory = new StringBuilder();
+
+            for(int i = 0; i<answeredQuestions.size(); ++i){
+                answerHistory.append(answeredQuestions.get(i));
+            }
+
+            String studentNo = databaseCreateDataURL.getSetting("setting_studentNo");
+            String course = databaseCreateDataURL.getSetting("setting_course");
+            String testId = databaseCreateDataURL.getSetting("setting_test_id");
+            String hall_row = databaseCreateDataURL.getSetting("setting_hall_row");
+            String hall_seat = databaseCreateDataURL.getSetting("setting_hall_seat");
+            String name = databaseCreateDataURL.getSetting("setting_name");
+            String surname = databaseCreateDataURL.getSetting("setting_surname");
+            String vector = databaseCreateDataURL.getSetting("setting_vector");
+            String group = databaseCreateDataURL.getSetting("setting_group");
+            String sessionID = databaseCreateDataURL.getSetting("setting_sessionID");
+            String sessionSecurityID = databaseCreateDataURL.getSetting("setting_sessionSecurityID");
+
+            sbServerQuery.append("student_no=").append(studentNo).append(divider);
+            sbServerQuery.append("course=").append(course).append(divider);
+            sbServerQuery.append("test_id=").append(testId).append(divider);
+            sbServerQuery.append("hall_row=").append(hall_row).append(divider);
+            sbServerQuery.append("hall_seat=").append(hall_seat).append(divider);
+            sbServerQuery.append("group=").append(group).append(divider);
+            sbServerQuery.append("timestamp=").append(timestamp).append(divider);
+            sbServerQuery.append("answer_history=").append(answerHistory.toString()).append(divider);
+            sbServerQuery.append("vector=").append(vector).append(divider);
+            sbServerQuery.append("version=").append(getResources().getString(R.string.version_value)).append(divider);
+            sbServerQuery.append("session_id=").append(sessionID).append(divider);
+            sbServerQuery.append("name=").append(name).append(divider);
+            sbServerQuery.append("surname=").append(surname).append(divider);
+            sbServerQuery.append("session_id2=").append(sessionSecurityID);
+
+            String sentUrl = sbServerQuery.toString();
+            sentUrl = sentUrl.replace(" ", "");
+
+            databaseCreateDataURL.close();
+
+            Log.d("specjalny URL", sentUrl);
 
             return sentUrl;
         }
@@ -1269,6 +1383,41 @@ public class TabsActivity extends AppCompatActivity {
                 fragment = passedFragment;
                 answerNo = passedAnswerNo;
             }
+        }
+
+        /**
+         * Uses AsyncTask to create a task away from the main UI threadTabs_killer. This task takes a
+         * URL string and uses it to create an HttpUrlConnection. Once the connection
+         * has been established, the AsyncTask downloads the contents of the webpage.
+         * Finally it sets up corresponding tab if server response code is 200.
+         */
+        private class DownloadWebpageHistoryTask extends AsyncTask<String, Void, String> {
+
+            @Override
+            protected String doInBackground(String... urls) {
+
+                try {
+                    return downloadUrl(urls[0]);
+                } catch (IOException e) {
+                    return "Unable to retrieve web page. URL may be invalid.";
+                }
+            }
+
+            /**
+             * Sets color of button according to successfully sent answer.
+             * Updates tab's info about current sent answer - look into
+             * sendToServer() to understand what is going on.
+             *
+             * @param result Response code got from server.
+             */
+            @Override
+            protected void onPostExecute(String result) {
+                Log.d(serverResponseCode.toString(), serverResponse);
+                if (!result.equals("200")) {
+                    Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getResources().getString(R.string.message_unable_to_send_answer), Toast.LENGTH_SHORT).show();
+                }
+            }
+
         }
     }
 

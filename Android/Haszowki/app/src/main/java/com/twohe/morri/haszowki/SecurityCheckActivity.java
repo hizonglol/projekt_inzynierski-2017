@@ -37,6 +37,9 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -641,6 +644,9 @@ public class SecurityCheckActivity extends AppCompatActivity
         @Override
         protected String doInBackground(String... urls) {
 
+            StringBuilder sbServerQuery = new StringBuilder();
+            String divider = "&";
+
             String stringDbServerUrl = databaseSecurityCheck.getSetting("setting_serverAddress");
             String stringServerUrl = getResources().getString(R.string.server_address);
             if (stringDbServerUrl.length() > 1) {
@@ -658,13 +664,46 @@ public class SecurityCheckActivity extends AppCompatActivity
 
             stringServerUrl = stringServerUrl.replace(" ", "");
 
-            stringServerUrl = stringServerUrl.concat("?")
-                    .concat("session_id2").concat("=")
-                    .concat(databaseSecurityCheck.getSetting("setting_sessionSecurityID"));
+            sbServerQuery.append(stringServerUrl).append("?");
 
-            Log.d("Adres z xml", stringServerUrl);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss_SSS", Locale.getDefault());
+            Date now = new Date();
+            String XMLtimestamp = formatter.format(now);
+            databaseSecurityCheck.createSetting("setting_XMLtimestamp", XMLtimestamp);
 
-            if (downloadedConfiguration(getApplicationContext(), stringServerUrl))
+            String studentNo = databaseSecurityCheck.getSetting("setting_studentNo");
+            String course = databaseSecurityCheck.getSetting("setting_course");
+            String testId = databaseSecurityCheck.getSetting("setting_test_id");
+            String hall_row = databaseSecurityCheck.getSetting("setting_hall_row");
+            String hall_seat = databaseSecurityCheck.getSetting("setting_hall_seat");
+            String name = databaseSecurityCheck.getSetting("setting_name");
+            String surname = databaseSecurityCheck.getSetting("setting_surname");
+            String vector = databaseSecurityCheck.getSetting("setting_vector");
+            String group = databaseSecurityCheck.getSetting("setting_group");
+            String question_no = "";
+            String answer = "";
+            String sessionID = "";
+
+            sbServerQuery.append("student_no=").append(studentNo).append(divider);
+            sbServerQuery.append("course=").append(course).append(divider);
+            sbServerQuery.append("test_id=").append(testId).append(divider);
+            sbServerQuery.append("hall_row=").append(hall_row).append(divider);
+            sbServerQuery.append("hall_seat=").append(hall_seat).append(divider);
+            sbServerQuery.append("group=").append(group).append(divider);
+            sbServerQuery.append("timestamp=").append(XMLtimestamp).append(divider);
+            sbServerQuery.append("question_no=").append(question_no).append(divider);
+            sbServerQuery.append("answer=").append(answer).append(divider);
+            sbServerQuery.append("vector=").append(vector).append(divider);
+            sbServerQuery.append("version=").append(getResources().getString(R.string.version_value)).append(divider);
+            sbServerQuery.append("session_id=").append(sessionID).append(divider);
+            sbServerQuery.append("name=").append(name).append(divider);
+            sbServerQuery.append("surname=").append(surname).append(divider);
+            sbServerQuery.append("session_id2=").append(sessionSecurityID);
+
+
+            Log.d("Adres z xml", sbServerQuery.toString().toLowerCase());
+
+            if (downloadedConfiguration(getApplicationContext(), sbServerQuery.toString().toLowerCase()))
                 return "success";
             else
                 return "failure";
