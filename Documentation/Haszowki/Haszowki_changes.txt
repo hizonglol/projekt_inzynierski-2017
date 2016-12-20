@@ -1,3 +1,9 @@
+## 0.9.6 - 2016-12-20
+### Changed
+~ sessionID generowany w Security Check Activity
+  (wczeœniej by³ generowany w Tabs Activity dlatego w Security Check Activity pozostawa³ pusty)
+~ zapytania HEAD w Tabs Activity oraz GET w Security Check Activity sprowadzane do lowercase
+
 ## 0.9.5 - 2016-12-20
 ### Added
 + po przejœciu do podsumowania do serwera wysy³ana jest historia aktualnego testu

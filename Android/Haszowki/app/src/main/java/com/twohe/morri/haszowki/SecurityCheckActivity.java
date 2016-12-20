@@ -652,8 +652,11 @@ public class SecurityCheckActivity extends AppCompatActivity
             if (stringDbServerUrl.length() > 1) {
                 stringServerUrl = stringDbServerUrl;
             }
+
             String sessionSecurityID = generateSessionID(8);
+            String sessionID = generateSessionID(6);
             databaseSecurityCheck.createSetting("setting_sessionSecurityID", sessionSecurityID);
+            databaseSecurityCheck.createSetting("setting_sessionID", sessionID);
 
             stringServerUrl = stringServerUrl
                     .concat(databaseSecurityCheck.getSetting("setting_course"))
@@ -682,7 +685,6 @@ public class SecurityCheckActivity extends AppCompatActivity
             String group = databaseSecurityCheck.getSetting("setting_group");
             String question_no = "";
             String answer = "";
-            String sessionID = "";
 
             sbServerQuery.append("student_no=").append(studentNo).append(divider);
             sbServerQuery.append("course=").append(course).append(divider);
@@ -699,9 +701,6 @@ public class SecurityCheckActivity extends AppCompatActivity
             sbServerQuery.append("name=").append(name).append(divider);
             sbServerQuery.append("surname=").append(surname).append(divider);
             sbServerQuery.append("session_id2=").append(sessionSecurityID);
-
-
-            Log.d("Adres z xml", sbServerQuery.toString().toLowerCase());
 
             if (downloadedConfiguration(getApplicationContext(), sbServerQuery.toString().toLowerCase()))
                 return "success";
