@@ -1015,13 +1015,13 @@ public class TabsActivity extends AppCompatActivity {
             sbServerQuery.append("hall_seat=").append(hall_seat).append(divider);
             sbServerQuery.append("group=").append(group).append(divider);
             sbServerQuery.append("timestamp=").append(timestamp).append(divider);
-            sbServerQuery.append("answer_history=").append(answerHistory.toString()).append(divider);
             sbServerQuery.append("vector=").append(vector).append(divider);
             sbServerQuery.append("version=").append(getResources().getString(R.string.version_value)).append(divider);
             sbServerQuery.append("session_id=").append(sessionID).append(divider);
             sbServerQuery.append("name=").append(name).append(divider);
             sbServerQuery.append("surname=").append(surname).append(divider);
-            sbServerQuery.append("session_id2=").append(sessionSecurityID);
+            sbServerQuery.append("session_id2=").append(sessionSecurityID).append(divider);
+            sbServerQuery.append("answer_history=").append(answerHistory.toString());
 
             String sentUrl = sbServerQuery.toString().toLowerCase();
             sentUrl = sentUrl.replace(" ", "");
