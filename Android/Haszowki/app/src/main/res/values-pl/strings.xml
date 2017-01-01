@@ -2,11 +2,11 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Haszówki</string>
-    <string name="version_value">0.9.7</string>
+    <string name="version_value">0.9.8</string>
     <string name="zero_value">0</string>
     <string name="six_zeros_value">000000</string>
     <string name="label_null">null</string>
-    <string name="server_address">http://sequoia.ict.pwr.wroc.pl/~witold/</string>
+    <string name="server_address">https://sequoia.ict.pwr.wroc.pl/~witold/</string>
 
 
     <!--*** LABEL strings of MAIN ***-->

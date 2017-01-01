@@ -1,3 +1,11 @@
+## 0.9.8 - 2017-01-01
+### Added
++ obs³uga HTTPS przy zapytaniach do serwera
+
+### Changed
+~ nazwa przedmiotu i numer grupy w pisowni oryginalnej (bez lowercase)
+~ w query string, w parametrze question_no podawany jest numer pytania, w którym u¿ytkownik przycisn¹³ przycisk "podsumuj test"
+
 ## 0.9.7 - 2016-12-21
 ### Changed
 ~ answer_history przeniesione na koniec query string

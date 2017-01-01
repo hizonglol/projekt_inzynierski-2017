@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.twohe.morri.tools.SettingsDataSource;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -43,12 +44,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
@@ -61,6 +68,9 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 
 /**
@@ -88,6 +98,7 @@ public class TabsActivity extends AppCompatActivity {
     private AlertDialog alertDialog;
     private File fileTabs_toWrite;
     List<Integer> answeredQuestions;
+    private static SSLContext SSLContext;
 
     /**
      * Creates layout.
@@ -98,9 +109,12 @@ public class TabsActivity extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("On create", "TabsActivity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabs);
+
+        Log.d("On create", "TabsActivity");
+
+        loadCertificate();
 
         answeredQuestions = new ArrayList<Integer>();
 
@@ -179,6 +193,62 @@ public class TabsActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPrefTabs.edit();
         editor.putBoolean("Rejecting enabled", false);
         editor.apply();
+    }
+
+    /**
+     * Method loading certificate.
+     *
+     * @return true if something went wrong, false if everything is okay
+     */
+    private boolean loadCertificate(){
+
+        try{
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+            InputStream caInput = new BufferedInputStream(getResources().openRawResource(R.raw.server));
+            Certificate ca;
+
+            ca = cf.generateCertificate(caInput);
+            System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+            caInput.close();
+
+            // Create a KeyStore containing our trusted CAs
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+
+            // Create a TrustManager that trusts the CAs in our KeyStore
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+
+            // Create an SSLContext that uses our TrustManager
+            SSLContext = SSLContext.getInstance("TLS");
+            SSLContext.init(null, tmf.getTrustManagers(), null);
+        }
+        catch (CertificateException e){
+            e.printStackTrace();
+            return true;
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            return true;
+        }
+        catch (NoSuchAlgorithmException e){
+            e.printStackTrace();
+            return true;
+        }
+        catch (KeyStoreException e){
+            e.printStackTrace();
+            return true;
+        }
+        catch (KeyManagementException e){
+            e.printStackTrace();
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -553,8 +623,9 @@ public class TabsActivity extends AppCompatActivity {
                         }
                     }
 
-                    saveToFile(timestamp, ((TabsActivity) getActivity()).answeredQuestions);
-                    sendToServer(timestamp, ((TabsActivity) getActivity()).answeredQuestions);
+                    int question_no = getArguments().getInt(ARG_SECTION_NUMBER);
+                    saveToFile(timestamp, ((TabsActivity) getActivity()).answeredQuestions, question_no);
+                    sendToServer(timestamp, ((TabsActivity) getActivity()).answeredQuestions, question_no);
 
                     ((TabsActivity) getActivity()).summariseTest();
                 }
@@ -742,9 +813,9 @@ public class TabsActivity extends AppCompatActivity {
          * @param answeredQuestions List of history of answered questions
          * @return false if everything went well, true if something bad happened
          */
-        private boolean saveToFile(String timestamp, List<Integer> answeredQuestions) {
+        private boolean saveToFile(String timestamp, List<Integer> answeredQuestions, int question_no) {
 
-            if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", timestamp, answeredQuestions))) {
+            if (((TabsActivity) getActivity()).appendToFileCiphered(createDataURL("to_file", timestamp, answeredQuestions, question_no))) {
                 return false;
             }
             return true;
@@ -796,11 +867,11 @@ public class TabsActivity extends AppCompatActivity {
          *
          * @param timestamp Current timestamp
          */
-        private void sendToServer(String timestamp, List<Integer> answeredQuestions) {
+        private void sendToServer(String timestamp, List<Integer> answeredQuestions, int question_no) {
 
             if (isOnline()) {
                 DownloadWebpageHistoryTask task = new DownloadWebpageHistoryTask();
-                task.execute(createDataURL("to_server", timestamp, answeredQuestions));
+                task.execute(createDataURL("to_server", timestamp, answeredQuestions, question_no));
             } else {
                 Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.message_no_internet_connection), Toast.LENGTH_SHORT).show();
             }
@@ -881,7 +952,7 @@ public class TabsActivity extends AppCompatActivity {
             sbServerQuery.append("surname=").append(surname).append(divider);
             sbServerQuery.append("session_id2=").append(sessionSecurityID);
 
-            String sentUrl = sbServerQuery.toString().toLowerCase();
+            String sentUrl = sbServerQuery.toString();
             sentUrl = sentUrl.replace(" ", "");
 
             databaseCreateDataURL.close();
@@ -951,7 +1022,7 @@ public class TabsActivity extends AppCompatActivity {
             sbServerQuery.append("surname=").append(surname).append(divider);
             sbServerQuery.append("session_id2=").append(sessionSecurityID);
 
-            String sentUrl = sbServerQuery.toString().toLowerCase();
+            String sentUrl = sbServerQuery.toString();
             sentUrl = sentUrl.replace(" ", "");
 
             databaseCreateDataURL.close();
@@ -967,7 +1038,7 @@ public class TabsActivity extends AppCompatActivity {
          * @param answeredQuestions List showing history of answered questions
          * @return Built URL with all significant data
          */
-        private String createDataURL(String mode, String timestamp, List<Integer> answeredQuestions) {
+        private String createDataURL(String mode, String timestamp, List<Integer> answeredQuestions, int question_no) {
 
             SettingsDataSource databaseCreateDataURL = new SettingsDataSource(getActivity());
             databaseCreateDataURL.open();
@@ -1015,6 +1086,8 @@ public class TabsActivity extends AppCompatActivity {
             sbServerQuery.append("hall_seat=").append(hall_seat).append(divider);
             sbServerQuery.append("group=").append(group).append(divider);
             sbServerQuery.append("timestamp=").append(timestamp).append(divider);
+            sbServerQuery.append("question_no=").append(question_no).append(divider);
+            sbServerQuery.append("answer=").append(divider);
             sbServerQuery.append("vector=").append(vector).append(divider);
             sbServerQuery.append("version=").append(getResources().getString(R.string.version_value)).append(divider);
             sbServerQuery.append("session_id=").append(sessionID).append(divider);
@@ -1023,7 +1096,7 @@ public class TabsActivity extends AppCompatActivity {
             sbServerQuery.append("session_id2=").append(sessionSecurityID).append(divider);
             sbServerQuery.append("answer_history=").append(answerHistory.toString());
 
-            String sentUrl = sbServerQuery.toString().toLowerCase();
+            String sentUrl = sbServerQuery.toString();
             sentUrl = sentUrl.replace(" ", "");
 
             databaseCreateDataURL.close();
@@ -1204,7 +1277,8 @@ public class TabsActivity extends AppCompatActivity {
 
             try {
                 URL url = new URL(myurl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                conn.setSSLSocketFactory(SSLContext.getSocketFactory());
                 conn.setReadTimeout(10000 /* milliseconds */);
                 conn.setConnectTimeout(15000 /* milliseconds */);
                 conn.setRequestMethod("HEAD");

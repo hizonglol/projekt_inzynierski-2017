@@ -25,16 +25,23 @@ import com.twohe.morri.tools.SettingsDataSource;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
@@ -45,6 +52,9 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 /**
  * Created by morri.
@@ -89,6 +99,7 @@ public class SecurityCheckActivity extends AppCompatActivity
     /* Client used to interact with Google APIs. */
     private GoogleApiClient mGoogleApiClient;
     private SharedPreferences sharedPrefSecurity;
+    private static SSLContext SSLContext;
 
     /**
      * Checks if server with given serverAddress is reachable
@@ -107,7 +118,8 @@ public class SecurityCheckActivity extends AppCompatActivity
             // Some sort of connection is open, check if server is reachable
             try {
                 URL url = new URL(serverAddress);
-                HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection urlc = (HttpsURLConnection) url.openConnection();
+                urlc.setSSLSocketFactory(SSLContext.getSocketFactory());
                 urlc.setRequestProperty("User-Agent", "Android Application");
                 urlc.setRequestProperty("Connection", "close");
                 urlc.setConnectTimeout(5 * 1000); //5 sek
@@ -138,7 +150,8 @@ public class SecurityCheckActivity extends AppCompatActivity
             // Some sort of connection is open, check if server is reachable
             try {
                 URL url = new URL(serverDocumentAddress);
-                URLConnection conn = url.openConnection();
+                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                conn.setSSLSocketFactory(SSLContext.getSocketFactory());
 
                 XmlPullParserFactory xmlFactoryObject = XmlPullParserFactory.newInstance();
                 XmlPullParser configurationParser = xmlFactoryObject.newPullParser();
@@ -181,6 +194,8 @@ public class SecurityCheckActivity extends AppCompatActivity
         setContentView(R.layout.activity_security_check);
 
         Log.d("On create", "SecurityCheckActivity");
+
+        loadCertificate();
 
         sharedPrefSecurity = PreferenceManager.getDefaultSharedPreferences(this);
         databaseSecurityCheck = new SettingsDataSource(this);
@@ -237,6 +252,62 @@ public class SecurityCheckActivity extends AppCompatActivity
             }
         });
 
+    }
+
+    /**
+     * Method loading certificate.
+     *
+     * @return true if something went wrong, false if everything is okay
+     */
+    private boolean loadCertificate(){
+
+        try{
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+            InputStream caInput = new BufferedInputStream(getResources().openRawResource(R.raw.server));
+            Certificate ca;
+
+            ca = cf.generateCertificate(caInput);
+            //System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+            caInput.close();
+
+            // Create a KeyStore containing our trusted CAs
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+
+            // Create a TrustManager that trusts the CAs in our KeyStore
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+
+            // Create an SSLContext that uses our TrustManager
+            SSLContext = SSLContext.getInstance("TLS");
+            SSLContext.init(null, tmf.getTrustManagers(), null);
+        }
+        catch (CertificateException e){
+            e.printStackTrace();
+            return true;
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            return true;
+        }
+        catch (NoSuchAlgorithmException e){
+            e.printStackTrace();
+            return true;
+        }
+        catch (KeyStoreException e){
+            e.printStackTrace();
+            return true;
+        }
+        catch (KeyManagementException e){
+            e.printStackTrace();
+            return true;
+        }
+
+        return false;
     }
 
     /**
