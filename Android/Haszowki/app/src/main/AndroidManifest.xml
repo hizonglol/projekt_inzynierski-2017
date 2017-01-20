@@ -9,19 +9,22 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/label_app"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/HaszowkiThemeDark">
+        <meta-data android:name="com.google.android.safetynet.ATTEST_API_KEY"
+            android:value="AIzaSyBtszAKi5zzBZNChvREDwFpl9g4a2LOriA"/>
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/label_app"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/HaszowkiThemeDark"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,27 +36,27 @@
             android:name=".SecurityCheckActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/HaszowkiThemeDark" />
         <activity
             android:name=".TabsActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/HaszowkiThemeDark" />
         <activity
             android:name=".SettingsActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/HaszowkiThemeDark" />
         <activity
             android:name=".InfoActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/HaszowkiThemeDark" />
         <activity
             android:name=".SummaryActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/HaszowkiThemeDark" />
 
         <receiver
             android:name="com.twohe.morri.tools.IncomingCallReceiver"

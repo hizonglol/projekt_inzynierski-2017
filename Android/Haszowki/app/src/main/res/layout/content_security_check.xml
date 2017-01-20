@@ -45,49 +45,6 @@
                 android:paddingEnd="@dimen/activity_vertical_margin"
                 android:paddingRight="@dimen/activity_vertical_margin"
                 android:text="@string/label_quality_check"
-                android:textColor="#000000"
-                android:textSize="25sp" /> <!-- maximum size -->
-
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="10sp"
-            android:layout_marginTop="10sp"
-            android:background="@android:color/darker_gray" />
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <com.dd.CircularProgressButton
-                android:id="@+id/progressButtonSecurityCheck_appConfiguration"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:textColor="@color/cpb_white"
-                android:textSize="18sp"
-                app:cpb_iconComplete="@drawable/ic_action_accept"
-                app:cpb_iconError="@drawable/ic_action_cancel" />
-
-            <com.twohe.morri.tools.AutoResizeTextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@id/progressButtonSecurityCheck_appConfiguration"
-                android:layout_toStartOf="@id/progressButtonSecurityCheck_appConfiguration"
-                android:gravity="center|start"
-                android:maxLines="1"
-                android:paddingEnd="@dimen/activity_vertical_margin"
-                android:paddingRight="@dimen/activity_vertical_margin"
-                android:text="@string/label_initialization"
-                android:textColor="#000000"
                 android:textSize="25sp" /> <!-- maximum size -->
 
         </RelativeLayout>
@@ -129,11 +86,50 @@
                 android:paddingEnd="@dimen/activity_vertical_margin"
                 android:paddingRight="@dimen/activity_vertical_margin"
                 android:text="@string/label_validation"
-                android:textColor="#000000"
                 android:textSize="25sp" /> <!-- maximum size -->
 
         </RelativeLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="10sp"
+            android:layout_marginTop="10sp"
+            android:background="@android:color/darker_gray" />
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.dd.CircularProgressButton
+                android:id="@+id/progressButtonSecurityCheck_appConfiguration"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/cpb_white"
+                android:textSize="18sp"
+                app:cpb_iconComplete="@drawable/ic_action_accept"
+                app:cpb_iconError="@drawable/ic_action_cancel" />
+
+            <com.twohe.morri.tools.AutoResizeTextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/progressButtonSecurityCheck_appConfiguration"
+                android:layout_toStartOf="@id/progressButtonSecurityCheck_appConfiguration"
+                android:gravity="center|start"
+                android:maxLines="1"
+                android:paddingEnd="@dimen/activity_vertical_margin"
+                android:paddingRight="@dimen/activity_vertical_margin"
+                android:text="@string/label_initialization"
+                android:textSize="25sp" /> <!-- maximum size -->
+
+        </RelativeLayout>
 
         <TableRow
             android:layout_width="fill_parent"

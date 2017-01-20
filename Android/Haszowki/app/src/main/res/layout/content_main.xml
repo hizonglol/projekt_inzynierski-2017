@@ -78,7 +78,6 @@
                 android:maxLines="1"
                 android:minHeight="50dp"
                 android:text="@string/zero_value"
-                android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
             <EditText
@@ -238,7 +237,6 @@
                 android:minHeight="50dp"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
 
@@ -250,7 +248,6 @@
                 android:gravity="center"
                 android:maxLines="1"
                 android:minHeight="50dp"
-                android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
 
@@ -316,7 +313,6 @@
                 android:gravity="center"
                 android:maxLines="1"
                 android:minHeight="50sp"
-                android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
 
@@ -333,7 +329,6 @@
                 android:minHeight="50sp"
                 android:selectAllOnFocus="true"
                 android:singleLine="true"
-                android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="30sp" />
 
 

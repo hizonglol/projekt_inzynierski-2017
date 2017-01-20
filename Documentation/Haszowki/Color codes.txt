@@ -1,0 +1,28 @@
+Czcionka: Serif / Angkor
+
+czerwony
+rgb: 154 52 45
+HEX: #9A342D
+
+czerwony dark
+HEX: #6C1511
+
+pastelowy
+rgb: 241 209 162
+HEX: #F1D1A2
+
+pastelowy dark
+HEX: #E7B575
+
+z³oty
+rgb: 134 109 7
+HEX: #866D4B
+
+Link do generatora palet kolorów:
+http://mcg.mbitson.com/#!/
+
+Link do generatora ikon:
+https://romannurik.github.io/AndroidAssetStudio/icons-launcher.html
+
+Link do generatora banerów:
+https://www.norio.be/android-feature-graphic-generator/

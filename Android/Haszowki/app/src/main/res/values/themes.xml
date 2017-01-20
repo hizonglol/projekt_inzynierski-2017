@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="HaszowkiThemeDark" parent="HaszowkiThemeDark.Base"/>
+
+    <style name="HaszowkiThemeDark.Base" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorPrimary</item>
+        <item name="android:textColorTertiary">@color/textColorPrimary</item>
+        <item name="android:textColorPrimaryInverse">@color/textColorPrimary</item>
+        <item name="android:textColorSecondaryInverse">@color/textColorPrimary</item>
+        <item name="android:textColorTertiaryInverse">@color/textColorPrimary</item>
+        //<item name="android:background">#000000</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
+</resources>

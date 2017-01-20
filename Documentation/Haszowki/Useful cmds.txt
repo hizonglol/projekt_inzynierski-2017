@@ -1,0 +1,2 @@
+### To get info about signing keys
+keytool -list -v -keystore morri.jks -alias morrisor -storepass Ohdude50$ -keypass Ohdude50$

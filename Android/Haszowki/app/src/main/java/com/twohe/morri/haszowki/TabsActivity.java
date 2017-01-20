@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -205,18 +206,25 @@ public class TabsActivity extends AppCompatActivity {
         try{
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
 
-            InputStream caInput = new BufferedInputStream(getResources().openRawResource(R.raw.server));
-            Certificate ca;
+            InputStream witoldInput = new BufferedInputStream(getResources().openRawResource(R.raw.witold));
+            Certificate witold;
 
-            ca = cf.generateCertificate(caInput);
-            System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
-            caInput.close();
+            InputStream morriInput = new BufferedInputStream(getResources().openRawResource(R.raw.morri));
+            Certificate morri;
+
+            witold = cf.generateCertificate(witoldInput);
+            //System.out.println("witold=" + ((X509Certificate) witold).getSubjectDN());
+            witoldInput.close();
+
+            morri = cf.generateCertificate(morriInput);
+            morriInput.close();
 
             // Create a KeyStore containing our trusted CAs
             String keyStoreType = KeyStore.getDefaultType();
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             keyStore.load(null, null);
-            keyStore.setCertificateEntry("ca", ca);
+            keyStore.setCertificateEntry("witold", witold);
+            keyStore.setCertificateEntry("morri", morri);
 
             // Create a TrustManager that trusts the CAs in our KeyStore
             String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
@@ -557,7 +565,6 @@ public class TabsActivity extends AppCompatActivity {
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static final String ARG_SECTION_ANSWER_FILE = "section_answer_file";
         private static final String ARG_SECTION_ANSWER_SERVER = "section_answer_server";
-        private static final String DEBUG_TAG = "HttpExample";
         private String serverResponse = "";
         private Integer serverResponseCode = 404;
         //used to check whether any answer has been choosen or not
@@ -890,6 +897,26 @@ public class TabsActivity extends AppCompatActivity {
             return formatter.format(timestamp);
         }
 
+        private StringBuilder setUpServerAddress(String mode, SettingsDataSource databaseCreateDataURL, StringBuilder sbServerQuery){
+            if (mode.equals("to_server")) {
+                String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
+                String stringServerUrl = getResources().getString(R.string.server_address);
+                if (stringDbServerUrl.length() > 1) {
+                    stringServerUrl = stringDbServerUrl;
+                }
+                stringServerUrl = stringServerUrl
+                        .concat("fcgi-bin")
+                        .concat("/")
+                        .concat("hasz_serwer")
+                        .concat("/")
+                        .concat("store_answers.fcgi").toLowerCase();
+                stringServerUrl = stringServerUrl.replace(" ", "");
+                sbServerQuery.append(stringServerUrl).append("?");
+            }
+
+            return sbServerQuery;
+        }
+
         /**
          * Creates URL for corresponding tab and answer. Gives it in format for server
          * or for file.
@@ -907,20 +934,7 @@ public class TabsActivity extends AppCompatActivity {
             StringBuilder sbServerQuery = new StringBuilder();
             String divider = "&";
 
-            if (mode.equals("to_server")) {
-                String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
-                String stringServerUrl = getResources().getString(R.string.server_address);
-                if (stringDbServerUrl.length() > 1) {
-                    stringServerUrl = stringDbServerUrl;
-                }
-                stringServerUrl = stringServerUrl
-                        .concat(databaseCreateDataURL.getSetting("setting_course"))
-                        .concat("/")
-                        .concat(databaseCreateDataURL.getSetting("setting_test_id"))
-                        .concat(".xml").toLowerCase();
-                stringServerUrl = stringServerUrl.replace(" ", "");
-                sbServerQuery.append(stringServerUrl).append("?");
-            }
+            sbServerQuery = setUpServerAddress(mode, databaseCreateDataURL, sbServerQuery);
 
             String studentNo = databaseCreateDataURL.getSetting("setting_studentNo");
             String course = databaseCreateDataURL.getSetting("setting_course");
@@ -978,20 +992,7 @@ public class TabsActivity extends AppCompatActivity {
             StringBuilder sbServerQuery = new StringBuilder();
             String divider = "&";
 
-            if (mode.equals("to_server")) {
-                String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
-                String stringServerUrl = getResources().getString(R.string.server_address);
-                if (stringDbServerUrl.length() > 1) {
-                    stringServerUrl = stringDbServerUrl;
-                }
-                stringServerUrl = stringServerUrl
-                        .concat(databaseCreateDataURL.getSetting("setting_course"))
-                        .concat("/")
-                        .concat(databaseCreateDataURL.getSetting("setting_test_id"))
-                        .concat(".xml").toLowerCase();
-                stringServerUrl = stringServerUrl.replace(" ", "");
-                sbServerQuery.append(stringServerUrl).append("?");
-            }
+            sbServerQuery = setUpServerAddress(mode, databaseCreateDataURL, sbServerQuery);
 
             String studentNo = databaseCreateDataURL.getSetting("setting_studentNo");
             String course = databaseCreateDataURL.getSetting("setting_course");
@@ -1046,20 +1047,7 @@ public class TabsActivity extends AppCompatActivity {
             StringBuilder sbServerQuery = new StringBuilder();
             String divider = "&";
 
-            if (mode.equals("to_server")) {
-                String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
-                String stringServerUrl = getResources().getString(R.string.server_address);
-                if (stringDbServerUrl.length() > 1) {
-                    stringServerUrl = stringDbServerUrl;
-                }
-                stringServerUrl = stringServerUrl
-                        .concat(databaseCreateDataURL.getSetting("setting_course"))
-                        .concat("/")
-                        .concat(databaseCreateDataURL.getSetting("setting_test_id"))
-                        .concat(".xml").toLowerCase();
-                stringServerUrl = stringServerUrl.replace(" ", "");
-                sbServerQuery.append(stringServerUrl).append("?");
-            }
+            sbServerQuery = setUpServerAddress(mode, databaseCreateDataURL, sbServerQuery);
 
             StringBuilder answerHistory = new StringBuilder();
 
