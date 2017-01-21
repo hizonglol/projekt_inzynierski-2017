@@ -16,7 +16,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/label_app"
         android:supportsRtl="true"
-        android:theme="@style/HaszowkiThemeDark">
+        android:theme="@style/HaszowkiTheme">
         <meta-data android:name="com.google.android.safetynet.ATTEST_API_KEY"
             android:value="AIzaSyBtszAKi5zzBZNChvREDwFpl9g4a2LOriA"/>
         <activity
@@ -24,7 +24,7 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/label_app"
             android:launchMode="singleTask"
-            android:theme="@style/HaszowkiThemeDark"
+            android:theme="@style/HaszowkiTheme"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,27 +36,27 @@
             android:name=".SecurityCheckActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/HaszowkiThemeDark" />
+            android:theme="@style/HaszowkiTheme" />
         <activity
             android:name=".TabsActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/HaszowkiThemeDark" />
+            android:theme="@style/HaszowkiTheme" />
         <activity
             android:name=".SettingsActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/HaszowkiThemeDark" />
+            android:theme="@style/HaszowkiTheme" />
         <activity
             android:name=".InfoActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/HaszowkiThemeDark" />
+            android:theme="@style/HaszowkiTheme" />
         <activity
             android:name=".SummaryActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/HaszowkiThemeDark" />
+            android:theme="@style/HaszowkiTheme" />
 
         <receiver
             android:name="com.twohe.morri.tools.IncomingCallReceiver"

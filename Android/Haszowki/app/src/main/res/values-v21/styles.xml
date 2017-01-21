@@ -5,12 +5,12 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="ButtonDark" parent="Widget.AppCompat.Button.Colored">
-        <item name="colorButtonNormal">@color/darkColorButtonNormal</item>
+        <item name="android:colorButtonNormal">@color/darkColorButtonNormal</item>
         <item name="android:textColorPrimary">@color/darkTextColorPrimary</item>
     </style>
 
     <style name="ButtonLight" parent="Widget.AppCompat.Button.Colored">
-        <item name="colorButtonNormal">@color/lightColorButtonNormal</item>
+        <item name="android:colorButtonNormal">@color/lightColorButtonNormal</item>
         <item name="android:textColorPrimary">@color/lightTextColorPrimary</item>
     </style>
 

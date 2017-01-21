@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,13 +19,17 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
@@ -1090,6 +1096,26 @@ public class TabsActivity extends AppCompatActivity {
             databaseCreateDataURL.close();
 
             return sentUrl;
+        }
+
+        private void setColorButton(Button button, Context mContext, Integer color){
+            ColorStateList c = ContextCompat.getColorStateList(mContext, color);
+            Drawable d = button.getBackground();
+            if (button instanceof AppCompatButton) {
+                // appcompat button replaces tint of its drawable background
+                ((AppCompatButton)button).setSupportBackgroundTintList(c);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // Lollipop button replaces tint of its drawable background
+                // however it is not equal to d.setTintList(c)
+                button.setBackgroundTintList(c);
+            } else {
+                // this should only happen if
+                // * manually creating a Button instead of AppCompatButton
+                // * LayoutInflater did not translate a Button to AppCompatButton
+                d = DrawableCompat.wrap(d);
+                DrawableCompat.setTintList(d, c);
+                button.setBackgroundDrawable(d);
+            }
         }
 
         /**

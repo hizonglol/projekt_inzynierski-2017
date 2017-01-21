@@ -1,18 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="HaszowkiTheme" parent="HaszowkiTheme.Base">
+    </style>
+
+    <style name="HaszowkiTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/darkColorPrimary</item>
+        <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/lightTextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/lightTextColorPrimary</item>
+        <item name="android:textColorTertiary">@color/lightTextColorPrimary</item>
+        <item name="android:textColorPrimaryInverse">@color/lightTextColorPrimary</item>
+        <item name="android:textColorSecondaryInverse">@color/lightTextColorPrimary</item>
+        <item name="android:textColorTertiaryInverse">@color/lightTextColorPrimary</item>
+        <item name="colorAccent">@color/darkColorAccent</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
     <style name="HaszowkiThemeDark" parent="HaszowkiThemeDark.Base"/>
 
     <style name="HaszowkiThemeDark.Base" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="android:textColorSecondary">@color/textColorPrimary</item>
-        <item name="android:textColorTertiary">@color/textColorPrimary</item>
-        <item name="android:textColorPrimaryInverse">@color/textColorPrimary</item>
-        <item name="android:textColorSecondaryInverse">@color/textColorPrimary</item>
-        <item name="android:textColorTertiaryInverse">@color/textColorPrimary</item>
-        //<item name="android:background">#000000</item>
+        <item name="colorPrimary">@color/darkColorPrimary</item>
+        <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/darkTextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/darkTextColorPrimary</item>
+        <item name="android:textColorTertiary">@color/darkTextColorPrimary</item>
+        <item name="android:textColorPrimaryInverse">@color/darkTextColorPrimary</item>
+        <item name="android:textColorSecondaryInverse">@color/darkTextColorPrimary</item>
+        <item name="android:textColorTertiaryInverse">@color/darkTextColorPrimary</item>
+        <item name="android:windowBackground">@color/darkBackground</item>
+        <item name="android:colorBackground">@color/darkBackground</item>
+        <item name="colorAccent">@color/darkColorAccent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
+
+    <style name="HaszowkiThemeLight" parent="HaszowkiThemeLight.Base">
+    </style>
+
+    <style name="HaszowkiThemeLight.Base" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/lightColorPrimary</item>
+        <item name="colorPrimaryDark">@color/lightColorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/lightTextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/lightTextColorPrimary</item>
+        <item name="android:textColorTertiary">@color/lightTextColorPrimary</item>
+        <item name="android:textColorPrimaryInverse">@color/lightTextColorPrimary</item>
+        <item name="android:textColorSecondaryInverse">@color/lightTextColorPrimary</item>
+        <item name="android:textColorTertiaryInverse">@color/lightTextColorPrimary</item>
+        <item name="android:windowBackground">@color/lightBackground</item>
+        <item name="android:colorBackground">@color/lightBackground</item>
+        <item name="colorAccent">@color/lightColorAccent</item>
+        <item name="android:buttonStyle">@style/ButtonLight</item>
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
     </style>
