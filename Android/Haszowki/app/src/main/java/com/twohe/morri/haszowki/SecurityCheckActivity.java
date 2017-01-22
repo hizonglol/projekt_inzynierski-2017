@@ -796,10 +796,6 @@ public class SecurityCheckActivity extends AppCompatActivity
             sbServerQuery.append("session_id2=").append(sessionSecurityID).append(divider);
             sbServerQuery.append("nonce=").append(stringNonce);
 
-            StringBuilder sbPostData = new StringBuilder();
-            sbPostData.append("{ \"signedAttestation\": \"");
-            sbPostData.append(mResult).append("\" }");
-
             if (responseUploaded(getApplicationContext(), sbServerQuery.toString(), mResult))
                 return "success";
             else

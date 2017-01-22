@@ -18,6 +18,9 @@ z³oty
 rgb: 134 109 7
 HEX: #866D4B
 
+Palety material design:
+https://material.io/guidelines/style/color.html#color-color-palette
+
 Link do generatora palet kolorów:
 http://mcg.mbitson.com/#!/
 
