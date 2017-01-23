@@ -36,7 +36,7 @@
     <string name="label_weight">Weights vector:</string>
     <string name="label_yes_answers">YES:</string>
     <string name="six_zeros_value">000000</string>
-    <string name="version_value">1.0.5</string>
+    <string name="version_value">0.9.9</string>
     <string name="zero_value">0</string>
     <string name="message_your_test_file_was_created">Your test file has been created</string>
     <string name="message_you_quit_test">You have left application</string>

@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -19,17 +17,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorInt;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
@@ -50,7 +44,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -212,25 +205,18 @@ public class TabsActivity extends AppCompatActivity {
         try{
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
 
-            InputStream witoldInput = new BufferedInputStream(getResources().openRawResource(R.raw.witold));
-            Certificate witold;
+            InputStream caInput = new BufferedInputStream(getResources().openRawResource(R.raw.server));
+            Certificate ca;
 
-            InputStream morriInput = new BufferedInputStream(getResources().openRawResource(R.raw.morri));
-            Certificate morri;
-
-            witold = cf.generateCertificate(witoldInput);
-            //System.out.println("witold=" + ((X509Certificate) witold).getSubjectDN());
-            witoldInput.close();
-
-            morri = cf.generateCertificate(morriInput);
-            morriInput.close();
+            ca = cf.generateCertificate(caInput);
+            System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+            caInput.close();
 
             // Create a KeyStore containing our trusted CAs
             String keyStoreType = KeyStore.getDefaultType();
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             keyStore.load(null, null);
-            keyStore.setCertificateEntry("witold", witold);
-            keyStore.setCertificateEntry("morri", morri);
+            keyStore.setCertificateEntry("ca", ca);
 
             // Create a TrustManager that trusts the CAs in our KeyStore
             String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
@@ -571,6 +557,7 @@ public class TabsActivity extends AppCompatActivity {
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static final String ARG_SECTION_ANSWER_FILE = "section_answer_file";
         private static final String ARG_SECTION_ANSWER_SERVER = "section_answer_server";
+        private static final String DEBUG_TAG = "HttpExample";
         private String serverResponse = "";
         private Integer serverResponseCode = 404;
         //used to check whether any answer has been choosen or not
@@ -903,26 +890,6 @@ public class TabsActivity extends AppCompatActivity {
             return formatter.format(timestamp);
         }
 
-        private StringBuilder setUpServerAddress(String mode, SettingsDataSource databaseCreateDataURL, StringBuilder sbServerQuery){
-            if (mode.equals("to_server")) {
-                String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
-                String stringServerUrl = getResources().getString(R.string.server_address);
-                if (stringDbServerUrl.length() > 1) {
-                    stringServerUrl = stringDbServerUrl;
-                }
-                stringServerUrl = stringServerUrl
-                        .concat("fcgi-bin")
-                        .concat("/")
-                        .concat("hasz_serwer")
-                        .concat("/")
-                        .concat("store_answers.fcgi").toLowerCase();
-                stringServerUrl = stringServerUrl.replace(" ", "");
-                sbServerQuery.append(stringServerUrl).append("?");
-            }
-
-            return sbServerQuery;
-        }
-
         /**
          * Creates URL for corresponding tab and answer. Gives it in format for server
          * or for file.
@@ -940,7 +907,20 @@ public class TabsActivity extends AppCompatActivity {
             StringBuilder sbServerQuery = new StringBuilder();
             String divider = "&";
 
-            sbServerQuery = setUpServerAddress(mode, databaseCreateDataURL, sbServerQuery);
+            if (mode.equals("to_server")) {
+                String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
+                String stringServerUrl = getResources().getString(R.string.server_address);
+                if (stringDbServerUrl.length() > 1) {
+                    stringServerUrl = stringDbServerUrl;
+                }
+                stringServerUrl = stringServerUrl
+                        .concat(databaseCreateDataURL.getSetting("setting_course"))
+                        .concat("/")
+                        .concat(databaseCreateDataURL.getSetting("setting_test_id"))
+                        .concat(".xml").toLowerCase();
+                stringServerUrl = stringServerUrl.replace(" ", "");
+                sbServerQuery.append(stringServerUrl).append("?");
+            }
 
             String studentNo = databaseCreateDataURL.getSetting("setting_studentNo");
             String course = databaseCreateDataURL.getSetting("setting_course");
@@ -998,7 +978,20 @@ public class TabsActivity extends AppCompatActivity {
             StringBuilder sbServerQuery = new StringBuilder();
             String divider = "&";
 
-            sbServerQuery = setUpServerAddress(mode, databaseCreateDataURL, sbServerQuery);
+            if (mode.equals("to_server")) {
+                String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
+                String stringServerUrl = getResources().getString(R.string.server_address);
+                if (stringDbServerUrl.length() > 1) {
+                    stringServerUrl = stringDbServerUrl;
+                }
+                stringServerUrl = stringServerUrl
+                        .concat(databaseCreateDataURL.getSetting("setting_course"))
+                        .concat("/")
+                        .concat(databaseCreateDataURL.getSetting("setting_test_id"))
+                        .concat(".xml").toLowerCase();
+                stringServerUrl = stringServerUrl.replace(" ", "");
+                sbServerQuery.append(stringServerUrl).append("?");
+            }
 
             String studentNo = databaseCreateDataURL.getSetting("setting_studentNo");
             String course = databaseCreateDataURL.getSetting("setting_course");
@@ -1053,7 +1046,20 @@ public class TabsActivity extends AppCompatActivity {
             StringBuilder sbServerQuery = new StringBuilder();
             String divider = "&";
 
-            sbServerQuery = setUpServerAddress(mode, databaseCreateDataURL, sbServerQuery);
+            if (mode.equals("to_server")) {
+                String stringDbServerUrl = databaseCreateDataURL.getSetting("setting_serverAddress");
+                String stringServerUrl = getResources().getString(R.string.server_address);
+                if (stringDbServerUrl.length() > 1) {
+                    stringServerUrl = stringDbServerUrl;
+                }
+                stringServerUrl = stringServerUrl
+                        .concat(databaseCreateDataURL.getSetting("setting_course"))
+                        .concat("/")
+                        .concat(databaseCreateDataURL.getSetting("setting_test_id"))
+                        .concat(".xml").toLowerCase();
+                stringServerUrl = stringServerUrl.replace(" ", "");
+                sbServerQuery.append(stringServerUrl).append("?");
+            }
 
             StringBuilder answerHistory = new StringBuilder();
 
@@ -1098,26 +1104,6 @@ public class TabsActivity extends AppCompatActivity {
             return sentUrl;
         }
 
-        private void setColorButton(Button button, Context mContext, Integer color){
-            ColorStateList c = ContextCompat.getColorStateList(mContext, color);
-            Drawable d = button.getBackground();
-            if (button instanceof AppCompatButton) {
-                // appcompat button replaces tint of its drawable background
-                ((AppCompatButton)button).setSupportBackgroundTintList(c);
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                // Lollipop button replaces tint of its drawable background
-                // however it is not equal to d.setTintList(c)
-                button.setBackgroundTintList(c);
-            } else {
-                // this should only happen if
-                // * manually creating a Button instead of AppCompatButton
-                // * LayoutInflater did not translate a Button to AppCompatButton
-                d = DrawableCompat.wrap(d);
-                DrawableCompat.setTintList(d, c);
-                button.setBackgroundDrawable(d);
-            }
-        }
-
         /**
          * Sets choosen button's background from corresponding view to gray
          * and makes letters on gray button white.
@@ -1139,68 +1125,36 @@ public class TabsActivity extends AppCompatActivity {
             else if (last_answer == 3) ((TabsActivity) getActivity()).tabs_fileDunnoAnswers--;
 
             if (arg == 1) {
-                /*
                 buttonYes.setBackgroundColor(Color.DKGRAY);
                 buttonYes.setTextColor(Color.WHITE);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setTextColor(Color.BLACK);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setTextColor(Color.BLACK);
-                */
-                setColorButton(buttonYes, rootView.getContext(),R.color.colorButtonNormalGray);
-                buttonYes.setTextColor(Color.WHITE);
-                setColorButton(buttonNo, getContext(),R.color.colorButtonNormal);
-                buttonNo.setTextColor(Color.BLACK);
-                setColorButton(buttonDunno, getContext(),R.color.colorButtonNormal);
-                buttonDunno.setTextColor(Color.BLACK);
                 getArguments().putInt(ARG_SECTION_ANSWER_FILE, 1);
                 ((TabsActivity) getActivity()).tabs_fileYesAnswers++;
             } else if (arg == 2) {
-                /*
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonYes.setTextColor(Color.BLACK);
                 buttonNo.setBackgroundColor(Color.DKGRAY);
                 buttonNo.setTextColor(Color.WHITE);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setTextColor(Color.BLACK);
-                */
-                setColorButton(buttonYes, getContext(),R.color.colorButtonNormal);
-                buttonYes.setTextColor(Color.BLACK);
-                setColorButton(buttonNo, getContext(),R.color.colorButtonNormalGray);
-                buttonNo.setTextColor(Color.WHITE);
-                setColorButton(buttonDunno, getContext(),R.color.colorButtonNormal);
-                buttonDunno.setTextColor(Color.BLACK);
                 getArguments().putInt(ARG_SECTION_ANSWER_FILE, 2);
                 ((TabsActivity) getActivity()).tabs_fileNoAnswers++;
             } else if (arg == 3) {
-                /*
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonYes.setTextColor(Color.BLACK);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setTextColor(Color.BLACK);
                 buttonDunno.setBackgroundColor(Color.DKGRAY);
                 buttonDunno.setTextColor(Color.WHITE);
-                */
-                setColorButton(buttonYes, getContext(),R.color.colorButtonNormal);
-                buttonYes.setTextColor(Color.BLACK);
-                setColorButton(buttonNo, getContext(),R.color.colorButtonNormal);
-                buttonNo.setTextColor(Color.BLACK);
-                setColorButton(buttonDunno, getContext(),R.color.colorButtonNormalGray);
-                buttonDunno.setTextColor(Color.WHITE);
                 getArguments().putInt(ARG_SECTION_ANSWER_FILE, 3);
                 ((TabsActivity) getActivity()).tabs_fileDunnoAnswers++;
             } else if (arg == 0) {
-                /*
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                */
-                setColorButton(buttonYes, getContext(),R.color.colorButtonNormal);
-                buttonYes.setTextColor(Color.BLACK);
-                setColorButton(buttonNo, getContext(),R.color.colorButtonNormal);
-                buttonNo.setTextColor(Color.BLACK);
-                setColorButton(buttonDunno, getContext(),R.color.colorButtonNormal);
-                buttonDunno.setTextColor(Color.BLACK);
                 getArguments().putInt(ARG_SECTION_ANSWER_FILE, 0);
             }
         }
@@ -1252,44 +1206,30 @@ public class TabsActivity extends AppCompatActivity {
             else if (last_answer == 3) ((TabsActivity) getActivity()).tabs_serverDunnoAnswers--;
 
             if (arg == 1) {
-                /*
                 buttonYes.setBackgroundColor(Color.parseColor("#819FF7"));
                 buttonYes.setTextColor(Color.BLACK);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                */
-                setColorButton(buttonYes, rootView.getContext(),R.color.colorButtonNormalBlue);
-                buttonYes.setTextColor(Color.WHITE);
                 getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 1);
                 ((TabsActivity) getActivity()).tabs_serverYesAnswers++;
             } else if (arg == 2) {
-                /*
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundColor(Color.parseColor("#819FF7"));
                 buttonNo.setTextColor(Color.BLACK);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                */
-                setColorButton(buttonNo, rootView.getContext(),R.color.colorButtonNormalBlue);
-                buttonNo.setTextColor(Color.WHITE);
                 getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 2);
                 ((TabsActivity) getActivity()).tabs_serverNoAnswers++;
             } else if (arg == 3) {
-                /*
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundColor(Color.parseColor("#819FF7"));
                 buttonDunno.setTextColor(Color.BLACK);
-                */
-                setColorButton(buttonDunno, rootView.getContext(),R.color.colorButtonNormalBlue);
-                buttonDunno.setTextColor(Color.WHITE);
                 getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 3);
                 ((TabsActivity) getActivity()).tabs_serverDunnoAnswers++;
             } else if (arg == 0) {
-                /*
                 buttonYes.setBackgroundResource(android.R.drawable.btn_default);
                 buttonNo.setBackgroundResource(android.R.drawable.btn_default);
                 buttonDunno.setBackgroundResource(android.R.drawable.btn_default);
-                */
                 getArguments().putInt(ARG_SECTION_ANSWER_SERVER, 0);
             }
         }
