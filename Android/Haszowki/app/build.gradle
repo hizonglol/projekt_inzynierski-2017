@@ -17,7 +17,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0.5"
+        versionName "1.0.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -28,16 +28,22 @@ android {
         signingConfig signingConfigs.release
     }
     buildTypes {
-        build {
+        debug {
+            signingConfig signingConfigs.release
+            shrinkResources false
             minifyEnabled false
+        }
+        build {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            shrinkResources false
+            minifyEnabled false
         }
         release {
-            shrinkResources true
-            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            shrinkResources true
+            minifyEnabled true
         }
     }
     externalNativeBuild {

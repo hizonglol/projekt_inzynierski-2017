@@ -361,6 +361,11 @@ public class SecurityCheckActivity extends AppCompatActivity
         button.setProgress(-1);
     }
 
+    private void spinnerIndeterminate(CircularProgressButton button) {
+        button.setIndeterminateProgressMode(true);
+        button.setProgress(0);
+    }
+
     // VALIDATION STUFF
 
     /**
@@ -436,6 +441,8 @@ public class SecurityCheckActivity extends AppCompatActivity
                 nonceDownloadTask.execute();
             } else if (result.equals("failure")) {
                 spinnerUnsuccessful(progressButtonSecurityCheck_serverConnection);
+                spinnerIndeterminate(progressButtonSecurityCheck_validation);
+                spinnerIndeterminate(progressButtonSecurityCheck_appConfiguration);
                 buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_try_again));
                 serverConnectionSuccessful = false;
 
