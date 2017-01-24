@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-
         release {
             keyAlias 'haszowki_release'
             keyPassword 'Ohdude50$'
@@ -17,7 +16,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0.6"
+        versionName "1.0.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {

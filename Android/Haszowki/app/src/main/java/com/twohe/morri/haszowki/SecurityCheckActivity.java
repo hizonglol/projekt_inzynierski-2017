@@ -66,6 +66,7 @@ import javax.net.ssl.TrustManagerFactory;
  * <p>
  * This file contains class Settings Activity.
  */
+@SuppressWarnings("FieldCanBeLocal")
 public class SecurityCheckActivity extends AppCompatActivity
         implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -75,8 +76,7 @@ public class SecurityCheckActivity extends AppCompatActivity
     static String minAppVersion;
     static String maxAppVersion;
     static String cipheringKey;
-    static String mResult;
-    static String validationStatus;
+    static String GoogleApiAttestation;
     static String confirmationStatus;
     byte[] nonce;
     //LAYOUT OBJECTS:
@@ -91,11 +91,8 @@ public class SecurityCheckActivity extends AppCompatActivity
     private appConfigurationTask configurationTask;
     private appNonceDownloadTask nonceDownloadTask;
     private appResponseUploadTask responseUploadTask;
-    private appValidationTask validationTask;
     private settingsConfirmationTask confirmationTask;
     //FLAGS:
-    //validation was successful.
-    private boolean appValidationSuccessful;
     //server is reachable.
     private boolean serverConnectionSuccessful;
     //app configuration went successful.
@@ -151,8 +148,6 @@ public class SecurityCheckActivity extends AppCompatActivity
         buttonSecurityCheck_continue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(String.valueOf(serverConnectionSuccessful), String.valueOf(appConfigurationSuccessful));
-                Log.d(String.valueOf(nonceDownloadSuccessful), String.valueOf(googleApiSuccessful));
 
                 if (serverConnectionSuccessful && appConfigurationSuccessful && nonceDownloadSuccessful && googleApiSuccessful && responseUploadSuccessful) {
 
@@ -180,8 +175,8 @@ public class SecurityCheckActivity extends AppCompatActivity
                     nonceDownloadTask.cancel(true);
                 if (responseUploadTask != null)
                     responseUploadTask.cancel(true);
-                if (validationTask != null)
-                    validationTask.cancel(true);
+                if (confirmationTask != null)
+                    confirmationTask.cancel(true);
 
                 try {
                     if (alertDialog != null && alertDialog.isShowing()) {
@@ -214,7 +209,6 @@ public class SecurityCheckActivity extends AppCompatActivity
             Certificate morri;
 
             witold = cf.generateCertificate(witoldInput);
-            //System.out.println("witold=" + ((X509Certificate) witold).getSubjectDN());
             witoldInput.close();
 
             morri = cf.generateCertificate(morriInput);
@@ -281,13 +275,7 @@ public class SecurityCheckActivity extends AppCompatActivity
             restartSpinning(progressButtonSecurityCheck_validation);
             responseUploadTask = new appResponseUploadTask();
             responseUploadTask.execute();
-        }/* else if (!appValidationSuccessful) {
-            if (validationTask != null)
-                validationTask.cancel(true);
-            restartSpinning(progressButtonSecurityCheck_validation);
-            validationTask = new appValidationTask();
-            validationTask.execute();
-        }*/ else if (!appConfigurationSuccessful) {
+        } else if (!appConfigurationSuccessful) {
             if (configurationTask != null)
                 configurationTask.cancel(true);
             restartSpinning(progressButtonSecurityCheck_appConfiguration);
@@ -380,11 +368,11 @@ public class SecurityCheckActivity extends AppCompatActivity
          * @param serverAddress address of checked server
          * @return true if server is reachable, false if not
          */
-        private boolean isReachable(Context context, String serverAddress) {
+        private int isReachable(Context context, String serverAddress) {
             // First, check we have any sort of connectivity
             final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             final NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
-            boolean reachable = false;
+            int reachable = -1;
 
             if (netInfo != null && netInfo.isConnected()) {
                 // Some sort of connection is open, check if server is reachable
@@ -396,9 +384,13 @@ public class SecurityCheckActivity extends AppCompatActivity
                     urlc.setRequestProperty("Connection", "close");
                     urlc.setConnectTimeout(5 * 1000); //5 sek
                     urlc.connect();
-                    reachable = (urlc.getResponseCode() == 200);
+                    if (urlc.getResponseCode() == 200)
+                        reachable = 0;
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (ClassCastException e) {
+                    e.printStackTrace();
+                    reachable = 1;
                 }
             }
 
@@ -420,8 +412,10 @@ public class SecurityCheckActivity extends AppCompatActivity
                 stringServerUrl = stringDbServerUrl;
             }
 
-            if (isReachable(getApplicationContext(), stringServerUrl))
+            if (isReachable(getApplicationContext(), stringServerUrl) == 0)
                 return "success";
+            else if (isReachable(getApplicationContext(), stringServerUrl) == 1)
+                return "http_url";
             else
                 return "failure";
         }
@@ -449,7 +443,20 @@ public class SecurityCheckActivity extends AppCompatActivity
                 alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage("Serwer jest nieosiągalny! Sprawdź połączenie internetowe oraz adres serwera!")
+                        .setMessage(getResources().getString(R.string.message_server_not_reachable))
+                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                        .show();
+            } else if (result.equals("http_url")) {
+                spinnerUnsuccessful(progressButtonSecurityCheck_serverConnection);
+                spinnerIndeterminate(progressButtonSecurityCheck_validation);
+                spinnerIndeterminate(progressButtonSecurityCheck_appConfiguration);
+                buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_try_again));
+                serverConnectionSuccessful = false;
+
+                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getResources().getString(R.string.label_attention))
+                        .setMessage(getResources().getString(R.string.message_url_not_safe))
                         .setPositiveButton(getResources().getString(R.string.button_ok), null)
                         .show();
             }
@@ -617,13 +624,14 @@ public class SecurityCheckActivity extends AppCompatActivity
             } else if (result.equals("failure")) {
 
                 spinnerUnsuccessful(progressButtonSecurityCheck_validation);
+                spinnerIndeterminate(progressButtonSecurityCheck_appConfiguration);
                 buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_try_again));
                 nonceDownloadSuccessful = false;
 
                 alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage("Anons nie został pobrany z serwera! Spróbuj ponownie!")
+                        .setMessage(getResources().getString(R.string.message_nonce_not_downloaded))
                         .setPositiveButton(getResources().getString(R.string.button_ok), null)
                         .show();
             }
@@ -663,12 +671,9 @@ public class SecurityCheckActivity extends AppCompatActivity
                              component of this sample for details on how to verify and parse this
                              result.
                              */
-                            mResult = result.getJwsResult();
-                            Log.d(TAG, "Success! SafetyNet result:\n" + mResult + "\n");
+                            GoogleApiAttestation = result.getJwsResult();
+                            Log.d(TAG, "Success! SafetyNet result:\n" + GoogleApiAttestation + "\n");
 
-                            /*
-                             TODO: Change it after validation is written
-                             */
                             googleApiSuccessful = true;
                             responseUploadTask = new appResponseUploadTask();
                             responseUploadTask.execute();
@@ -678,10 +683,18 @@ public class SecurityCheckActivity extends AppCompatActivity
                             // An error occurred while communicating with the service.
                             Log.d(TAG, "ERROR! " + status.getStatusCode() + " " + status
                                     .getStatusMessage());
-                            mResult = null;
+                            GoogleApiAttestation = null;
                             spinnerUnsuccessful(progressButtonSecurityCheck_validation);
+                            spinnerIndeterminate(progressButtonSecurityCheck_appConfiguration);
                             buttonSecurityCheck_continue.setText(getResources().getString(R.string.button_try_again));
                             googleApiSuccessful = false;
+
+                            alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setTitle(getResources().getString(R.string.label_attention))
+                                    .setMessage(getResources().getString(R.string.message_google_api_unavailable))
+                                    .setPositiveButton(getResources().getString(R.string.button_ok), null)
+                                    .show();
                         }
                     }
                 });
@@ -803,7 +816,7 @@ public class SecurityCheckActivity extends AppCompatActivity
             sbServerQuery.append("session_id2=").append(sessionSecurityID).append(divider);
             sbServerQuery.append("nonce=").append(stringNonce);
 
-            if (responseUploaded(getApplicationContext(), sbServerQuery.toString(), mResult))
+            if (responseUploaded(getApplicationContext(), sbServerQuery.toString(), GoogleApiAttestation))
                 return "success";
             else
                 return "failure";
@@ -830,209 +843,9 @@ public class SecurityCheckActivity extends AppCompatActivity
             } else if (result.equals("failure")) {
 
                 spinnerUnsuccessful(progressButtonSecurityCheck_validation);
+                spinnerIndeterminate(progressButtonSecurityCheck_appConfiguration);
                 responseUploadSuccessful = false;
             }
-        }
-    }
-
-    //TODO ten fragment jeszcze nie działa
-    private class appValidationTask extends AsyncTask<String, String, String> {
-
-        private int appValidated(Context context, String serverDocumentAddress) {
-            // First, check we have any sort of connectivity
-            final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            final NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
-            int validated = -1;
-
-            if (netInfo != null && netInfo.isConnected()) {
-                // Some sort of connection is open, check if server is reachable
-                try {
-                    URL url = new URL(serverDocumentAddress);
-                    HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-                    conn.setSSLSocketFactory(SSLContext.getSocketFactory());
-
-                    XmlPullParserFactory xmlFactoryObject = XmlPullParserFactory.newInstance();
-                    XmlPullParser configurationParser = xmlFactoryObject.newPullParser();
-                    configurationParser.setInput(conn.getInputStream(), null);
-
-                    int event = configurationParser.getEventType();
-                    while (event != XmlPullParser.END_DOCUMENT) {
-                        String name = configurationParser.getName();
-                        switch (event) {
-                            case XmlPullParser.START_TAG:
-                                break;
-
-                            case XmlPullParser.END_TAG:
-                                if (name.equals("validation")) {
-                                    validationStatus = configurationParser.getAttributeValue(null, "status");
-                                }
-                                break;
-                        }
-                        event = configurationParser.next();
-                    }
-
-                    if (validationStatus.equals("success")) validated = 0;
-                    else if(validationStatus.equals("processed")) validated = 1;
-                    else if(validationStatus.equals("attestation_missing")) validated = 2;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    validated = -2;
-                }
-            }
-
-            return validated;
-        }
-
-        /**
-         * Used to download configuration data from server.
-         *
-         * @param urls execution parameters
-         * @return success if successful, failure if unsuccessful
-         */
-        @Override
-        protected String doInBackground(String... urls) {
-
-            StringBuilder sbServerQuery = new StringBuilder();
-            String divider = "&";
-
-            String stringDbServerUrl = databaseSecurityCheck.getSetting("setting_serverAddress");
-            String stringServerUrl = getResources().getString(R.string.server_address);
-            if (stringDbServerUrl.length() > 1) {
-                stringServerUrl = stringDbServerUrl;
-            }
-
-            stringServerUrl = stringServerUrl
-                    .concat("fcgi-bin")
-                    .concat("/")
-                    .concat("hasz_serwer")
-                    .concat("/")
-                    .concat("verify.fcgi").toLowerCase();
-
-            stringServerUrl = stringServerUrl.replace(" ", "");
-
-            sbServerQuery.append(stringServerUrl).append("?");
-
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss_SSS", Locale.getDefault());
-            Date now = new Date();
-            String timestamp = formatter.format(now);
-
-            String studentNo = databaseSecurityCheck.getSetting("setting_studentNo");
-            String course = databaseSecurityCheck.getSetting("setting_course");
-            String testId = databaseSecurityCheck.getSetting("setting_test_id");
-            String hall_row = databaseSecurityCheck.getSetting("setting_hall_row");
-            String hall_seat = databaseSecurityCheck.getSetting("setting_hall_seat");
-            String name = databaseSecurityCheck.getSetting("setting_name");
-            String surname = databaseSecurityCheck.getSetting("setting_surname");
-            String vector = databaseSecurityCheck.getSetting("setting_vector");
-            String group = databaseSecurityCheck.getSetting("setting_group");
-            String sessionSecurityID = databaseSecurityCheck.getSetting("setting_sessionSecurityID");
-            String sessionID = databaseSecurityCheck.getSetting("setting_sessionID");
-            String question_no = "";
-            String answer = "";
-
-            sbServerQuery.append("student_no=").append(studentNo).append(divider);
-            sbServerQuery.append("course=").append(course).append(divider);
-            sbServerQuery.append("test_id=").append(testId).append(divider);
-            sbServerQuery.append("hall_row=").append(hall_row).append(divider);
-            sbServerQuery.append("hall_seat=").append(hall_seat).append(divider);
-            sbServerQuery.append("group=").append(group).append(divider);
-            sbServerQuery.append("timestamp=").append(timestamp).append(divider);
-            sbServerQuery.append("question_no=").append(question_no).append(divider);
-            sbServerQuery.append("answer=").append(answer).append(divider);
-            sbServerQuery.append("vector=").append(vector).append(divider);
-            sbServerQuery.append("version=").append(getResources().getString(R.string.version_value)).append(divider);
-            sbServerQuery.append("session_id=").append(sessionID).append(divider);
-            sbServerQuery.append("name=").append(name).append(divider);
-            sbServerQuery.append("surname=").append(surname).append(divider);
-            sbServerQuery.append("session_id2=").append(sessionSecurityID);
-
-            int status = appValidated(getApplicationContext(), sbServerQuery.toString());
-
-            if (status == 0)
-                return "success";
-            else if (status == -1)
-                return "failure";
-            else if (status == -2)
-                return "connection_problem";
-            else if (status == 1)
-                return "processing";
-            else if (status == 2)
-                return "attestation_missing";
-            else return "unknown_problem";
-        }
-
-        /**
-         * Handles result of doInBackground.
-         * Checks what was the result of configuration.
-         * If it was successful then notifies about it and changes buttonSecurityCheck_continue
-         * text to appropriate one.
-         * If it was unsuccessful then
-         *
-         * @param result of check
-         */
-        @Override
-        protected void onPostExecute(String result) {
-            if (result.equals("success")) {
-
-                appValidationSuccessful = true;
-                configurationTask = new appConfigurationTask();
-                configurationTask.execute();
-
-            } else if (result.equals("failure")) {
-
-                appValidationSuccessful = false;
-
-                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage("Twoja aplikacja nie przeszła walidacji!")
-                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                        .show();
-            } else if (result.equals("processed")) {
-
-                appValidationSuccessful = false;
-
-                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage("Twoja aplikacja w trakcie walidacji! Spróbuj ponownie w celu potwierdzenia statusu!")
-                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                        .show();
-            } else if (result.equals("attestation_missing")) {
-
-                responseUploadSuccessful = false;
-                appValidationSuccessful = false;
-
-                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage("Informacje o weryfikacji nie dotarły na serwer! Spróbuj ponownie!")
-                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                        .show();
-            } else if (result.equals("connection_problem")) {
-
-                responseUploadSuccessful = false;
-                appValidationSuccessful = false;
-
-                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage("Problem z połączeniem z serwerem! Spróbuj ponownie!")
-                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                        .show();
-            } else if (result.equals("unknown_problem")) {
-
-                responseUploadSuccessful = false;
-                appValidationSuccessful = false;
-
-                alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage("Nieznany błąd! Zakończ aplikację i pisz na kartce!")
-                        .setPositiveButton(getResources().getString(R.string.button_ok), null)
-                        .show();
-            }
-
         }
     }
 
@@ -1424,7 +1237,7 @@ public class SecurityCheckActivity extends AppCompatActivity
                 alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage("Błąd połączenia internetowego lub niewłaściwe ID testu!")
+                        .setMessage(getResources().getString(R.string.message_connection_or_test_id_error))
                         .setPositiveButton(getResources().getString(R.string.button_ok), null)
                         .show();
             }
@@ -1432,6 +1245,7 @@ public class SecurityCheckActivity extends AppCompatActivity
     }
 
     //TODO ten fragment jeszcze nie działa
+    //zostanie wykorzystany do potwierdzenia rozpoczęcia testu i zajęcia danego miejsca
     private class settingsConfirmationTask extends AsyncTask<String, String, String> {
 
         private boolean settingsConfirmed(Context context, String serverDocumentAddress) {
@@ -1570,7 +1384,7 @@ public class SecurityCheckActivity extends AppCompatActivity
                 alertDialog = new AlertDialog.Builder(SecurityCheckActivity.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(getResources().getString(R.string.label_attention))
-                        .setMessage("Podane miejsce zostało juz zajęte! Zajmij inne miejsce!")
+                        .setMessage(getResources().getString(R.string.message_seat_already_taken))
                         .setPositiveButton(getResources().getString(R.string.button_ok), null)
                         .show();
             }

@@ -36,7 +36,7 @@
     <string name="label_weight">Weights vector:</string>
     <string name="label_yes_answers">YES:</string>
     <string name="six_zeros_value">000000</string>
-    <string name="version_value">1.0.6</string>
+    <string name="version_value">1.0.7</string>
     <string name="zero_value">0</string>
     <string name="message_your_test_file_was_created">Your test file has been created</string>
     <string name="message_you_quit_test">You have left application</string>
@@ -90,4 +90,10 @@
     <string name="label_quality_check">Connection quality test</string>
     <string name="label_initialization">Test initialization</string>
     <string name="label_validation">App validation</string>
+    <string name="message_url_not_safe">You\'ve typed invalid server URL. Only safe connections are accepted!</string>
+    <string name="message_server_not_reachable">Server is unreachable! Check your Internet connection or server address!</string>
+    <string name="message_seat_already_taken">Seat is already occupied! Take other seat or check your seat and row!</string>
+    <string name="message_nonce_not_downloaded">Nonce has not been downloaded from server! Try again or check server address!</string>
+    <string name="message_google_api_unavailable">Connection error with Google servers! Try again!</string>
+    <string name="message_connection_or_test_id_error">Internet connection error or invalid test ID!</string>
 </resources>

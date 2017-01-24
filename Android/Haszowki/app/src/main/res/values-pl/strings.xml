@@ -2,7 +2,7 @@
 
     <!--*** General strings ***-->
     <string name="label_app">Haszówki</string>
-    <string name="version_value">1.0.6</string>
+    <string name="version_value">1.0.7</string>
     <string name="zero_value">0</string>
     <string name="six_zeros_value">000000</string>
     <string name="label_null">null</string>
@@ -93,6 +93,12 @@
     <string name="message_missing_max_version">Błędna konfiguracja! Brak maksymalnej wersji aplikacji!</string>
     <string name="message_missing_key">Błędna konfiguracja! Brak klucza do testu!</string>
     <string name="message_wrong_key_abort_test">Klucz do testu nieprawidłowy! Sprawdź poprawność ID testu lub kontynuuj test na kartce!</string>
+    <string name="message_connection_or_test_id_error">Błąd połączenia internetowego lub niewłaściwe ID testu!</string>
+    <string name="message_server_not_reachable">Serwer jest nieosiągalny! Sprawdź połączenie internetowe oraz adres serwera!</string>
+    <string name="message_url_not_safe">Wpisałeś nieprawidłowy URL serwera. Tylko bezpieczne połączenia są akceptowane!</string>
+    <string name="message_nonce_not_downloaded">Anons nie został pobrany z serwera! Spróbuj ponownie lub sprawdź adres serwera!</string>
+    <string name="message_google_api_unavailable">Błąd połączenia z serwerem Google! Spróbuj ponownie!</string>
+    <string name="message_seat_already_taken">Podane miejsce zostało juz zajęte! Zajmij inne miejsce lub sprawdź podane miejsce i rząd!</string>
 
     <!--*** LABEL strings of TABS ***-->
     <string name="label_section">Pytanie nr %1$d</string>

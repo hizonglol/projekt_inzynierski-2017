@@ -2,7 +2,7 @@
 <resources>
     <color name="colorButtonNormal">#D7D7D7</color>
     <color name="colorButtonNormalGray">#424242</color>
-    <color name="colorButtonNormalBlue">#283593</color>
+    <color name="colorButtonNormalBlue">#3949AB</color>
 
     <color name="darkColorPrimary">#9A342D</color>
     <color name="darkColorPrimaryDark">#6C1511</color>
