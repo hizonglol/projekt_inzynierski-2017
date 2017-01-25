@@ -13,3 +13,8 @@ Serwer:
 
 Dodatkowo a propos serwera:
 Jak pisaæ, ¿eby zapisy by³y bezpieczne i bez ci¹g³ego otwierania i zamykania.
+
+- z³a godzina w WP_log.log
+- newline trzeba popoprawiaæ
+
+https://fast-cgi.github.io/
