@@ -45,6 +45,7 @@ public class SummaryActivity extends AppCompatActivity {
             }
         }
     };
+    SummaryActivity.MemoryBoss SummaryMemoryBoss;
 
     /**
      * Used to enable IncomingCallReceiver that rejects any incoming calls
@@ -81,11 +82,10 @@ public class SummaryActivity extends AppCompatActivity {
         Log.d("On create", "SummaryActivity");
 
         sharedPrefSummary = PreferenceManager.getDefaultSharedPreferences(this);
-        SummaryActivity.MemoryBoss mMemoryBoss;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            mMemoryBoss = new SummaryActivity.MemoryBoss();
-            registerComponentCallbacks(mMemoryBoss);
+            SummaryMemoryBoss = new SummaryActivity.MemoryBoss();
+            registerComponentCallbacks(SummaryMemoryBoss);
         }
 
         /* obsluga toolbar w Info */
@@ -275,7 +275,6 @@ public class SummaryActivity extends AppCompatActivity {
                 // We're in the Background
 
                 wasInBackgroundSummary = true;
-
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {

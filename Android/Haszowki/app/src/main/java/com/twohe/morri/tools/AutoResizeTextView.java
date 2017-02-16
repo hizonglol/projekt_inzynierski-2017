@@ -1,19 +1,19 @@
 package com.twohe.morri.tools;
 
 /**
- *               DO WHAT YOU WANT TO PUBLIC LICENSE
- *                    Version 2, December 2004
- *
+ * DO WHAT YOU WANT TO PUBLIC LICENSE
+ * Version 2, December 2004
+ * <p>
  * Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
- *
+ * <p>
  * Everyone is permitted to copy and distribute verbatim or modified
  * copies of this license document, and changing it is allowed as long
  * as the name is changed.
- *
- *            DO WHAT YOU WANT TO PUBLIC LICENSE
- *   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
- *
- *  0. You just DO WHAT YOU WANT TO.
+ * <p>
+ * DO WHAT YOU WANT TO PUBLIC LICENSE
+ * TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+ * <p>
+ * 0. You just DO WHAT YOU WANT TO.
  */
 
 import android.annotation.TargetApi;
@@ -25,8 +25,10 @@ import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.widget.TextView;
 
 /**
@@ -38,6 +40,17 @@ import android.widget.TextView;
  * @since Apr 4, 2011
  */
 public class AutoResizeTextView extends TextView {
+
+    @Override
+    public boolean onFilterTouchEventForSecurity(MotionEvent event) {
+        if ((event.getFlags() & MotionEvent.FLAG_WINDOW_IS_OBSCURED) == MotionEvent.FLAG_WINDOW_IS_OBSCURED) {
+            Log.d("AutoResizeTextView", "is obscured");
+
+            return false;
+        }
+        return super.onFilterTouchEventForSecurity(event);
+    }
+
     private interface SizeTester {
         /**
          *

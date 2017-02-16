@@ -20,6 +20,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -34,6 +35,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -70,6 +72,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -79,6 +83,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
+import static android.view.MotionEvent.FLAG_WINDOW_IS_OBSCURED;
 
 /**
  * Created by TwoHe on 10.07.2016.
@@ -106,6 +111,7 @@ public class TabsActivity extends AppCompatActivity {
     private File fileTabs_toWrite;
     List<Integer> answeredQuestions;
     private static SSLContext SSLContext;
+    TabsActivity.MemoryBoss TabsMemoryBoss;
 
     /**
      * Creates layout.
@@ -130,11 +136,9 @@ public class TabsActivity extends AppCompatActivity {
 
         threadKillerTabs = new threadKiller();
 
-        MemoryBoss mMemoryBoss;
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            mMemoryBoss = new MemoryBoss();
-            registerComponentCallbacks(mMemoryBoss);
+            TabsMemoryBoss = new MemoryBoss();
+            registerComponentCallbacks(TabsMemoryBoss);
         }
 
         if (createTestFile()) endTestWhenTestFileCreationFailure();
@@ -163,6 +167,7 @@ public class TabsActivity extends AppCompatActivity {
         nie miala przyznanych uprawnien do internetu, a socket bylby zajety.
          */
         enableIncomingCallReceiver();
+
 
     }
 
@@ -302,7 +307,6 @@ public class TabsActivity extends AppCompatActivity {
 
             threadKillerTabs.start();
         }
-
     }
 
     /**
