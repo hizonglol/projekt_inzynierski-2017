@@ -19,9 +19,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorInt;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -35,13 +32,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.twohe.morri.tools.SecureTabLayout;
 import com.twohe.morri.tools.SettingsDataSource;
 
 import java.io.BufferedInputStream;
@@ -52,7 +49,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -64,7 +60,6 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
@@ -72,8 +67,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -82,8 +75,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
-
-import static android.view.MotionEvent.FLAG_WINDOW_IS_OBSCURED;
 
 /**
  * Created by TwoHe on 10.07.2016.
@@ -112,6 +103,7 @@ public class TabsActivity extends AppCompatActivity {
     List<Integer> answeredQuestions;
     private static SSLContext SSLContext;
     TabsActivity.MemoryBoss TabsMemoryBoss;
+    SecureTabLayout SecureTabs;
 
     /**
      * Creates layout.
@@ -154,7 +146,7 @@ public class TabsActivity extends AppCompatActivity {
         if (ViewPagerTabs != null)
             ViewPagerTabs.setAdapter(SectionsPagerAdapterTabs);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        SecureTabLayout tabLayout = (SecureTabLayout) findViewById(R.id.tabs);
         if (tabLayout != null)
             tabLayout.setupWithViewPager(ViewPagerTabs);
 

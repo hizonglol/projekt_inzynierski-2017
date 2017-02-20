@@ -41,16 +41,6 @@ import android.widget.TextView;
  */
 public class AutoResizeTextView extends TextView {
 
-    @Override
-    public boolean onFilterTouchEventForSecurity(MotionEvent event) {
-        if ((event.getFlags() & MotionEvent.FLAG_WINDOW_IS_OBSCURED) == MotionEvent.FLAG_WINDOW_IS_OBSCURED) {
-            Log.d("AutoResizeTextView", "is obscured");
-
-            return false;
-        }
-        return super.onFilterTouchEventForSecurity(event);
-    }
-
     private interface SizeTester {
         /**
          *

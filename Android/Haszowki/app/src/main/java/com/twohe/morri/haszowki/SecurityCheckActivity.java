@@ -3,6 +3,9 @@ package com.twohe.morri.haszowki;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -51,6 +54,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.crypto.BadPaddingException;
@@ -854,6 +858,32 @@ public class SecurityCheckActivity extends AppCompatActivity
      */
     private class appConfigurationTask extends AsyncTask<String, String, String> {
 
+        private void checkPermissions() {
+            StringBuffer appNameAndPermissions = new StringBuffer();
+            PackageManager pm = getPackageManager();
+            List packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+            for ( Object object : packages) {
+                ApplicationInfo applicationInfo = (ApplicationInfo) object;
+                Log.d("test", "App: " + applicationInfo.name + " Package: " + applicationInfo.packageName);
+                try {
+                    PackageInfo packageInfo = pm.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS);
+                    appNameAndPermissions.append(packageInfo.packageName + "*:\n");
+                    //Get Permissions
+                    String[] requestedPermissions = packageInfo.requestedPermissions;
+                    if (requestedPermissions != null) {
+                        for (int i = 0; i < requestedPermissions.length; i++) {
+                            Log.d("test", requestedPermissions[i]);
+                            appNameAndPermissions.append(requestedPermissions[i] + "\n");
+                        }
+                        appNameAndPermissions.append("\n");
+                    }
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+
+                }
+            }
+        }
+
         /**
          * Downloads configuration file from server
          *
@@ -861,6 +891,7 @@ public class SecurityCheckActivity extends AppCompatActivity
          * @param serverDocumentAddress address of configuration file
          * @return true if downloaded configuration, false if not
          */
+
         private boolean configurationDownloaded(Context context, String serverDocumentAddress) {
             // First, check we have any sort of connectivity
             final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -1199,6 +1230,8 @@ public class SecurityCheckActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(String result) {
             if (result.equals("success")) {
+
+                //checkPermissions();
 
                 if (!isConfigurationProper(minAppVersion, maxAppVersion, cipheringKey)) {
                     spinnerUnsuccessful(progressButtonSecurityCheck_appConfiguration);
