@@ -23,16 +23,18 @@ import java.security.*;
  */
 public class configGenerator {
 
-    private static String VERSION_NUMBER = "0.9.0";
+    private static String VERSION_NUMBER = "1.0.6";
 
 
-    private static boolean flagVersion = false;
-    private static boolean flagConfigFile = false;
-    private static String configFileName = "";
-    private static boolean flagMaxVersion = false;
-    private static String maxVersion = "";
-    private static boolean flagMinVersion = false;
-    private static String minVersion = "";
+    private static boolean flag_version = false;
+    private static boolean flag_config_file = false;
+    private static String ConfigFileName = "";
+    private static boolean flag_max_version = false;
+    private static String MaxVersion = "";
+    private static boolean flag_min_version = false;
+    private static String MinVersion = "";
+    private static boolean flag_skip_validation = false;
+    private static boolean flag_proceed_anyway = false;
 
     private static String stringPublicKey;
     private static String stringPrivateKey;
@@ -44,12 +46,12 @@ public class configGenerator {
     private static boolean generatePrivateKeyFile() {
 
         try {
-            Path pathToFile = Paths.get(configFileName);
+            Path pathToFile = Paths.get(ConfigFileName);
             if (pathToFile.getParent() != null) {
                 Files.createDirectories(pathToFile.getParent());
                 Files.createFile(pathToFile);
             }
-            PrintWriter writer = new PrintWriter(configFileName + ".privKey", "UTF-8");
+            PrintWriter writer = new PrintWriter(ConfigFileName + ".privKey", "UTF-8");
 
             writer.println(stringPrivateKey);
             writer.flush();
@@ -89,14 +91,14 @@ public class configGenerator {
 
             // set attribute to version element
             Attr max = doc.createAttribute("max");
-            max.setValue(maxVersion);
+            max.setValue(MaxVersion);
             version.setAttributeNode(max);
 
             // shorten way
-            // version.setAttribute("min", minVersion);
+            // version.setAttribute("min", MinVersion);
 
             Attr min = doc.createAttribute("min");
-            min.setValue(minVersion);
+            min.setValue(MinVersion);
             version.setAttributeNode(min);
 
 
@@ -106,6 +108,15 @@ public class configGenerator {
 
             key.setAttribute("rsa", stringPublicKey);
 
+            // flags element
+            Element flags = doc.createElement("flags");
+            rootElement.appendChild(flags);
+
+            if (flag_skip_validation) flags.setAttribute("skip_validation", "true");
+            else flags.setAttribute("skip_validation", "false");
+
+            if (flag_proceed_anyway) flags.setAttribute("proceed_anyway", "true");
+            else flags.setAttribute("proceed_anyway", "false");
 
             // write the content into xml file
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -115,12 +126,12 @@ public class configGenerator {
             DOMSource source = new DOMSource(doc);
 
 
-            Path pathToFile = Paths.get(configFileName);
+            Path pathToFile = Paths.get(ConfigFileName);
             if (pathToFile.getParent() != null) {
                 Files.createDirectories(pathToFile.getParent());
                 Files.createFile(pathToFile);
             }
-            StreamResult result = new StreamResult(new File(configFileName + ".xml"));
+            StreamResult result = new StreamResult(new File(ConfigFileName + ".xml"));
 
             // Output to console for testing
             // StreamResult result = new StreamResult(System.out);
@@ -168,39 +179,46 @@ public class configGenerator {
                     if (args[i].length() == 2) {
                         switch (args[i].charAt(1)) {
                             case 'v':
-                                flagVersion = true;
-                                ++i;
+                                flag_version = true;
+                                break;
+
+                            case 'p':
+                                flag_proceed_anyway = true;
+                                break;
+
+                            case 's':
+                                flag_skip_validation = true;
                                 break;
 
                             case 'h':
-                                flagMaxVersion = true;
+                                flag_max_version = true;
                                 ++i;
                                 if (i < args.length)
-                                    maxVersion = args[i];
+                                    MaxVersion = args[i];
                                 else {
-                                    flagMaxVersion = false;
+                                    flag_max_version = false;
                                     throw new IllegalArgumentException("Give max acceptable version");
                                 }
                                 break;
 
                             case 'l':
-                                flagMinVersion = true;
+                                flag_min_version = true;
                                 ++i;
                                 if (i < args.length)
-                                    minVersion = args[i];
+                                    MinVersion = args[i];
                                 else {
-                                    flagMinVersion = false;
+                                    flag_min_version = false;
                                     throw new IllegalArgumentException("Give min acceptable version");
                                 }
                                 break;
 
                             case 'c':
-                                flagConfigFile = true;
+                                flag_config_file = true;
                                 ++i;
                                 if (i < args.length)
-                                    configFileName = args[i];
+                                    ConfigFileName = args[i];
                                 else {
-                                    flagConfigFile = false;
+                                    flag_config_file = false;
                                     throw new IllegalArgumentException("Give output config file name");
                                 }
                                 break;
@@ -235,12 +253,12 @@ public class configGenerator {
 
         parseArguments(args);
 
-        if (flagVersion) {
+        if (flag_version) {
             System.out.println("Version " + VERSION_NUMBER);
             return;
         }
 
-        if (flagConfigFile && flagMaxVersion && flagMinVersion) {
+        if (flag_config_file && flag_max_version && flag_min_version) {
             generateKeyPair();
             generateConfigFile();
             generatePrivateKeyFile();

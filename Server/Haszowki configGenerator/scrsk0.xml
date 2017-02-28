@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+  <version max="1.1.0" min="0.0.0"/>
+  <key rsa="MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAoJalkJjx7z+uWjpGlgf5ViFna3B5D+xe5hfryFzM31mh1rZcgPbk1vYppGoI5wNwQYdHauUV1FQ3ItkB+/KY+641+HGERSiBy4ZQRXTaEAs2wHigOlX8Cd72AeWSlJybsNlXToG/Uqn/tmqOqU50qFy4+VHQxCOMHLD/QBOFQD3SNOwpPgLxqpPoU/YegGojYcBQFDE2Qu+1vk3NJcrZ3socEbS8dEx2NuzTorh1RwKdENfGj/W3hdGC/R2SjkzbPgCimwbDc9aZEfUYFPUjWGtojAbVaJmy5ANjSW3/MZO5brE7/W2DAaFjm3kqzDnMxi+6ZAc5vL+z5ku0mn4u5y0KwTRUt+6Bu+blvWOstkGrkSsalvDW397gxq1+bBKb8yIbfq3F7UMTLxybXoM0pR6teagiNsuOU2dXM9+W/p2aLOjG/l8ZoN5aJJHhrOzIdSJcCy9P8lMHBHT4V7qrG8gp98sOo8OKiQGjSQ1nhF/LkMMhKB72+x6t3RJRBonrEgtCMMqrkwV0lUQp+JZmK7fr1JFHk0d+7tIMVZYu1BJCLe9h5s5CPrhBaX5l/swbS3bEZsOjGNiocYovW3Vd0oxClAQl+73x2PMmtpp6mbKZy3zVqRpXZ6fmU0aGz98saHTN9nR0dGCS9746xKr2ONyD4aPHMKMfhd+3oVHtpC8CAwEAAQ=="/>
+  <flags proceed_anyway="true" skip_validation="true"/>
+</configuration>
